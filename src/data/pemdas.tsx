@@ -68,7 +68,11 @@ export const frac = (num: ReactNode, den: ReactNode): ReactNode => (
 export const pow = (base: ReactNode, exp: ReactNode): ReactNode => (
   <span className="inline-flex items-start">
     {base}
-    <span className={`${EXP} text-[0.7em] -mt-1 ml-0.5`}>{exp}</span>
+    <span
+      className={`${EXP} [&_*]:text-green-400 text-[0.7em] -mt-1 ml-0.5`}
+    >
+      {exp}
+    </span>
   </span>
 );
 
@@ -203,7 +207,7 @@ export const rows: PemdasRow[] = [
     id: "frac-add",
     left: plus(frac(n("a"), n("c")), frac(n("b"), n("c"))),
     right: frac(plus(n("a"), n("b")), n("c")),
-    leftCol: "Division",
+    leftCol: "Somme",
     rightCol: "Division",
     quiz: (lvl) => {
       const c = rnd(3, lvl >= 2 ? 15 : 9);
@@ -220,7 +224,7 @@ export const rows: PemdasRow[] = [
     id: "frac-mul",
     left: times(frac(n("a"), n("b")), frac(n("c"), n("d"))),
     right: frac(times(n("a"), n("c")), times(n("b"), n("d"))),
-    leftCol: "Division",
+    leftCol: "Multiplication",
     rightCol: "Division",
     quiz: (lvl) => {
       const a = rnd(1, lvl >= 2 ? 9 : 5);

@@ -87,7 +87,7 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
     return (
       <button
         onClick={onOpen}
-        className="group flex w-full items-center justify-center py-5 text-lg transition hover:bg-white/5"
+        className="group flex w-full items-center justify-center py-5 text-lg transition hover:bg-pink-500/30"
       >
         <span className="inline-flex items-center">
           {row.left}
@@ -105,7 +105,7 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
     return (
       <button
         onClick={onOpen}
-        className="grid w-full grid-cols-4 items-center py-5 text-lg transition hover:bg-white/5"
+        className="grid w-full grid-cols-4 items-center py-5 text-lg transition hover:bg-pink-500/30"
       >
         {COLS.map((_, i) => (
           <div key={i} className="flex items-center justify-center">
@@ -128,7 +128,7 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
   return (
     <button
       onClick={onOpen}
-      className="relative grid w-full grid-cols-4 items-center py-5 text-lg transition hover:bg-white/5"
+      className="relative grid w-full grid-cols-4 items-center py-5 text-lg transition hover:bg-pink-500/30"
     >
       {COLS.map((_, i) => (
         <div key={i} className="flex items-center justify-center px-2">
