@@ -1,24 +1,82 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { fiches, categories } from "@/data/fiches";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Fiches de révision — Maths" },
+      {
+        name: "description",
+        content:
+          "Fiches de révision de mathématiques classées par sujet : analyse, algèbre, probabilités, géométrie.",
+      },
+      { property: "og:title", content: "Fiches de révision — Maths" },
+      {
+        property: "og:description",
+        content: "Fiches de maths classées par sujet, prêtes à réviser.",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <p className="text-sm uppercase tracking-[0.2em] text-primary">
+            Révisions
+          </p>
+          <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+            Fiches de mathématiques
+          </h1>
+          <p className="mt-4 max-w-xl text-muted-foreground">
+            Une sélection de fiches synthétiques classées par sujet. Choisis un
+            thème pour ouvrir la fiche correspondante.
+          </p>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-6 py-12">
+        {categories.map((cat) => (
+          <section key={cat} className="mb-12">
+            <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              {cat}
+            </h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {fiches
+                .filter((f) => f.category === cat)
+                .map((f) => (
+                  <Link
+                    key={f.slug}
+                    to="/fiches/$slug"
+                    params={{ slug: f.slug }}
+                    className="group relative rounded-xl border border-border bg-card p-6 transition hover:border-primary hover:-translate-y-0.5"
+                  >
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-lg font-semibold text-card-foreground">
+                        {f.title}
+                      </h3>
+                      <span className="text-primary opacity-0 transition group-hover:opacity-100">
+                        →
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {f.summary}
+                    </p>
+                  </Link>
+                ))}
+            </div>
+          </section>
+        ))}
+      </main>
+
+      <footer className="border-t border-border">
+        <div className="mx-auto max-w-6xl px-6 py-6 text-xs text-muted-foreground">
+          {fiches.length} fiches disponibles
+        </div>
+      </footer>
     </div>
   );
 }
