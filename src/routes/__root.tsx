@@ -119,8 +119,18 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="min-h-screen bg-background">
+        <div className="w-full bg-pink-500 text-white">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+            <Link to="/" className="text-sm font-semibold tracking-wide">
+              Fiches Maths
+            </Link>
+            <span className="text-xs opacity-90">Révisions</span>
+          </div>
+        </div>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </div>
     </QueryClientProvider>
   );
 }
