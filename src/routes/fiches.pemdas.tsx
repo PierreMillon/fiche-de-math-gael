@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -155,14 +155,14 @@ function QuizDialog({
 }) {
   const [streak, setStreak] = useState(0);
   const [level, setLevel] = useState(1);
-  const [seed, setSeed] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
+  const [q, setQ] = useState<QuizQ | null>(null);
 
-  const q: QuizQ | null = useMemo(() => {
-    if (!row) return null;
-    return row.quiz(level);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [row, level, seed]);
+  // Generate the first question when the dialog opens on a new row.
+  // Subsequent questions are generated only when the user clicks "Question suivante".
+  useEffect(() => {
+    if (row) setQ(row.quiz(1));
+  }, [row]);
 
   if (!row || !q) return null;
 
@@ -183,8 +183,9 @@ function QuizDialog({
   };
 
   const next = () => {
+    if (picked === null) return;
+    setQ(row.quiz(level));
     setPicked(null);
-    setSeed(seed + 1);
   };
 
   return (
@@ -196,7 +197,7 @@ function QuizDialog({
           setPicked(null);
           setStreak(0);
           setLevel(1);
-          setSeed(0);
+          setQ(null);
         }
       }}
     >
