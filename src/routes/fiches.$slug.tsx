@@ -55,7 +55,7 @@ function FichePage() {
 
       <main className="mx-auto max-w-3xl px-6 py-10">
         <div className="space-y-8">
-          {fiche.sections.map((s) => (
+          {fiche.sections.map((s: Fiche["sections"][number]) => (
             <section
               key={s.heading}
               className="rounded-xl border border-border bg-card p-6"
@@ -66,7 +66,7 @@ function FichePage() {
               <p className="mt-2 text-sm text-muted-foreground">{s.content}</p>
               {s.formulas && (
                 <ul className="mt-4 space-y-2">
-                  {s.formulas.map((f, i) => (
+                  {s.formulas.map((f: string, i: number) => (
                     <li
                       key={i}
                       className="rounded-md border border-border bg-muted px-3 py-2 font-mono text-sm text-foreground"
