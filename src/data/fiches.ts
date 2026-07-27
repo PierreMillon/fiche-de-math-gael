@@ -8,6 +8,14 @@ export type Fiche = {
 
 export const fiches: Fiche[] = [
   {
+    slug: "pemdas",
+    title: "Bases PEMDAS",
+    category: "Algèbre",
+    summary:
+      "Transformations élémentaires : somme, multiplication, division, exposant. Chaque ligne ouvre un QCM.",
+    sections: [],
+  },
+  {
     slug: "derivees",
     title: "Dérivées",
     category: "Analyse",
