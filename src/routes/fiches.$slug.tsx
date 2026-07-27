@@ -1,8 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { getFiche, fiches } from "@/data/fiches";
+import { getFiche, fiches, type Fiche } from "@/data/fiches";
 
 export const Route = createFileRoute("/fiches/$slug")({
-  loader: ({ params }) => {
+  loader: ({ params }): { fiche: Fiche } => {
     const fiche = getFiche(params.slug);
     if (!fiche) throw notFound();
     return { fiche };
