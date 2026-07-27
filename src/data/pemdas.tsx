@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 const W = "text-white";
 const PLUS = "text-blue-400";
+const MINUS = "text-blue-400";
 const TIMES = "text-red-400";
 const FRAC = "border-yellow-400";
 const EXP = "text-green-400";
@@ -28,7 +29,7 @@ export const plus = (...parts: ReactNode[]): ReactNode => (
 export const minus = (a: ReactNode, b: ReactNode): ReactNode => (
   <span className="inline-flex items-center">
     {a}
-    <span className={`${W} mx-0.5`}>−</span>
+    <span className={`${MINUS} mx-0.5`}>−</span>
     {b}
   </span>
 );
@@ -73,6 +74,15 @@ export const pow = (base: ReactNode, exp: ReactNode): ReactNode => (
     >
       {exp}
     </span>
+  </span>
+);
+
+// Variant of pow that does NOT force all descendants to green.
+// Used when the exponent must keep its own colors (e.g. show a×b in red).
+export const powRaw = (base: ReactNode, exp: ReactNode): ReactNode => (
+  <span className="inline-flex items-start">
+    {base}
+    <span className="text-[0.7em] -mt-1 ml-0.5">{exp}</span>
   </span>
 );
 
@@ -190,9 +200,10 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "diff-squares",
-    fused: true,
     left: minus(pow(n("a"), n(2)), pow(n("b"), n(2))),
     right: times(paren(plus(n("a"), n("b"))), paren(minus(n("a"), n("b")))),
+    leftCol: "Somme",
+    rightCol: "Multiplication",
     quiz: (lvl) => {
       const a = rnd(2, lvl >= 2 ? 12 : 8);
       const b = rnd(1, a - 1);
@@ -358,9 +369,10 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "pow-of-pow",
-    fused: true,
-    left: pow(n("x"), jux(n("a"), n("b"))),
+    left: powRaw(n("x"), times(n("a"), n("b"))),
     right: pow(paren(pow(n("x"), n("a"))), n("b")),
+    leftCol: "Exposant",
+    rightCol: "Exposant",
     quiz: (lvl) => {
       if (lvl >= 3) {
         return makeQ(
@@ -381,9 +393,10 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "square-plus",
-    fused: true,
     left: plus(pow(n("a"), n(2)), jux(n(2), n("a"), n("b")), pow(n("b"), n(2))),
     right: pow(paren(plus(n("a"), n("b"))), n(2)),
+    leftCol: "Somme",
+    rightCol: "Exposant",
     quiz: (lvl) => {
       const k = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
@@ -395,9 +408,10 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "square-minus",
-    fused: true,
     left: plus(pow(n("a"), n(2)), jux(n("−2"), n("a"), n("b")), pow(n("b"), n(2))),
     right: pow(paren(minus(n("a"), n("b"))), n(2)),
+    leftCol: "Somme",
+    rightCol: "Exposant",
     quiz: (lvl) => {
       const k = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
