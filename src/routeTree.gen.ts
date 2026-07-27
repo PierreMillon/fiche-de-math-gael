@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FichesTangenteRouteImport } from './routes/fiches.tangente'
 import { Route as FichesPemdasRouteImport } from './routes/fiches.pemdas'
 import { Route as FichesSlugRouteImport } from './routes/fiches.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichesTangenteRoute = FichesTangenteRouteImport.update({
+  id: '/fiches/tangente',
+  path: '/fiches/tangente',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FichesPemdasRoute = FichesPemdasRouteImport.update({
@@ -33,30 +39,34 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
+  '/fiches/tangente': typeof FichesTangenteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
+  '/fiches/tangente': typeof FichesTangenteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
+  '/fiches/tangente': typeof FichesTangenteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/fiches/$slug' | '/fiches/pemdas'
+  fullPaths: '/' | '/fiches/$slug' | '/fiches/pemdas' | '/fiches/tangente'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/fiches/$slug' | '/fiches/pemdas'
-  id: '__root__' | '/' | '/fiches/$slug' | '/fiches/pemdas'
+  to: '/' | '/fiches/$slug' | '/fiches/pemdas' | '/fiches/tangente'
+  id: '__root__' | '/' | '/fiches/$slug' | '/fiches/pemdas' | '/fiches/tangente'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FichesSlugRoute: typeof FichesSlugRoute
   FichesPemdasRoute: typeof FichesPemdasRoute
+  FichesTangenteRoute: typeof FichesTangenteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fiches/tangente': {
+      id: '/fiches/tangente'
+      path: '/fiches/tangente'
+      fullPath: '/fiches/tangente'
+      preLoaderRoute: typeof FichesTangenteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fiches/pemdas': {
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FichesSlugRoute: FichesSlugRoute,
   FichesPemdasRoute: FichesPemdasRoute,
+  FichesTangenteRoute: FichesTangenteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

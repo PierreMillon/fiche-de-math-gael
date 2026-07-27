@@ -16,6 +16,14 @@ export const fiches: Fiche[] = [
     sections: [],
   },
   {
+    slug: "tangente",
+    title: "La tangente, visuellement",
+    category: "Analyse",
+    summary:
+      "Animation interactive : déplace un point sur la courbe et observe la tangente et sa pente f'(x).",
+    sections: [],
+  },
+  {
     slug: "derivees",
     title: "Dérivées",
     category: "Analyse",
