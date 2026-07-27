@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FichesPemdasRouteImport } from './routes/fiches.pemdas'
 import { Route as FichesSlugRouteImport } from './routes/fiches.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichesPemdasRoute = FichesPemdasRouteImport.update({
+  id: '/fiches/pemdas',
+  path: '/fiches/pemdas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FichesSlugRoute = FichesSlugRouteImport.update({
@@ -26,27 +32,31 @@ const FichesSlugRoute = FichesSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/pemdas': typeof FichesPemdasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/pemdas': typeof FichesPemdasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/pemdas': typeof FichesPemdasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/fiches/$slug'
+  fullPaths: '/' | '/fiches/$slug' | '/fiches/pemdas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/fiches/$slug'
-  id: '__root__' | '/' | '/fiches/$slug'
+  to: '/' | '/fiches/$slug' | '/fiches/pemdas'
+  id: '__root__' | '/' | '/fiches/$slug' | '/fiches/pemdas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FichesSlugRoute: typeof FichesSlugRoute
+  FichesPemdasRoute: typeof FichesPemdasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fiches/pemdas': {
+      id: '/fiches/pemdas'
+      path: '/fiches/pemdas'
+      fullPath: '/fiches/pemdas'
+      preLoaderRoute: typeof FichesPemdasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fiches/$slug': {
@@ -71,7 +88,18 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FichesSlugRoute: FichesSlugRoute,
+  FichesPemdasRoute: FichesPemdasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
