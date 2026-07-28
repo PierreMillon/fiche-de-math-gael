@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { fmt } from "@/lib/mathFormat";
 
 // ---------- Formula rendering primitives ----------
 // Colors (per request): + blue, × red, fraction bar yellow, exponent green.
@@ -93,7 +94,7 @@ export const COLS: Col[] = ["Somme", "Multiplication", "Division", "Exposant"];
 
 export type QuizQ = {
   prompt: ReactNode;
-  choices: string[];
+  choices: ReactNode[];
   answer: number;
 };
 
@@ -121,10 +122,29 @@ const shuffle = <T,>(arr: T[]): T[] => {
   return a;
 };
 
-const makeQ = (prompt: ReactNode, correct: string, distractors: string[]): QuizQ => {
-  const all = shuffle([correct, ...distractors.filter((d) => d !== correct)]).slice(0, 4);
-  if (!all.includes(correct)) all[0] = correct;
-  return { prompt, choices: all, answer: all.indexOf(correct) };
+const makeQ = (
+  prompt: ReactNode,
+  correct: string,
+  distractors: string[],
+): QuizQ => {
+  const uniqueD: string[] = [];
+  for (const d of distractors) {
+    if (d !== correct && !uniqueD.includes(d)) uniqueD.push(d);
+  }
+  // Guarantee 3 distinct distractors so we always render exactly 4 options.
+  let filler = 1;
+  while (uniqueD.length < 3) {
+    const candidate = `${correct} (?${filler})`;
+    if (candidate !== correct && !uniqueD.includes(candidate))
+      uniqueD.push(candidate);
+    filler++;
+  }
+  const all = shuffle([correct, ...uniqueD.slice(0, 3)]);
+  return {
+    prompt,
+    choices: all.map((s) => fmt(s)),
+    answer: all.indexOf(correct),
+  };
 };
 
 const gcd = (a: number, b: number): number => (b === 0 ? Math.abs(a) : gcd(b, a % b));
@@ -208,9 +228,9 @@ export const rows: PemdasRow[] = [
       const a = rnd(2, lvl >= 2 ? 12 : 8);
       const b = rnd(1, a - 1);
       return makeQ(
-        <>Factorise : {a}² − {b}²</>,
+        <>Factorise : {fmt(`${a}^2`)} − {fmt(`${b}^2`)}</>,
         `(${a}+${b})(${a}−${b})`,
-        [`(${a}−${b})²`, `${a}² − ${b}²`, `${a * a - b * b}`],
+        [`(${a}−${b})^2`, `${a}^2 − ${b}^2`, `${a * a - b * b}`],
       );
     },
   },
@@ -293,16 +313,16 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       if (lvl >= 3) {
         return makeQ(
-          <>Simplifie : x^(1/2) × x^(1/2)</>,
+          <>Simplifie : {fmt("x^(1/2)")} × {fmt("x^(1/2)")}</>,
           "x",
-          ["x^(1/4)", "x²", "2x"],
+          ["x^(1/4)", "x^2", "2x"],
         );
       }
       const x = rnd(2, 5);
-      const a = rnd(2, 4);
-      const b = rnd(2, 4);
+      const a = rnd(2, lvl >= 2 ? 7 : 4);
+      const b = rnd(2, lvl >= 2 ? 7 : 4);
       return makeQ(
-        <>Simplifie : {x}^{a} × {x}^{b}</>,
+        <>Simplifie : {fmt(`${x}^${a}`)} × {fmt(`${x}^${b}`)}</>,
         `${x}^${a + b}`,
         [`${x}^${a * b}`, `${x * x}^${a + b}`, `${x}^${a - b}`],
       );
@@ -317,9 +337,9 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       const x = rnd(2, 6);
       const y = rnd(2, 6);
-      const a = rnd(2, lvl >= 2 ? 5 : 3);
+      const a = rnd(2, lvl >= 2 ? 7 : 3);
       return makeQ(
-        <>Simplifie : {x}^{a} × {y}^{a}</>,
+        <>Simplifie : {fmt(`${x}^${a}`)} × {fmt(`${y}^${a}`)}</>,
         `${x * y}^${a}`,
         [`${x + y}^${a}`, `${x * y}^${2 * a}`, `${x}^${a} + ${y}^${a}`],
       );
@@ -334,16 +354,16 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       if (lvl >= 3) {
         return makeQ(
-          <>Simplifie : x^(3/2) / x^(1/2)</>,
+          <>Simplifie : {fmt("x^(3/2)")} / {fmt("x^(1/2)")}</>,
           "x",
-          ["x²", "x^(1/2)", "x^3"],
+          ["x^2", "x^(1/2)", "x^3"],
         );
       }
       const x = rnd(2, 5);
-      const a = rnd(4, 8);
+      const a = rnd(4, lvl >= 2 ? 9 : 8);
       const b = rnd(1, 3);
       return makeQ(
-        <>Simplifie : {x}^{a} / {x}^{b}</>,
+        <>Simplifie : {fmt(`${x}^${a}`)} / {fmt(`${x}^${b}`)}</>,
         `${x}^${a - b}`,
         [`${x}^${a + b}`, `1^${a - b}`, `${x}^${a * b}`],
       );
@@ -359,9 +379,9 @@ export const rows: PemdasRow[] = [
       const y = rnd(2, 4);
       const k = rnd(2, 4);
       const x = y * k;
-      const a = rnd(2, lvl >= 2 ? 4 : 3);
+      const a = rnd(2, lvl >= 2 ? 6 : 3);
       return makeQ(
-        <>Simplifie : {x}^{a} / {y}^{a}</>,
+        <>Simplifie : {fmt(`${x}^${a}`)} / {fmt(`${y}^${a}`)}</>,
         `${k}^${a}`,
         [`${x - y}^${a}`, `${k}^${2 * a}`, `${x}^${a} − ${y}^${a}`],
       );
@@ -376,16 +396,16 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       if (lvl >= 3) {
         return makeQ(
-          <>Simplifie : (x^(1/2))²</>,
+          <>Simplifie : {fmt("(x^(1/2))^2")}</>,
           "x",
-          ["x^(1/4)", "x²", "x^4"],
+          ["x^(1/4)", "x^2", "x^4"],
         );
       }
       const x = rnd(2, 5);
-      const a = rnd(2, 4);
-      const b = rnd(2, 4);
+      const a = rnd(2, lvl >= 2 ? 6 : 4);
+      const b = rnd(2, lvl >= 2 ? 6 : 4);
       return makeQ(
-        <>Simplifie : ({x}^{a})^{b}</>,
+        <>Simplifie : {fmt(`(${x}^${a})^${b}`)}</>,
         `${x}^${a * b}`,
         [`${x}^${a + b}`, `${x}^${a - b}`, `${x * a}^${b}`],
       );
@@ -400,9 +420,13 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       const k = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
-        <>Développe : (x + {k})²</>,
+        <>Développe : {fmt(`(x + ${k})^2`)}</>,
         `x²+${2 * k}x+${k * k}`,
-        [`x²+${k * k}`, `x²−${2 * k}x+${k * k}`, `x²+${k}x+${k * k}`],
+        [
+          `x²+${k * k}`,
+          `x²−${2 * k}x+${k * k}`,
+          `x²+${k}x+${k * k}`,
+        ],
       );
     },
   },
@@ -415,7 +439,7 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       const k = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
-        <>Développe : (x − {k})²</>,
+        <>Développe : {fmt(`(x − ${k})^2`)}</>,
         `x²−${2 * k}x+${k * k}`,
         [`x²+${2 * k}x+${k * k}`, `x²−${k * k}`, `x²−${k}x+${k * k}`],
       );
