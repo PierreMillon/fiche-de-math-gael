@@ -8,6 +8,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { rows, COLS, type PemdasRow, type QuizQ } from "@/data/pemdas";
+import { PyramidView, usePyramid } from "@/lib/pyramid";
 
 export const Route = createFileRoute("/fiches/pemdas")({
   head: () => ({
@@ -76,6 +77,13 @@ function PemdasPage() {
 }
 
 function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
+  const { pyramid } = usePyramid(row.id);
+  const pyramidEl = (
+    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+      <PyramidView p={pyramid} />
+    </div>
+  );
+
   // Same-column non-fused rows: single cell with "left = right" inline.
   // Fused rows: full-width centered "left = right".
   // Different-column rows: left in its col, right in its col, "=" absolutely
@@ -87,13 +95,14 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
     return (
       <button
         onClick={onOpen}
-        className="group flex w-full items-center justify-center py-5 text-lg transition hover:bg-pink-500/30"
+        className="group relative flex w-full items-center justify-center py-5 pr-16 text-lg transition hover:bg-pink-500/30"
       >
         <span className="inline-flex items-center">
           {row.left}
           {eq}
           {row.right}
         </span>
+        {pyramidEl}
       </button>
     );
   }
@@ -105,7 +114,7 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
     return (
       <button
         onClick={onOpen}
-        className="grid w-full grid-cols-4 items-center py-5 text-lg transition hover:bg-pink-500/30"
+        className="relative grid w-full grid-cols-4 items-center py-5 pr-16 text-lg transition hover:bg-pink-500/30"
       >
         {COLS.map((_, i) => (
           <div key={i} className="flex items-center justify-center">
@@ -118,6 +127,7 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
             )}
           </div>
         ))}
+        {pyramidEl}
       </button>
     );
   }
@@ -128,7 +138,7 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
   return (
     <button
       onClick={onOpen}
-      className="relative grid w-full grid-cols-4 items-center py-5 text-lg transition hover:bg-pink-500/30"
+      className="relative grid w-full grid-cols-4 items-center py-5 pr-16 text-lg transition hover:bg-pink-500/30"
     >
       {COLS.map((_, i) => (
         <div key={i} className="flex items-center justify-center px-2">
@@ -142,6 +152,7 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
       >
         =
       </span>
+      {pyramidEl}
     </button>
   );
 }
@@ -153,15 +164,18 @@ function QuizDialog({
   row: PemdasRow | null;
   onClose: () => void;
 }) {
-  const [streak, setStreak] = useState(0);
-  const [level, setLevel] = useState(1);
+  // usePyramid is always called (row is only null when the dialog is closed —
+  // we still need a stable hook order). Use a placeholder key when null.
+  const { pyramid, onCorrect, onWrong } = usePyramid(row?.id ?? "__none__");
   const [picked, setPicked] = useState<number | null>(null);
   const [q, setQ] = useState<QuizQ | null>(null);
 
   // Generate the first question when the dialog opens on a new row.
-  // Subsequent questions are generated only when the user clicks "Question suivante".
+  // Subsequent questions are generated only when the user clicks
+  // "Question suivante", so the feedback always matches the shown question.
   useEffect(() => {
-    if (row) setQ(row.quiz(1));
+    if (row) setQ(row.quiz(pyramid.tier));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [row]);
 
   if (!row || !q) return null;
@@ -169,24 +183,21 @@ function QuizDialog({
   const onPick = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
-    if (i === q.answer) {
-      const s = streak + 1;
-      if (s >= 3 && level < 3) {
-        setLevel(level + 1);
-        setStreak(0);
-      } else {
-        setStreak(s % 3 === 0 && level >= 3 ? 0 : s);
-      }
-    } else {
-      setStreak(0);
-    }
+    if (i === q.answer) onCorrect();
+    else onWrong();
   };
 
   const next = () => {
     if (picked === null) return;
-    setQ(row.quiz(level));
+    setQ(row.quiz(pyramid.tier));
     setPicked(null);
   };
+
+  const tierLabel = pyramid.complete
+    ? "Pyramide complète ✨"
+    : `Palier ${pyramid.tier} · ${pyramid.filled}/${
+        pyramid.tier === 1 ? 3 : pyramid.tier === 2 ? 2 : 1
+      }`;
 
   return (
     <Dialog
@@ -195,8 +206,6 @@ function QuizDialog({
         if (!o) {
           onClose();
           setPicked(null);
-          setStreak(0);
-          setLevel(1);
           setQ(null);
         }
       }}
@@ -205,8 +214,9 @@ function QuizDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>QCM</span>
-            <span className="text-xs font-normal text-muted-foreground">
-              Niveau {level} · Série {streak}/3
+            <span className="flex items-center gap-3 text-xs font-normal text-muted-foreground">
+              <span>{tierLabel}</span>
+              <PyramidView p={pyramid} size="md" />
             </span>
           </DialogTitle>
           <DialogDescription asChild>
