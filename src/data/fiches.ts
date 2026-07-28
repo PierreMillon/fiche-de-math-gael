@@ -227,6 +227,14 @@ export const fiches: Fiche[] = [
       },
     ],
   },
+  {
+    slug: "logique-booleenne",
+    title: "Logique booléenne — circuits",
+    category: "Logique",
+    summary:
+      "Portes logiques (ET, OU, NON, NON-ET, NON-OU, XOR) et circuits interactifs. Fais circuler le signal et devine la sortie.",
+    sections: [],
+  },
 ];
 
 export const getFiche = (slug: string) => fiches.find((f) => f.slug === slug);

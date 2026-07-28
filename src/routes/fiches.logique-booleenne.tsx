@@ -1,0 +1,466 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { PyramidView, usePyramid } from "@/lib/pyramid";
+
+export const Route = createFileRoute("/fiches/logique-booleenne")({
+  head: () => ({
+    meta: [
+      { title: "Logique booléenne — circuits" },
+      {
+        name: "description",
+        content:
+          "Portes logiques (ET, OU, NON, NON-ET, NON-OU, XOR) et circuits interactifs : choisis les entrées, devine la sortie.",
+      },
+      {
+        property: "og:title",
+        content: "Logique booléenne — circuits",
+      },
+      {
+        property: "og:description",
+        content:
+          "Rappel des portes logiques et exercice interactif de circuits.",
+      },
+    ],
+  }),
+  component: LogiquePage,
+});
+
+// ---------------- Gates ----------------
+
+type GateType = "AND" | "OR" | "NOT" | "NAND" | "NOR" | "XOR";
+
+const GATE_LABEL: Record<GateType, string> = {
+  AND: "ET",
+  OR: "OU",
+  NOT: "NON",
+  NAND: "NON-ET",
+  NOR: "NON-OU",
+  XOR: "XOR",
+};
+
+function evalGate(g: GateType, a: 0 | 1, b: 0 | 1 = 0): 0 | 1 {
+  switch (g) {
+    case "AND":
+      return (a && b) as 0 | 1;
+    case "OR":
+      return (a || b) as 0 | 1;
+    case "NOT":
+      return (a ? 0 : 1) as 0 | 1;
+    case "NAND":
+      return (a && b ? 0 : 1) as 0 | 1;
+    case "NOR":
+      return (a || b ? 0 : 1) as 0 | 1;
+    case "XOR":
+      return ((a ^ b) as 0 | 1) as 0 | 1;
+  }
+}
+
+// A tiny inline SVG for each gate (schematic-ish).
+function GateSymbol({ type, size = 44 }: { type: GateType; size?: number }) {
+  const w = size * 1.4;
+  const h = size;
+  const common = "stroke-white fill-none";
+  const strokeW = 1.6;
+  switch (type) {
+    case "AND":
+    case "NAND":
+      return (
+        <svg width={w} height={h} viewBox="0 0 70 50">
+          <path
+            className={common}
+            strokeWidth={strokeW}
+            d="M8 8 H35 A17 17 0 0 1 35 42 H8 Z"
+          />
+          {type === "NAND" && (
+            <circle
+              className={common}
+              strokeWidth={strokeW}
+              cx="57"
+              cy="25"
+              r="3"
+            />
+          )}
+        </svg>
+      );
+    case "OR":
+    case "NOR":
+      return (
+        <svg width={w} height={h} viewBox="0 0 70 50">
+          <path
+            className={common}
+            strokeWidth={strokeW}
+            d="M6 8 Q22 25 6 42 Q30 42 55 25 Q30 8 6 8 Z"
+          />
+          {type === "NOR" && (
+            <circle
+              className={common}
+              strokeWidth={strokeW}
+              cx="60"
+              cy="25"
+              r="3"
+            />
+          )}
+        </svg>
+      );
+    case "NOT":
+      return (
+        <svg width={w} height={h} viewBox="0 0 70 50">
+          <path
+            className={common}
+            strokeWidth={strokeW}
+            d="M8 8 L50 25 L8 42 Z"
+          />
+          <circle
+            className={common}
+            strokeWidth={strokeW}
+            cx="55"
+            cy="25"
+            r="3"
+          />
+        </svg>
+      );
+    case "XOR":
+      return (
+        <svg width={w} height={h} viewBox="0 0 70 50">
+          <path
+            className={common}
+            strokeWidth={strokeW}
+            d="M2 8 Q18 25 2 42"
+          />
+          <path
+            className={common}
+            strokeWidth={strokeW}
+            d="M8 8 Q24 25 8 42 Q30 42 55 25 Q30 8 8 8 Z"
+          />
+        </svg>
+      );
+  }
+}
+
+function TruthTable({ type }: { type: GateType }) {
+  const unary = type === "NOT";
+  const rows: Array<[0 | 1, 0 | 1, 0 | 1]> = unary
+    ? [
+        [0, 0, evalGate(type, 0)],
+        [1, 0, evalGate(type, 1)],
+      ]
+    : ([
+        [0, 0],
+        [0, 1],
+        [1, 0],
+        [1, 1],
+      ] as Array<[0 | 1, 0 | 1]>).map(
+        ([a, b]) => [a, b, evalGate(type, a, b)] as [0 | 1, 0 | 1, 0 | 1],
+      );
+  return (
+    <table className="mt-3 border-collapse text-xs">
+      <thead>
+        <tr className="text-muted-foreground">
+          <th className="border border-border px-2 py-1">a</th>
+          {!unary && <th className="border border-border px-2 py-1">b</th>}
+          <th className="border border-border px-2 py-1">S</th>
+        </tr>
+      </thead>
+      <tbody className="font-mono">
+        {rows.map(([a, b, s], i) => (
+          <tr key={i}>
+            <td className="border border-border px-2 py-1 text-center">{a}</td>
+            {!unary && (
+              <td className="border border-border px-2 py-1 text-center">
+                {b}
+              </td>
+            )}
+            <td className="border border-border px-2 py-1 text-center text-primary">
+              {s}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+// ---------------- Circuit model ----------------
+
+type Node =
+  | { kind: "in"; id: string }
+  | { kind: "gate"; type: GateType; a: Node; b?: Node };
+
+function evalNode(n: Node, inputs: Record<string, 0 | 1>): 0 | 1 {
+  if (n.kind === "in") return inputs[n.id] ?? 0;
+  const a = evalNode(n.a, inputs);
+  if (n.type === "NOT") return evalGate("NOT", a);
+  const b = evalNode(n.b!, inputs);
+  return evalGate(n.type, a, b);
+}
+
+function collectInputs(n: Node, acc: Set<string> = new Set()): string[] {
+  if (n.kind === "in") acc.add(n.id);
+  else {
+    collectInputs(n.a, acc);
+    if (n.b) collectInputs(n.b, acc);
+  }
+  return Array.from(acc).sort();
+}
+
+const rndPick = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+function makeCircuit(tier: 1 | 2 | 3): Node {
+  const A: Node = { kind: "in", id: "A" };
+  const B: Node = { kind: "in", id: "B" };
+  const C: Node = { kind: "in", id: "C" };
+  const binary: GateType[] = ["AND", "OR", "XOR", "NAND", "NOR"];
+  if (tier === 1) {
+    // 1 gate: NOT(A) or A ⊕ B
+    if (Math.random() < 0.5) {
+      return { kind: "gate", type: "NOT", a: A };
+    }
+    return { kind: "gate", type: rndPick(binary), a: A, b: B };
+  }
+  if (tier === 2) {
+    // 3 gates chain: g2( g1(A,B), NOT(C) )  or  g2( g1(A,B), C )
+    const g1: Node = { kind: "gate", type: rndPick(binary), a: A, b: B };
+    const rightBranch: Node =
+      Math.random() < 0.5 ? { kind: "gate", type: "NOT", a: C } : C;
+    return { kind: "gate", type: rndPick(binary), a: g1, b: rightBranch };
+  }
+  // tier 3: 4 gates
+  const g1: Node = { kind: "gate", type: rndPick(binary), a: A, b: B };
+  const g2: Node = { kind: "gate", type: "NOT", a: C };
+  const g3: Node = { kind: "gate", type: rndPick(binary), a: g1, b: g2 };
+  return { kind: "gate", type: rndPick(binary), a: g3, b: B };
+}
+
+// Recursive render of the circuit tree as a horizontal diagram.
+function CircuitView({
+  node,
+  inputs,
+  reveal,
+}: {
+  node: Node;
+  inputs: Record<string, 0 | 1>;
+  reveal: boolean;
+}) {
+  const val = evalNode(node, inputs);
+  if (node.kind === "in") {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="rounded border border-border bg-card px-2 py-1 text-xs font-mono">
+          {node.id}
+        </div>
+        <div
+          className={`h-px w-6 ${
+            reveal
+              ? val
+                ? "bg-green-400"
+                : "bg-white/30"
+              : "bg-white/30"
+          }`}
+        />
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2">
+        <CircuitView node={node.a} inputs={inputs} reveal={reveal} />
+        {node.b && (
+          <CircuitView node={node.b} inputs={inputs} reveal={reveal} />
+        )}
+      </div>
+      <div className="flex flex-col items-center">
+        <GateSymbol type={node.type} size={36} />
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          {GATE_LABEL[node.type]}
+        </div>
+      </div>
+      <div
+        className={`h-px w-6 ${
+          reveal ? (val ? "bg-green-400" : "bg-white/30") : "bg-white/30"
+        }`}
+      />
+      {reveal && (
+        <div
+          className={`rounded border px-1.5 py-0.5 font-mono text-xs ${
+            val
+              ? "border-green-400 text-green-300"
+              : "border-white/30 text-muted-foreground"
+          }`}
+        >
+          {val}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LogiquePage() {
+  const gates: GateType[] = ["AND", "OR", "NOT", "NAND", "NOR", "XOR"];
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border">
+        <div className="mx-auto max-w-5xl px-6 py-10">
+          <Link
+            to="/"
+            className="text-sm text-muted-foreground transition hover:text-primary"
+          >
+            ← Toutes les fiches
+          </Link>
+          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">
+            Logique
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+            Logique booléenne — circuits
+          </h1>
+          <p className="mt-3 text-muted-foreground">
+            Rappel des portes logiques puis exercice interactif : choisis les
+            entrées et devine la sortie du circuit.
+          </p>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-5xl px-6 py-10">
+        <section>
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Cours — portes logiques
+          </h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {gates.map((g) => (
+              <div
+                key={g}
+                className="rounded-xl border border-border bg-card p-5"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-semibold">{GATE_LABEL[g]}</div>
+                    <div className="text-xs text-muted-foreground">{g}</div>
+                  </div>
+                  <GateSymbol type={g} />
+                </div>
+                <TruthTable type={g} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-12">
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Exercice — circuit interactif
+          </h2>
+          <CircuitExercise />
+        </section>
+      </main>
+    </div>
+  );
+}
+
+function CircuitExercise() {
+  const { pyramid, onCorrect, onWrong } = usePyramid("logique-circuit");
+  const [seed, setSeed] = useState(0);
+  const tier = pyramid.complete ? 3 : pyramid.tier;
+
+  const node = useMemo(() => makeCircuit(tier), [seed, tier]);
+  const inputIds = useMemo(() => collectInputs(node), [node]);
+
+  const [inputs, setInputs] = useState<Record<string, 0 | 1>>({});
+  const [picked, setPicked] = useState<0 | 1 | null>(null);
+
+  useEffect(() => {
+    const init: Record<string, 0 | 1> = {};
+    for (const id of inputIds) init[id] = Math.random() < 0.5 ? 1 : 0;
+    setInputs(init);
+    setPicked(null);
+  }, [inputIds.join(",")]);
+
+  const expected = evalNode(node, inputs);
+  const picking = picked !== null;
+
+  const pick = (v: 0 | 1) => {
+    if (picking) return;
+    setPicked(v);
+    if (v === expected) onCorrect();
+    else onWrong();
+  };
+
+  const next = () => setSeed((s) => s + 1);
+
+  const toggle = (id: string) => {
+    if (picking) return;
+    setInputs((prev) => ({ ...prev, [id]: prev[id] ? 0 : 1 }));
+  };
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          {pyramid.complete
+            ? "Pyramide complète ✨"
+            : `Palier ${pyramid.tier} · ${pyramid.filled}/${
+                pyramid.tier === 1 ? 3 : pyramid.tier === 2 ? 2 : 1
+              }`}
+        </div>
+        <PyramidView p={pyramid} size="md" />
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-3">
+        {inputIds.map((id) => (
+          <button
+            key={id}
+            onClick={() => toggle(id)}
+            disabled={picking}
+            className={`rounded-md border px-3 py-1.5 font-mono text-sm transition ${
+              inputs[id]
+                ? "border-green-400 bg-green-500/10 text-green-300"
+                : "border-border text-muted-foreground hover:border-primary"
+            } disabled:opacity-60`}
+          >
+            {id} = {inputs[id] ?? 0}
+          </button>
+        ))}
+      </div>
+
+      <div className="overflow-x-auto rounded-md border border-border bg-background p-4">
+        <CircuitView node={node} inputs={inputs} reveal={picking} />
+      </div>
+
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <span className="text-sm text-muted-foreground">Sortie S =</span>
+        {([0, 1] as const).map((v) => {
+          const state =
+            picked === null
+              ? "border-border hover:border-primary"
+              : v === expected
+                ? "border-green-500 bg-green-500/10 text-green-300"
+                : v === picked
+                  ? "border-red-500 bg-red-500/10 text-red-300"
+                  : "border-border opacity-60";
+          return (
+            <button
+              key={v}
+              onClick={() => pick(v)}
+              disabled={picking}
+              className={`rounded-md border px-4 py-2 font-mono text-sm transition ${state}`}
+            >
+              {v}
+            </button>
+          );
+        })}
+        <div className="ml-auto flex items-center gap-2">
+          {picked !== null && picked !== expected && (
+            <span className="text-xs text-red-300">
+              Faux — la bonne réponse était {expected}.
+            </span>
+          )}
+          <button
+            onClick={next}
+            disabled={!picking}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
+          >
+            Nouveau circuit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
