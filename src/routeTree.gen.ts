@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FichesTangenteRouteImport } from './routes/fiches.tangente'
 import { Route as FichesPemdasRouteImport } from './routes/fiches.pemdas'
+import { Route as FichesLogiqueBooleenneRouteImport } from './routes/fiches.logique-booleenne'
 import { Route as FichesSlugRouteImport } from './routes/fiches.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const FichesPemdasRoute = FichesPemdasRouteImport.update({
   path: '/fiches/pemdas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FichesLogiqueBooleenneRoute = FichesLogiqueBooleenneRouteImport.update({
+  id: '/fiches/logique-booleenne',
+  path: '/fiches/logique-booleenne',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FichesSlugRoute = FichesSlugRouteImport.update({
   id: '/fiches/$slug',
   path: '/fiches/$slug',
@@ -38,12 +44,14 @@ const FichesSlugRoute = FichesSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
   '/fiches/tangente': typeof FichesTangenteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
   '/fiches/tangente': typeof FichesTangenteRoute
 }
@@ -51,20 +59,38 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
   '/fiches/tangente': typeof FichesTangenteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/fiches/$slug' | '/fiches/pemdas' | '/fiches/tangente'
+  fullPaths:
+    | '/'
+    | '/fiches/$slug'
+    | '/fiches/logique-booleenne'
+    | '/fiches/pemdas'
+    | '/fiches/tangente'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/fiches/$slug' | '/fiches/pemdas' | '/fiches/tangente'
-  id: '__root__' | '/' | '/fiches/$slug' | '/fiches/pemdas' | '/fiches/tangente'
+  to:
+    | '/'
+    | '/fiches/$slug'
+    | '/fiches/logique-booleenne'
+    | '/fiches/pemdas'
+    | '/fiches/tangente'
+  id:
+    | '__root__'
+    | '/'
+    | '/fiches/$slug'
+    | '/fiches/logique-booleenne'
+    | '/fiches/pemdas'
+    | '/fiches/tangente'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FichesSlugRoute: typeof FichesSlugRoute
+  FichesLogiqueBooleenneRoute: typeof FichesLogiqueBooleenneRoute
   FichesPemdasRoute: typeof FichesPemdasRoute
   FichesTangenteRoute: typeof FichesTangenteRoute
 }
@@ -92,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FichesPemdasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fiches/logique-booleenne': {
+      id: '/fiches/logique-booleenne'
+      path: '/fiches/logique-booleenne'
+      fullPath: '/fiches/logique-booleenne'
+      preLoaderRoute: typeof FichesLogiqueBooleenneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fiches/$slug': {
       id: '/fiches/$slug'
       path: '/fiches/$slug'
@@ -105,6 +138,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FichesSlugRoute: FichesSlugRoute,
+  FichesLogiqueBooleenneRoute: FichesLogiqueBooleenneRoute,
   FichesPemdasRoute: FichesPemdasRoute,
   FichesTangenteRoute: FichesTangenteRoute,
 }
