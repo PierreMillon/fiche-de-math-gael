@@ -212,6 +212,29 @@ const simp = (num: number, den: number) => {
   return `${num / g}/${den / g}`;
 };
 
+// ---------- Tier-3 exponent helpers (fractional 1/2, 1/3 and negative) ----------
+
+const fracDen = (): 2 | 3 => (Math.random() < 0.5 ? 2 : 3);
+
+// Simplifies num/den to its lowest terms; returns a plain integer string
+// ("3", "-2") when the fraction reduces to a whole number.
+const expStr = (num: number, den = 1): string => {
+  if (den === 1) return String(num);
+  const g = gcd(num, den) || 1;
+  const n = num / g;
+  const d = den / g;
+  return d === 1 ? String(n) : `${n}/${d}`;
+};
+
+// Renders base^exponent as plain text, dropping the exponent entirely when
+// it's 0 or 1, and wrapping negative/fractional exponents in parens.
+const powTerm = (base: string, e: string): string => {
+  if (e === "0") return "1";
+  if (e === "1") return base;
+  const needsParen = e.includes("/") || e.startsWith("-");
+  return needsParen ? `${base}^(${e})` : `${base}^${e}`;
+};
+
 // ---------- Rows ----------
 
 export const rows: PemdasRow[] = [
@@ -394,13 +417,38 @@ export const rows: PemdasRow[] = [
     rightCol: "Exposant",
     quiz: (lvl) => {
       if (lvl >= 3) {
+        if (Math.random() < 0.5) {
+          const d = fracDen();
+          const p = rnd(1, d - 1);
+          const q = rnd(1, d - 1);
+          const sum = expStr(p + q, d);
+          return makeQ(
+            <>
+              Simplifie : {fmt(`x^(${p}/${d})`)} × {fmt(`x^(${q}/${d})`)}
+            </>,
+            powTerm("x", sum),
+            [
+              powTerm("x", expStr(p * q, d)),
+              powTerm("x", expStr(p + q, d * 2)),
+              powTerm("x", expStr(Math.abs(p - q), d)),
+            ],
+            `Même base : on additionne les exposants, ${p}/${d}+${q}/${d}=${sum}.`,
+          );
+        }
+        const a = rnd(2, 6);
+        const b = -rnd(2, 5);
+        const sum = expStr(a + b);
         return makeQ(
           <>
-            Simplifie : {fmt("x^(1/2)")} × {fmt("x^(1/2)")}
+            Simplifie : {fmt(`x^${a}`)} × {fmt(`x^${b}`)}
           </>,
-          "x",
-          ["x^(1/4)", "x^2", "2x"],
-          `Même base : on additionne les exposants, 1/2+1/2=1.`,
+          powTerm("x", sum),
+          [
+            powTerm("x", expStr(a - b)),
+            powTerm("x", expStr(a * b)),
+            powTerm("x", expStr(-(a + b))),
+          ],
+          `Même base : on additionne les exposants, ${a}+(${b})=${sum}.`,
         );
       }
       const x = rnd(2, 5);
@@ -424,13 +472,27 @@ export const rows: PemdasRow[] = [
     rightCol: "Exposant",
     quiz: (lvl) => {
       if (lvl >= 3) {
+        if (Math.random() < 0.5) {
+          const d = fracDen();
+          const p = rnd(1, d - 1);
+          const e = expStr(p, d);
+          return makeQ(
+            <>
+              Simplifie : {fmt(`x^(${e})`)} × {fmt(`y^(${e})`)}
+            </>,
+            `(xy)^(${e})`,
+            [`(xy)^${d}`, `x^(${e})+y^(${e})`, `(x+y)^(${e})`],
+            `Même exposant : on multiplie les bases, l'exposant ${e} reste inchangé.`,
+          );
+        }
+        const a = -rnd(2, 4);
         return makeQ(
           <>
-            Simplifie : {fmt("x^(1/3)")} × {fmt("y^(1/3)")}
+            Simplifie : {fmt(`x^${a}`)} × {fmt(`y^${a}`)}
           </>,
-          "(xy)^(1/3)",
-          ["(xy)^3", "x^(1/3)+y^(1/3)", "(x+y)^(1/3)"],
-          `Même exposant : on multiplie les bases.`,
+          `(xy)^(${a})`,
+          [`(xy)^${-a}`, `x^${a}+y^${a}`, `(x+y)^${a}`],
+          `Même exposant : on multiplie les bases, l'exposant ${a} reste inchangé.`,
         );
       }
       const x = rnd(2, 6);
@@ -454,13 +516,34 @@ export const rows: PemdasRow[] = [
     rightCol: "Exposant",
     quiz: (lvl) => {
       if (lvl >= 3) {
+        if (Math.random() < 0.5) {
+          const d = fracDen();
+          const p = rnd(1, 2 * d);
+          const q = rnd(1, 2 * d);
+          const diff = expStr(p - q, d);
+          return makeQ(
+            <>
+              Simplifie : {fmt(`x^(${p}/${d})`)} / {fmt(`x^(${q}/${d})`)}
+            </>,
+            powTerm("x", diff),
+            [
+              powTerm("x", expStr(p + q, d)),
+              powTerm("x", expStr(q - p, d)),
+              powTerm("x", expStr(p * q, d)),
+            ],
+            `Même base : on soustrait les exposants, ${p}/${d}−${q}/${d}=${diff}.`,
+          );
+        }
+        const a = rnd(1, 4);
+        const b = -rnd(2, 5);
+        const diff = expStr(a - b);
         return makeQ(
           <>
-            Simplifie : {fmt("x^(3/2)")} / {fmt("x^(1/2)")}
+            Simplifie : {fmt(`x^${a}`)} / {fmt(`x^${b}`)}
           </>,
-          "x",
-          ["x^2", "x^(1/2)", "x^3"],
-          `Même base : on soustrait les exposants, 3/2−1/2=1.`,
+          powTerm("x", diff),
+          [powTerm("x", expStr(a + b)), powTerm("x", expStr(b - a)), powTerm("x", expStr(a * b))],
+          `Même base : on soustrait les exposants, ${a}−(${b})=${diff}.`,
         );
       }
       const x = rnd(2, 5);
@@ -484,13 +567,27 @@ export const rows: PemdasRow[] = [
     rightCol: "Exposant",
     quiz: (lvl) => {
       if (lvl >= 3) {
+        if (Math.random() < 0.5) {
+          const d = fracDen();
+          const p = rnd(1, d - 1);
+          const e = expStr(p, d);
+          return makeQ(
+            <>
+              Simplifie : {fmt(`x^(${e})`)} / {fmt(`y^(${e})`)}
+            </>,
+            `(x/y)^(${e})`,
+            [`(x/y)^${d}`, `(x−y)^(${e})`, `x^(${e})−y^(${e})`],
+            `Même exposant : on divise les bases, l'exposant ${e} reste inchangé.`,
+          );
+        }
+        const a = -rnd(2, 4);
         return makeQ(
           <>
-            Simplifie : {fmt("x^(1/2)")} / {fmt("y^(1/2)")}
+            Simplifie : {fmt(`x^${a}`)} / {fmt(`y^${a}`)}
           </>,
-          "(x/y)^(1/2)",
-          ["(x/y)^2", "(x−y)^(1/2)", "x^(1/2)−y^(1/2)"],
-          `Même exposant : on divise les bases.`,
+          `(x/y)^(${a})`,
+          [`(x/y)^${-a}`, `(x−y)^(${a})`, `x^${a}−y^${a}`],
+          `Même exposant : on divise les bases, l'exposant ${a} reste inchangé.`,
         );
       }
       const y = rnd(2, 4);
@@ -515,11 +612,30 @@ export const rows: PemdasRow[] = [
     rightCol: "Exposant",
     quiz: (lvl) => {
       if (lvl >= 3) {
+        if (Math.random() < 0.5) {
+          const d = fracDen();
+          const p = rnd(1, d - 1);
+          const b = rnd(2, 4);
+          const prodExp = expStr(p * b, d);
+          return makeQ(
+            <>Simplifie : {fmt(`(x^(${p}/${d}))^${b}`)}</>,
+            powTerm("x", prodExp),
+            [powTerm("x", expStr(p + b, d)), powTerm("x", expStr(p, d)), powTerm("x", String(b))],
+            `Puissance de puissance : on multiplie les exposants, ${p}/${d}×${b}=${prodExp}.`,
+          );
+        }
+        const a = rnd(2, 4);
+        const b = -rnd(2, 3);
+        const prodExp = expStr(a * b);
         return makeQ(
-          <>Simplifie : {fmt("(x^(1/2))^2")}</>,
-          "x",
-          ["x^(1/4)", "x^2", "x^4"],
-          `Puissance de puissance : on multiplie les exposants, 1/2×2=1.`,
+          <>Simplifie : {fmt(`(x^${a})^${b}`)}</>,
+          powTerm("x", prodExp),
+          [
+            powTerm("x", expStr(a + b)),
+            powTerm("x", expStr(a - b)),
+            powTerm("x", expStr(-(a * b))),
+          ],
+          `Puissance de puissance : on multiplie les exposants, ${a}×(${b})=${prodExp}.`,
         );
       }
       const x = rnd(2, 5);
@@ -541,11 +657,18 @@ export const rows: PemdasRow[] = [
     rightCol: "Exposant",
     quiz: (lvl) => {
       if (lvl >= 3) {
+        const useFraction = Math.random() < 0.5;
+        const den = useFraction ? fracDen() : 1;
+        const num = useFraction ? 1 : -rnd(2, 3);
+        const e = expStr(num, den);
+        const e2 = expStr(2 * num, den);
+        const aTerm = powTerm("x", e);
+        const a2Term = powTerm("x", e2);
         return makeQ(
-          <>Développe : {fmt("(x^(1/2) + 1)^2")}</>,
-          "x+2x^(1/2)+1",
-          ["x+1", "x^(1/2)+1", "x+2x+1"],
-          `(a+b)² = a²+2ab+b² avec a=x^(1/2), b=1.`,
+          <>Développe : {fmt(`(x^(${e}) + 1)^2`)}</>,
+          `${a2Term}+2${aTerm}+1`,
+          [`${aTerm}+1`, `x+1`, `${a2Term}+${aTerm}+1`],
+          `(a+b)² = a²+2ab+b² avec a=x^(${e}), b=1 : a²=${a2Term}.`,
         );
       }
       const k = rnd(2, lvl >= 2 ? 9 : 5);
@@ -565,11 +688,18 @@ export const rows: PemdasRow[] = [
     rightCol: "Exposant",
     quiz: (lvl) => {
       if (lvl >= 3) {
+        const useFraction = Math.random() < 0.5;
+        const den = useFraction ? fracDen() : 1;
+        const num = useFraction ? 1 : -rnd(2, 3);
+        const e = expStr(num, den);
+        const e2 = expStr(2 * num, den);
+        const aTerm = powTerm("x", e);
+        const a2Term = powTerm("x", e2);
         return makeQ(
-          <>Développe : {fmt("(x^(1/2) − 1)^2")}</>,
-          "x−2x^(1/2)+1",
-          ["x−1", "x^(1/2)−1", "x−2x+1"],
-          `(a−b)² = a²−2ab+b² avec a=x^(1/2), b=1.`,
+          <>Développe : {fmt(`(x^(${e}) − 1)^2`)}</>,
+          `${a2Term}−2${aTerm}+1`,
+          [`${aTerm}−1`, `x−1`, `${a2Term}−${aTerm}+1`],
+          `(a−b)² = a²−2ab+b² avec a=x^(${e}), b=1 : a²=${a2Term}.`,
         );
       }
       const k = rnd(2, lvl >= 2 ? 9 : 5);
