@@ -16,7 +16,8 @@ type Built = { item: QItem; choices: string[]; answer: number };
 
 // Always returns exactly 4 distinct choices, even if the data has
 // duplicate distractors or a distractor equal to the answer.
-const build = (item: QItem): Built => {
+// Exported for src/lib/quiz.test.ts.
+export const build = (item: QItem): Built => {
   const uniqueD: string[] = [];
   for (const d of item.d) {
     if (d !== item.a && !uniqueD.includes(d)) uniqueD.push(d);
@@ -97,8 +98,11 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
             <button
               key={i}
               onClick={() => answer(i)}
-              className={`rounded-md border px-3 py-2 text-left text-sm transition ${state}`}
+              className={`flex items-center gap-2 rounded-md border px-3 py-2 text-left text-sm transition ${state}`}
             >
+              {picked !== null && (
+                <span aria-hidden="true">{isRight ? "✓" : isPicked ? "✗" : ""}</span>
+              )}
               {fmt(c)}
             </button>
           );

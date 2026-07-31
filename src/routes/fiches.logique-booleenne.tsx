@@ -300,6 +300,9 @@ function CircuitExercise() {
   const [seed, setSeed] = useState(0);
   const tier = pyramid.complete ? 3 : pyramid.tier;
 
+  // `seed` isn't read inside makeCircuit — it's bumped by "Suivant" purely to
+  // force a new random circuit for the same tier.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const node = useMemo(() => makeCircuit(tier), [seed, tier]);
   const inputIds = useMemo(() => collectInputs(node), [node]);
 
@@ -311,7 +314,7 @@ function CircuitExercise() {
     for (const id of inputIds) init[id] = Math.random() < 0.5 ? 1 : 0;
     setInputs(init);
     setPicked(null);
-  }, [inputIds.join(",")]);
+  }, [inputIds]);
 
   const expected = evalNode(node, inputs);
   const picking = picked !== null;
@@ -371,13 +374,18 @@ function CircuitExercise() {
                 : v === picked
                   ? "border-red-500 bg-red-500/10 text-red-300"
                   : "border-border opacity-60";
+          const isRight = v === expected;
+          const isPicked = v === picked;
           return (
             <button
               key={v}
               onClick={() => pick(v)}
               disabled={picking}
-              className={`rounded-md border px-4 py-2 font-mono text-sm transition ${state}`}
+              className={`flex items-center gap-1.5 rounded-md border px-4 py-2 font-mono text-sm transition ${state}`}
             >
+              {picked !== null && (
+                <span aria-hidden="true">{isRight ? "✓" : isPicked ? "✗" : ""}</span>
+              )}
               {v}
             </button>
           );

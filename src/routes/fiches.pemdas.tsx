@@ -256,8 +256,11 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
               <button
                 key={i}
                 onClick={() => onPick(i)}
-                className={`rounded-md border px-3 py-2 text-left font-mono text-sm transition ${state}`}
+                className={`flex items-center gap-2 rounded-md border px-3 py-2 text-left font-mono text-sm transition ${state}`}
               >
+                {picked !== null && (
+                  <span aria-hidden="true">{isRight ? "✓" : isPicked ? "✗" : ""}</span>
+                )}
                 {c}
               </button>
             );
