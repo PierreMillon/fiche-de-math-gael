@@ -10,7 +10,7 @@ export function fmt(s: string): ReactNode {
   let i = 0;
   const flush = () => {
     if (buf) {
-      parts.push(buf);
+      parts.push(<span key={`t${parts.length}`}>{buf}</span>);
       buf = "";
     }
   };
