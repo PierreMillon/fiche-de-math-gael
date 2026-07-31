@@ -87,6 +87,64 @@ export const powRaw = (base: ReactNode, exp: ReactNode): ReactNode => (
   </span>
 );
 
+// ---------- White (uncolored) variants ----------
+// Coloring rule: on each row only the two signs marking the transition
+// between the two columns are colored (one on the left member, one on the
+// right member). Every other identical sign on the row stays white.
+
+export const plusW = (...parts: ReactNode[]): ReactNode => (
+  <span className="inline-flex items-center">
+    {parts.map((p, i) => (
+      <span key={i} className="inline-flex items-center">
+        {i > 0 && <span className={`${W} mx-0.5`}>+</span>}
+        {p}
+      </span>
+    ))}
+  </span>
+);
+
+export const minusW = (a: ReactNode, b: ReactNode): ReactNode => (
+  <span className="inline-flex items-center">
+    {a}
+    <span className={`${W} mx-0.5`}>−</span>
+    {b}
+  </span>
+);
+
+export const timesW = (...parts: ReactNode[]): ReactNode => (
+  <span className="inline-flex items-center">
+    {parts.map((p, i) => (
+      <span key={i} className="inline-flex items-center">
+        {i > 0 && <span className={`${W} mx-0.5`}>×</span>}
+        {p}
+      </span>
+    ))}
+  </span>
+);
+
+export const fracW = (num: ReactNode, den: ReactNode): ReactNode => (
+  <span className="inline-flex flex-col items-center align-middle mx-0.5 leading-tight">
+    <span className="px-1">{num}</span>
+    <span className="w-full border-t border-white"></span>
+    <span className="px-1">{den}</span>
+  </span>
+);
+
+// Exponent without the green coloring (position kept, color white).
+export const powW = (base: ReactNode, exp: ReactNode): ReactNode => (
+  <span className="inline-flex items-start">
+    {base}
+    <span className={`${W} text-[0.7em] -mt-1 ml-0.5`}>{exp}</span>
+  </span>
+);
+
+export const COL_COLOR: Record<string, string> = {
+  Somme: "text-blue-400",
+  Multiplication: "text-red-400",
+  Division: "text-yellow-400",
+  Exposant: "text-green-400",
+};
+
 // ---------- Row + quiz definitions ----------
 
 export type Col = "Somme" | "Multiplication" | "Division" | "Exposant";
