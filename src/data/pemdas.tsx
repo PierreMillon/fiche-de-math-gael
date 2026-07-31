@@ -48,7 +48,13 @@ export const times = (...parts: ReactNode[]): ReactNode => (
 
 // Juxtaposition (implicit multiplication like "ka") — no operator symbol.
 export const jux = (...parts: ReactNode[]): ReactNode => (
-  <span className="inline-flex items-center">{parts}</span>
+  <span className="inline-flex items-center">
+    {parts.map((p, i) => (
+      <span key={i} className="inline-flex items-center">
+        {p}
+      </span>
+    ))}
+  </span>
 );
 
 export const paren = (a: ReactNode): ReactNode => (
@@ -86,6 +92,64 @@ export const powRaw = (base: ReactNode, exp: ReactNode): ReactNode => (
     <span className="text-[0.7em] -mt-1 ml-0.5">{exp}</span>
   </span>
 );
+
+// ---------- White (uncolored) variants ----------
+// Coloring rule: on each row only the two signs marking the transition
+// between the two columns are colored (one on the left member, one on the
+// right member). Every other identical sign on the row stays white.
+
+export const plusW = (...parts: ReactNode[]): ReactNode => (
+  <span className="inline-flex items-center">
+    {parts.map((p, i) => (
+      <span key={i} className="inline-flex items-center">
+        {i > 0 && <span className={`${W} mx-0.5`}>+</span>}
+        {p}
+      </span>
+    ))}
+  </span>
+);
+
+export const minusW = (a: ReactNode, b: ReactNode): ReactNode => (
+  <span className="inline-flex items-center">
+    {a}
+    <span className={`${W} mx-0.5`}>−</span>
+    {b}
+  </span>
+);
+
+export const timesW = (...parts: ReactNode[]): ReactNode => (
+  <span className="inline-flex items-center">
+    {parts.map((p, i) => (
+      <span key={i} className="inline-flex items-center">
+        {i > 0 && <span className={`${W} mx-0.5`}>×</span>}
+        {p}
+      </span>
+    ))}
+  </span>
+);
+
+export const fracW = (num: ReactNode, den: ReactNode): ReactNode => (
+  <span className="inline-flex flex-col items-center align-middle mx-0.5 leading-tight">
+    <span className="px-1">{num}</span>
+    <span className="w-full border-t border-white"></span>
+    <span className="px-1">{den}</span>
+  </span>
+);
+
+// Exponent without the green coloring (position kept, color white).
+export const powW = (base: ReactNode, exp: ReactNode): ReactNode => (
+  <span className="inline-flex items-start">
+    {base}
+    <span className={`${W} text-[0.7em] -mt-1 ml-0.5`}>{exp}</span>
+  </span>
+);
+
+export const COL_COLOR: Record<string, string> = {
+  Somme: "text-blue-400",
+  Multiplication: "text-red-400",
+  Division: "text-yellow-400",
+  Exposant: "text-green-400",
+};
 
 // ---------- Row + quiz definitions ----------
 
@@ -191,7 +255,7 @@ export const rows: PemdasRow[] = [
   {
     id: "factor-plus",
     left: plus(jux(n("k"), n("a")), jux(n("k"), n("b"))),
-    right: times(n("k"), paren(plus(n("a"), n("b")))),
+    right: times(n("k"), paren(plusW(n("a"), n("b")))),
     leftCol: "Somme",
     rightCol: "Multiplication",
     quiz: (lvl) => {
@@ -206,7 +270,7 @@ export const rows: PemdasRow[] = [
   {
     id: "factor-minus",
     left: minus(jux(n("k"), n("a")), jux(n("k"), n("b"))),
-    right: times(n("k"), paren(minus(n("a"), n("b")))),
+    right: times(n("k"), paren(minusW(n("a"), n("b")))),
     leftCol: "Somme",
     rightCol: "Multiplication",
     quiz: (lvl) => {
@@ -220,8 +284,8 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "diff-squares",
-    left: minus(pow(n("a"), n(2)), pow(n("b"), n(2))),
-    right: times(paren(plus(n("a"), n("b"))), paren(minus(n("a"), n("b")))),
+    left: minus(powW(n("a"), n(2)), powW(n("b"), n(2))),
+    right: times(paren(plusW(n("a"), n("b"))), paren(minusW(n("a"), n("b")))),
     leftCol: "Somme",
     rightCol: "Multiplication",
     quiz: (lvl) => {
@@ -236,8 +300,8 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "frac-add",
-    left: plus(frac(n("a"), n("c")), frac(n("b"), n("c"))),
-    right: frac(plus(n("a"), n("b")), n("c")),
+    left: plusW(fracW(n("a"), n("c")), fracW(n("b"), n("c"))),
+    right: fracW(plus(n("a"), n("b")), n("c")),
     leftCol: "Somme",
     rightCol: "Division",
     quiz: (lvl) => {
@@ -253,8 +317,8 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "frac-mul",
-    left: times(frac(n("a"), n("b")), frac(n("c"), n("d"))),
-    right: frac(times(n("a"), n("c")), times(n("b"), n("d"))),
+    left: times(fracW(n("a"), n("b")), fracW(n("c"), n("d"))),
+    right: fracW(timesW(n("a"), n("c")), timesW(n("b"), n("d"))),
     leftCol: "Multiplication",
     rightCol: "Division",
     quiz: (lvl) => {
@@ -271,8 +335,8 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "frac-div",
-    left: frac(frac(n("a"), n("b")), frac(n("c"), n("d"))),
-    right: times(frac(n("a"), n("b")), frac(n("d"), n("c"))),
+    left: fracW(fracW(n("a"), n("b")), fracW(n("c"), n("d"))),
+    right: times(fracW(n("a"), n("b")), fracW(n("d"), n("c"))),
     leftCol: "Division",
     rightCol: "Multiplication",
     quiz: (lvl) => {
@@ -289,7 +353,7 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "frac-simplify",
-    left: frac(times(n("a"), n("c")), times(n("b"), n("c"))),
+    left: frac(timesW(n("a"), n("c")), timesW(n("b"), n("c"))),
     right: frac(n("a"), n("b")),
     leftCol: "Division",
     rightCol: "Division",
@@ -306,7 +370,7 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "pow-mul-same-base",
-    left: times(pow(n("x"), n("a")), pow(n("x"), n("b"))),
+    left: times(powW(n("x"), n("a")), powW(n("x"), n("b"))),
     right: pow(n("x"), plus(n("a"), n("b"))),
     leftCol: "Multiplication",
     rightCol: "Exposant",
@@ -330,11 +394,18 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "pow-mul-same-exp",
-    left: times(pow(n("x"), n("a")), pow(n("y"), n("a"))),
-    right: pow(paren(times(n("x"), n("y"))), n("a")),
+    left: times(powW(n("x"), n("a")), powW(n("y"), n("a"))),
+    right: pow(paren(timesW(n("x"), n("y"))), n("a")),
     leftCol: "Multiplication",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 3) {
+        return makeQ(
+          <>Simplifie : {fmt("x^(1/3)")} × {fmt("y^(1/3)")}</>,
+          "(xy)^(1/3)",
+          ["(xy)^3", "x^(1/3)+y^(1/3)", "(x+y)^(1/3)"],
+        );
+      }
       const x = rnd(2, 6);
       const y = rnd(2, 6);
       const a = rnd(2, lvl >= 2 ? 7 : 3);
@@ -347,7 +418,7 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "pow-div-same-base",
-    left: frac(pow(n("x"), n("a")), pow(n("x"), n("b"))),
+    left: frac(powW(n("x"), n("a")), powW(n("x"), n("b"))),
     right: pow(n("x"), minus(n("a"), n("b"))),
     leftCol: "Division",
     rightCol: "Exposant",
@@ -371,11 +442,18 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "pow-div-same-exp",
-    left: frac(pow(n("x"), n("a")), pow(n("y"), n("a"))),
-    right: pow(paren(frac(n("x"), n("y"))), n("a")),
+    left: frac(powW(n("x"), n("a")), powW(n("y"), n("a"))),
+    right: pow(paren(fracW(n("x"), n("y"))), n("a")),
     leftCol: "Division",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 3) {
+        return makeQ(
+          <>Simplifie : {fmt("x^(1/2)")} / {fmt("y^(1/2)")}</>,
+          "(x/y)^(1/2)",
+          ["(x/y)^2", "(x−y)^(1/2)", "x^(1/2)−y^(1/2)"],
+        );
+      }
       const y = rnd(2, 4);
       const k = rnd(2, 4);
       const x = y * k;
@@ -389,8 +467,8 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "pow-of-pow",
-    left: powRaw(n("x"), times(n("a"), n("b"))),
-    right: pow(paren(pow(n("x"), n("a"))), n("b")),
+    left: powRaw(n("x"), timesW(n("a"), n("b"))),
+    right: pow(paren(powW(n("x"), n("a"))), n("b")),
     leftCol: "Exposant",
     rightCol: "Exposant",
     quiz: (lvl) => {
@@ -413,11 +491,18 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "square-plus",
-    left: plus(pow(n("a"), n(2)), jux(n(2), n("a"), n("b")), pow(n("b"), n(2))),
-    right: pow(paren(plus(n("a"), n("b"))), n(2)),
+    left: plus(powW(n("a"), n(2)), jux(n(2), n("a"), n("b")), powW(n("b"), n(2))),
+    right: pow(paren(plusW(n("a"), n("b"))), n(2)),
     leftCol: "Somme",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 3) {
+        return makeQ(
+          <>Développe : {fmt("(x^(1/2) + 1)^2")}</>,
+          "x+2x^(1/2)+1",
+          ["x+1", "x^(1/2)+1", "x+2x+1"],
+        );
+      }
       const k = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
         <>Développe : {fmt(`(x + ${k})^2`)}</>,
@@ -432,11 +517,18 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "square-minus",
-    left: plus(pow(n("a"), n(2)), jux(n("−2"), n("a"), n("b")), pow(n("b"), n(2))),
-    right: pow(paren(minus(n("a"), n("b"))), n(2)),
+    left: plus(powW(n("a"), n(2)), jux(n("−2"), n("a"), n("b")), powW(n("b"), n(2))),
+    right: pow(paren(minusW(n("a"), n("b"))), n(2)),
     leftCol: "Somme",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 3) {
+        return makeQ(
+          <>Développe : {fmt("(x^(1/2) − 1)^2")}</>,
+          "x−2x^(1/2)+1",
+          ["x−1", "x^(1/2)−1", "x−2x+1"],
+        );
+      }
       const k = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
         <>Développe : {fmt(`(x − ${k})^2`)}</>,

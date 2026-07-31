@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { rows, COLS, type PemdasRow, type QuizQ } from "@/data/pemdas";
+import { rows, COLS, COL_COLOR, type PemdasRow, type QuizQ } from "@/data/pemdas";
 import { PyramidView, usePyramid } from "@/lib/pyramid";
 
 export const Route = createFileRoute("/fiches/pemdas")({
@@ -56,9 +56,9 @@ function PemdasPage() {
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-10">
-        <div className="grid grid-cols-4 gap-2 border-b border-border pb-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        <div className="grid grid-cols-4 gap-2 border-b border-border pb-3 text-xs font-semibold uppercase tracking-[0.2em]">
           {COLS.map((c) => (
-            <div key={c} className="text-center">
+            <div key={c} className={`text-center ${COL_COLOR[c]}`}>
               {c}
             </div>
           ))}

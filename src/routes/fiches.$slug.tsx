@@ -1,5 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { getFiche, fiches, type Fiche } from "@/data/fiches";
+import { hasExercises } from "@/data/exercises";
+import { ExerciseQuiz } from "@/lib/quiz";
 
 export const Route = createFileRoute("/fiches/$slug")({
   loader: ({ params }): { fiche: Fiche } => {
@@ -78,6 +80,8 @@ function FichePage() {
               )}
             </section>
           ))}
+
+          {hasExercises(fiche.slug) && <ExerciseQuiz slug={fiche.slug} />}
         </div>
 
         <nav className="mt-12 border-t border-border pt-6">
