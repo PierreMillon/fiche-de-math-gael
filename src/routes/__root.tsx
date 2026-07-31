@@ -127,7 +127,7 @@ function RootComponent() {
                 Fiches Maths
               </Link>
               <span className="text-xs opacity-90">
-                Fiches de maths de Gaëlle — pour réserver un cours particulier, contactez gaelle.maths@example.com
+                Fiches de révision interactives basées sur les fiches de Gaël Boury, pour réserver un cours : gaelboury@gmail.com
               </span>
             </div>
             <span className="text-xs opacity-90">Révisions</span>
