@@ -24,6 +24,14 @@ export const fiches: Fiche[] = [
     sections: [],
   },
   {
+    slug: "equations",
+    title: "Équations et inéquations",
+    category: "Analyse",
+    summary:
+      "Trouver un signe, trouver l'inconnue : 7 niveaux en vis-à-vis, du cas évident à l'étude de fonction.",
+    sections: [],
+  },
+  {
     slug: "derivees",
     title: "Dérivées",
     category: "Analyse",
@@ -90,11 +98,7 @@ export const fiches: Fiche[] = [
       {
         heading: "Croissances comparées",
         content: "En +∞ :",
-        formulas: [
-          "ln x ≪ xᵃ ≪ eˣ   (a > 0)",
-          "lim (ln x)/x = 0",
-          "lim eˣ / xⁿ = +∞",
-        ],
+        formulas: ["ln x ≪ xᵃ ≪ eˣ   (a > 0)", "lim (ln x)/x = 0", "lim eˣ / xⁿ = +∞"],
       },
       {
         heading: "Formes indéterminées",
@@ -121,8 +125,7 @@ export const fiches: Fiche[] = [
       },
       {
         heading: "Récurrence",
-        content:
-          "Initialisation, hérédité, conclusion. Vérifier P(0), puis P(n) ⇒ P(n+1).",
+        content: "Initialisation, hérédité, conclusion. Vérifier P(0), puis P(n) ⇒ P(n+1).",
       },
     ],
   },
@@ -144,11 +147,7 @@ export const fiches: Fiche[] = [
       {
         heading: "Loi binomiale B(n, p)",
         content: "n épreuves de Bernoulli indépendantes :",
-        formulas: [
-          "P(X = k) = C(n,k) · pᵏ · (1−p)ⁿ⁻ᵏ",
-          "E(X) = n·p",
-          "V(X) = n·p·(1−p)",
-        ],
+        formulas: ["P(X = k) = C(n,k) · pᵏ · (1−p)ⁿ⁻ᵏ", "E(X) = n·p", "V(X) = n·p·(1−p)"],
       },
     ],
   },
@@ -161,11 +160,7 @@ export const fiches: Fiche[] = [
       {
         heading: "Produit scalaire",
         content: "Dans le plan ou l'espace :",
-        formulas: [
-          "u·v = ‖u‖·‖v‖·cos(θ)",
-          "u·v = x·x' + y·y' (+ z·z')",
-          "u ⊥ v ⇔ u·v = 0",
-        ],
+        formulas: ["u·v = ‖u‖·‖v‖·cos(θ)", "u·v = x·x' + y·y' (+ z·z')", "u ⊥ v ⇔ u·v = 0"],
       },
       {
         heading: "Colinéarité",
@@ -218,12 +213,7 @@ export const fiches: Fiche[] = [
       {
         heading: "Exponentielle",
         content: "Pour tous x, y ∈ ℝ :",
-        formulas: [
-          "eˣ⁺ʸ = eˣ · eʸ",
-          "e⁻ˣ = 1/eˣ",
-          "(eˣ)ⁿ = eⁿˣ",
-          "eˣ = y ⇔ x = ln y (y > 0)",
-        ],
+        formulas: ["eˣ⁺ʸ = eˣ · eʸ", "e⁻ˣ = 1/eˣ", "(eˣ)ⁿ = eⁿˣ", "eˣ = y ⇔ x = ln y (y > 0)"],
       },
     ],
   },
@@ -316,12 +306,7 @@ export const fiches: Fiche[] = [
       {
         heading: "Indicateurs",
         content: "Sur une série de n valeurs :",
-        formulas: [
-          "x̄ = (1/n)·Σ xᵢ",
-          "V = (1/n)·Σ (xᵢ − x̄)²",
-          "σ = √V",
-          "V(ax) = a²·V(x)",
-        ],
+        formulas: ["x̄ = (1/n)·Σ xᵢ", "V = (1/n)·Σ (xᵢ − x̄)²", "σ = √V", "V(ax) = a²·V(x)"],
       },
       {
         heading: "Loi normale",

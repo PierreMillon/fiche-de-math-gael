@@ -12,9 +12,7 @@ const TIMES = "text-red-400";
 const FRAC = "border-yellow-400";
 const EXP = "text-green-400";
 
-export const n = (v: string | number): ReactNode => (
-  <span className={W}>{v}</span>
-);
+export const n = (v: string | number): ReactNode => <span className={W}>{v}</span>;
 
 export const plus = (...parts: ReactNode[]): ReactNode => (
   <span className="inline-flex items-center">
@@ -76,11 +74,7 @@ export const frac = (num: ReactNode, den: ReactNode): ReactNode => (
 export const pow = (base: ReactNode, exp: ReactNode): ReactNode => (
   <span className="inline-flex items-start">
     {base}
-    <span
-      className={`${EXP} [&_*]:text-green-400 text-[0.7em] -mt-1 ml-0.5`}
-    >
-      {exp}
-    </span>
+    <span className={`${EXP} [&_*]:text-green-400 text-[0.7em] -mt-1 ml-0.5`}>{exp}</span>
   </span>
 );
 
@@ -160,6 +154,7 @@ export type QuizQ = {
   prompt: ReactNode;
   choices: ReactNode[];
   answer: number;
+  explanation: string;
 };
 
 export type PemdasRow = {
@@ -174,8 +169,7 @@ export type PemdasRow = {
 
 // ---------- helpers ----------
 
-const rnd = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1)) + min;
+const rnd = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 const shuffle = <T,>(arr: T[]): T[] => {
   const a = [...arr];
@@ -190,6 +184,7 @@ const makeQ = (
   prompt: ReactNode,
   correct: string,
   distractors: string[],
+  explanation: string,
 ): QuizQ => {
   const uniqueD: string[] = [];
   for (const d of distractors) {
@@ -199,8 +194,7 @@ const makeQ = (
   let filler = 1;
   while (uniqueD.length < 3) {
     const candidate = `${correct} (?${filler})`;
-    if (candidate !== correct && !uniqueD.includes(candidate))
-      uniqueD.push(candidate);
+    if (candidate !== correct && !uniqueD.includes(candidate)) uniqueD.push(candidate);
     filler++;
   }
   const all = shuffle([correct, ...uniqueD.slice(0, 3)]);
@@ -208,6 +202,7 @@ const makeQ = (
     prompt,
     choices: all.map((s) => fmt(s)),
     answer: all.indexOf(correct),
+    explanation,
   };
 };
 
@@ -233,6 +228,7 @@ export const rows: PemdasRow[] = [
         <>Écris {Array(t).fill(k).join("+")} sous forme d'un produit.</>,
         `${k}×${t}`,
         [`${k}+${t}`, `${k}×${t + 1}`, `${k}${t}`],
+        `Additionner ${k} un total de ${t} fois revient à calculer ${k}×${t}.`,
       );
     },
   },
@@ -249,6 +245,7 @@ export const rows: PemdasRow[] = [
         <>Écris {Array(e).fill(b).join("×")} sous forme d'une puissance.</>,
         `${b}^${e}`,
         [`${b}×${e}`, `${b}^${e + 1}`, `${e}^${b}`],
+        `Multiplier ${b} par lui-même ${e} fois revient à calculer ${b}^${e}.`,
       );
     },
   },
@@ -261,9 +258,12 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       const k = rnd(2, lvl >= 2 ? 12 : 7);
       return makeQ(
-        <>Factorise : {k}a + {k}b</>,
+        <>
+          Factorise : {k}a + {k}b
+        </>,
         `${k}(a+b)`,
         [`${k}(a−b)`, `${2 * k}(a+b)`, `${k}ab`],
+        `${k} est un facteur commun : ${k}a+${k}b = ${k}(a+b).`,
       );
     },
   },
@@ -276,9 +276,12 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       const k = rnd(2, lvl >= 2 ? 12 : 7);
       return makeQ(
-        <>Factorise : {k}a − {k}b</>,
+        <>
+          Factorise : {k}a − {k}b
+        </>,
         `${k}(a−b)`,
         [`${k}(a+b)`, `${2 * k}(a−b)`, `${k}(b−a)`],
+        `${k} est un facteur commun : ${k}a−${k}b = ${k}(a−b).`,
       );
     },
   },
@@ -292,9 +295,12 @@ export const rows: PemdasRow[] = [
       const a = rnd(2, lvl >= 2 ? 12 : 8);
       const b = rnd(1, a - 1);
       return makeQ(
-        <>Factorise : {fmt(`${a}^2`)} − {fmt(`${b}^2`)}</>,
+        <>
+          Factorise : {fmt(`${a}^2`)} − {fmt(`${b}^2`)}
+        </>,
         `(${a}+${b})(${a}−${b})`,
         [`(${a}−${b})^2`, `${a}^2 − ${b}^2`, `${a * a - b * b}`],
+        `Identité remarquable : a²−b² = (a+b)(a−b).`,
       );
     },
   },
@@ -309,9 +315,12 @@ export const rows: PemdasRow[] = [
       const a = rnd(1, c - 1);
       const b = rnd(1, c - 1);
       return makeQ(
-        <>Calcule : {a}/{c} + {b}/{c}</>,
+        <>
+          Calcule : {a}/{c} + {b}/{c}
+        </>,
         `${a + b}/${c}`,
         [`${a + b}/${2 * c}`, `${a * b}/${c}`, `${a}+${b}/${c}`],
+        `Même dénominateur : on additionne seulement les numérateurs.`,
       );
     },
   },
@@ -327,9 +336,12 @@ export const rows: PemdasRow[] = [
       const c = rnd(1, lvl >= 2 ? 9 : 5);
       const d = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
-        <>Calcule : ({a}/{b}) × ({c}/{d})</>,
+        <>
+          Calcule : ({a}/{b}) × ({c}/{d})
+        </>,
         `${a * c}/${b * d}`,
         [`${a + c}/${b + d}`, `${a * b}/${c * d}`, `${a * d}/${b * c}`],
+        `On multiplie les numérateurs entre eux, et les dénominateurs entre eux.`,
       );
     },
   },
@@ -345,9 +357,12 @@ export const rows: PemdasRow[] = [
       const c = rnd(1, lvl >= 2 ? 9 : 5);
       const d = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
-        <>Calcule : ({a}/{b}) ÷ ({c}/{d})</>,
+        <>
+          Calcule : ({a}/{b}) ÷ ({c}/{d})
+        </>,
         `${a * d}/${b * c}`,
         [`${a * c}/${b * d}`, `${b * c}/${a * d}`, `${a + d}/${b + c}`],
+        `Diviser par une fraction revient à multiplier par son inverse.`,
       );
     },
   },
@@ -362,9 +377,12 @@ export const rows: PemdasRow[] = [
       const b = rnd(2, lvl >= 2 ? 9 : 5);
       const c = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
-        <>Simplifie : {a * c}/{b * c}</>,
+        <>
+          Simplifie : {a * c}/{b * c}
+        </>,
         simp(a, b),
         [`${a}/${b * c}`, `${a * c}/${b}`, `${c}/${b}`],
+        `Le facteur commun ${c} se simplifie au numérateur et au dénominateur.`,
       );
     },
   },
@@ -377,18 +395,24 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       if (lvl >= 3) {
         return makeQ(
-          <>Simplifie : {fmt("x^(1/2)")} × {fmt("x^(1/2)")}</>,
+          <>
+            Simplifie : {fmt("x^(1/2)")} × {fmt("x^(1/2)")}
+          </>,
           "x",
           ["x^(1/4)", "x^2", "2x"],
+          `Même base : on additionne les exposants, 1/2+1/2=1.`,
         );
       }
       const x = rnd(2, 5);
       const a = rnd(2, lvl >= 2 ? 7 : 4);
       const b = rnd(2, lvl >= 2 ? 7 : 4);
       return makeQ(
-        <>Simplifie : {fmt(`${x}^${a}`)} × {fmt(`${x}^${b}`)}</>,
+        <>
+          Simplifie : {fmt(`${x}^${a}`)} × {fmt(`${x}^${b}`)}
+        </>,
         `${x}^${a + b}`,
         [`${x}^${a * b}`, `${x * x}^${a + b}`, `${x}^${a - b}`],
+        `Même base : on additionne les exposants (${a}+${b}).`,
       );
     },
   },
@@ -401,18 +425,24 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       if (lvl >= 3) {
         return makeQ(
-          <>Simplifie : {fmt("x^(1/3)")} × {fmt("y^(1/3)")}</>,
+          <>
+            Simplifie : {fmt("x^(1/3)")} × {fmt("y^(1/3)")}
+          </>,
           "(xy)^(1/3)",
           ["(xy)^3", "x^(1/3)+y^(1/3)", "(x+y)^(1/3)"],
+          `Même exposant : on multiplie les bases.`,
         );
       }
       const x = rnd(2, 6);
       const y = rnd(2, 6);
       const a = rnd(2, lvl >= 2 ? 7 : 3);
       return makeQ(
-        <>Simplifie : {fmt(`${x}^${a}`)} × {fmt(`${y}^${a}`)}</>,
+        <>
+          Simplifie : {fmt(`${x}^${a}`)} × {fmt(`${y}^${a}`)}
+        </>,
         `${x * y}^${a}`,
         [`${x + y}^${a}`, `${x * y}^${2 * a}`, `${x}^${a} + ${y}^${a}`],
+        `Même exposant : on multiplie les bases (${x}×${y}).`,
       );
     },
   },
@@ -425,18 +455,24 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       if (lvl >= 3) {
         return makeQ(
-          <>Simplifie : {fmt("x^(3/2)")} / {fmt("x^(1/2)")}</>,
+          <>
+            Simplifie : {fmt("x^(3/2)")} / {fmt("x^(1/2)")}
+          </>,
           "x",
           ["x^2", "x^(1/2)", "x^3"],
+          `Même base : on soustrait les exposants, 3/2−1/2=1.`,
         );
       }
       const x = rnd(2, 5);
       const a = rnd(4, lvl >= 2 ? 9 : 8);
       const b = rnd(1, 3);
       return makeQ(
-        <>Simplifie : {fmt(`${x}^${a}`)} / {fmt(`${x}^${b}`)}</>,
+        <>
+          Simplifie : {fmt(`${x}^${a}`)} / {fmt(`${x}^${b}`)}
+        </>,
         `${x}^${a - b}`,
         [`${x}^${a + b}`, `1^${a - b}`, `${x}^${a * b}`],
+        `Même base : on soustrait les exposants (${a}−${b}).`,
       );
     },
   },
@@ -449,9 +485,12 @@ export const rows: PemdasRow[] = [
     quiz: (lvl) => {
       if (lvl >= 3) {
         return makeQ(
-          <>Simplifie : {fmt("x^(1/2)")} / {fmt("y^(1/2)")}</>,
+          <>
+            Simplifie : {fmt("x^(1/2)")} / {fmt("y^(1/2)")}
+          </>,
           "(x/y)^(1/2)",
           ["(x/y)^2", "(x−y)^(1/2)", "x^(1/2)−y^(1/2)"],
+          `Même exposant : on divise les bases.`,
         );
       }
       const y = rnd(2, 4);
@@ -459,9 +498,12 @@ export const rows: PemdasRow[] = [
       const x = y * k;
       const a = rnd(2, lvl >= 2 ? 6 : 3);
       return makeQ(
-        <>Simplifie : {fmt(`${x}^${a}`)} / {fmt(`${y}^${a}`)}</>,
+        <>
+          Simplifie : {fmt(`${x}^${a}`)} / {fmt(`${y}^${a}`)}
+        </>,
         `${k}^${a}`,
         [`${x - y}^${a}`, `${k}^${2 * a}`, `${x}^${a} − ${y}^${a}`],
+        `Même exposant : on divise les bases (${x}÷${y}=${k}).`,
       );
     },
   },
@@ -477,6 +519,7 @@ export const rows: PemdasRow[] = [
           <>Simplifie : {fmt("(x^(1/2))^2")}</>,
           "x",
           ["x^(1/4)", "x^2", "x^4"],
+          `Puissance de puissance : on multiplie les exposants, 1/2×2=1.`,
         );
       }
       const x = rnd(2, 5);
@@ -486,6 +529,7 @@ export const rows: PemdasRow[] = [
         <>Simplifie : {fmt(`(${x}^${a})^${b}`)}</>,
         `${x}^${a * b}`,
         [`${x}^${a + b}`, `${x}^${a - b}`, `${x * a}^${b}`],
+        `Puissance de puissance : on multiplie les exposants (${a}×${b}).`,
       );
     },
   },
@@ -501,17 +545,15 @@ export const rows: PemdasRow[] = [
           <>Développe : {fmt("(x^(1/2) + 1)^2")}</>,
           "x+2x^(1/2)+1",
           ["x+1", "x^(1/2)+1", "x+2x+1"],
+          `(a+b)² = a²+2ab+b² avec a=x^(1/2), b=1.`,
         );
       }
       const k = rnd(2, lvl >= 2 ? 9 : 5);
       return makeQ(
         <>Développe : {fmt(`(x + ${k})^2`)}</>,
         `x²+${2 * k}x+${k * k}`,
-        [
-          `x²+${k * k}`,
-          `x²−${2 * k}x+${k * k}`,
-          `x²+${k}x+${k * k}`,
-        ],
+        [`x²+${k * k}`, `x²−${2 * k}x+${k * k}`, `x²+${k}x+${k * k}`],
+        `Identité remarquable : (x+${k})² = x²+2×${k}×x+${k}².`,
       );
     },
   },
@@ -527,6 +569,7 @@ export const rows: PemdasRow[] = [
           <>Développe : {fmt("(x^(1/2) − 1)^2")}</>,
           "x−2x^(1/2)+1",
           ["x−1", "x^(1/2)−1", "x−2x+1"],
+          `(a−b)² = a²−2ab+b² avec a=x^(1/2), b=1.`,
         );
       }
       const k = rnd(2, lvl >= 2 ? 9 : 5);
@@ -534,6 +577,7 @@ export const rows: PemdasRow[] = [
         <>Développe : {fmt(`(x − ${k})^2`)}</>,
         `x²−${2 * k}x+${k * k}`,
         [`x²+${2 * k}x+${k * k}`, `x²−${k * k}`, `x²−${k}x+${k * k}`],
+        `Identité remarquable : (x−${k})² = x²−2×${k}×x+${k}².`,
       );
     },
   },
