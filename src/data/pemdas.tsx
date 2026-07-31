@@ -48,7 +48,13 @@ export const times = (...parts: ReactNode[]): ReactNode => (
 
 // Juxtaposition (implicit multiplication like "ka") — no operator symbol.
 export const jux = (...parts: ReactNode[]): ReactNode => (
-  <span className="inline-flex items-center">{parts}</span>
+  <span className="inline-flex items-center">
+    {parts.map((p, i) => (
+      <span key={i} className="inline-flex items-center">
+        {p}
+      </span>
+    ))}
+  </span>
 );
 
 export const paren = (a: ReactNode): ReactNode => (
@@ -461,7 +467,7 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "pow-of-pow",
-    left: pow(n("x"), timesW(n("a"), n("b"))),
+    left: powRaw(n("x"), timesW(n("a"), n("b"))),
     right: pow(paren(powW(n("x"), n("a"))), n("b")),
     leftCol: "Exposant",
     rightCol: "Exposant",
