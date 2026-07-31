@@ -75,6 +75,18 @@ export function usePyramid(storageKey: string) {
   return { pyramid: p, onCorrect, onWrong, reset };
 }
 
+// Client-only, one-shot read (no subscription) — for places that just want
+// to display a snapshot of progress, e.g. the homepage fiche cards.
+export function readStoredPyramid(key: string): Pyramid | null {
+  try {
+    const raw = localStorage.getItem("pyramid:" + key);
+    if (!raw) return null;
+    return { ...initialPyramid, ...JSON.parse(raw) };
+  } catch {
+    return null;
+  }
+}
+
 export function pyramidLabel(p: Pyramid): string {
   if (p.bossDone) return "Niveau boss réussi ✨";
   if (p.complete) return `Niveau boss · ${p.bossRays}/${BOSS_TARGET} rayons`;

@@ -892,6 +892,12 @@ export const exercises: Record<string, Bank> = {
         d: ["x>1/2", "x<−1/2", "x>−1/2"],
         e: "1−2x>0 ⟺ −2x>−1 ⟺ x<1/2 (on divise par un négatif : le sens change).",
       },
+      {
+        q: "Résoudre : −3x+6>0",
+        a: "x<2",
+        d: ["x>2", "x<−2", "x>−2"],
+        e: "−3x+6>0 ⟺ −3x>−6 ⟺ x<2 (on divise par −3, négatif : le sens s'inverse).",
+      },
     ],
     2: [
       {
@@ -899,6 +905,12 @@ export const exercises: Record<string, Bank> = {
         a: "positif si x<(1/3)ln 2",
         d: ["positif si x>(1/3)ln 2", "toujours positif", "toujours négatif"],
         e: "−e^(3x)+2>0 ⟺ e^(3x)<2 ⟺ 3x<ln 2 ⟺ x<(1/3)ln 2.",
+      },
+      {
+        q: "Résoudre : −2e^x+6>0",
+        a: "x<ln 3",
+        d: ["x>ln 3", "x<−ln 3", "x>−ln 3"],
+        e: "−2e^x+6>0 ⟺ −2e^x>−6 ⟺ e^x<3 (on divise par −2, négatif : le sens s'inverse) ⟺ x<ln 3.",
       },
       {
         q: "Résoudre : 3x+2 = x+5",

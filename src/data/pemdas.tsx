@@ -323,7 +323,7 @@ export const rows: PemdasRow[] = [
         </>,
         `(${a}+${b})(${a}−${b})`,
         [`(${a}−${b})^2`, `${a}^2 − ${b}^2`, `${a * a - b * b}`],
-        `Identité remarquable : a²−b² = (a+b)(a−b).`,
+        `Identité remarquable : a²−b² = (a+b)(a−b), avec a=${a}, b=${b}.`,
       );
     },
   },
@@ -343,7 +343,7 @@ export const rows: PemdasRow[] = [
         </>,
         `${a + b}/${c}`,
         [`${a + b}/${2 * c}`, `${a * b}/${c}`, `${a}+${b}/${c}`],
-        `Même dénominateur : on additionne seulement les numérateurs.`,
+        `Même dénominateur : on additionne seulement les numérateurs, ${a}+${b}=${a + b}.`,
       );
     },
   },
@@ -364,7 +364,7 @@ export const rows: PemdasRow[] = [
         </>,
         `${a * c}/${b * d}`,
         [`${a + c}/${b + d}`, `${a * b}/${c * d}`, `${a * d}/${b * c}`],
-        `On multiplie les numérateurs entre eux, et les dénominateurs entre eux.`,
+        `On multiplie les numérateurs entre eux (${a}×${c}=${a * c}), et les dénominateurs entre eux (${b}×${d}=${b * d}).`,
       );
     },
   },
@@ -385,7 +385,7 @@ export const rows: PemdasRow[] = [
         </>,
         `${a * d}/${b * c}`,
         [`${a * c}/${b * d}`, `${b * c}/${a * d}`, `${a + d}/${b + c}`],
-        `Diviser par une fraction revient à multiplier par son inverse.`,
+        `Diviser par une fraction revient à multiplier par son inverse : (${a}/${b}) × (${d}/${c}) = ${a * d}/${b * c}.`,
       );
     },
   },
