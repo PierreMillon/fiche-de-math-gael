@@ -235,6 +235,191 @@ export const fiches: Fiche[] = [
       "Portes logiques (ET, OU, NON, NON-ET, NON-OU, XOR) et circuits interactifs. Fais circuler le signal et devine la sortie.",
     sections: [],
   },
+  {
+    slug: "developpements-limites",
+    title: "Développements limités",
+    category: "Analyse",
+    summary: "DL usuels en 0 et calcul de limites par développement.",
+    sections: [
+      {
+        heading: "DL usuels en 0",
+        content: "À l'ordre 2 (avec o(x²)) :",
+        formulas: [
+          "e^x = 1 + x + x²/2 + o(x²)",
+          "ln(1+x) = x − x²/2 + o(x²)",
+          "sin x = x − x³/6 + o(x³)",
+          "cos x = 1 − x²/2 + o(x²)",
+          "1/(1−x) = 1 + x + x² + o(x²)",
+          "(1+x)^α = 1 + αx + α(α−1)x²/2 + o(x²)",
+        ],
+      },
+      {
+        heading: "Méthode",
+        content:
+          "Pour lever une forme indéterminée : remplacer chaque fonction par son DL au bon ordre, simplifier, puis conclure.",
+      },
+    ],
+  },
+  {
+    slug: "denombrement",
+    title: "Dénombrement",
+    category: "Probabilités",
+    summary: "Permutations, arrangements, combinaisons et cardinaux.",
+    sections: [
+      {
+        heading: "Formules clés",
+        content: "Sur un ensemble à n éléments :",
+        formulas: [
+          "n! permutations",
+          "A(n,k) = n! / (n−k)!  (ordre, sans répétition)",
+          "C(n,k) = n! / (k!(n−k)!)  (sans ordre)",
+          "nᵏ listes de k éléments avec répétition",
+          "2ⁿ parties d'un ensemble à n éléments",
+        ],
+      },
+      {
+        heading: "Propriétés des combinaisons",
+        content: "Symétrie et triangle de Pascal :",
+        formulas: ["C(n,k) = C(n,n−k)", "C(n,k) + C(n,k+1) = C(n+1,k+1)"],
+      },
+    ],
+  },
+  {
+    slug: "matrices",
+    title: "Matrices",
+    category: "Algèbre",
+    summary: "Produit matriciel, déterminant et inversibilité.",
+    sections: [
+      {
+        heading: "Produit",
+        content:
+          "Le produit d'une matrice n×p par une p×q donne une matrice n×q. Il n'est pas commutatif.",
+        formulas: ["(AB)ᵢⱼ = Σₖ aᵢₖ · bₖⱼ", "A·I = I·A = A"],
+      },
+      {
+        heading: "Déterminant 2×2",
+        content: "Pour A = [[a,b],[c,d]] :",
+        formulas: [
+          "det(A) = ad − bc",
+          "A⁻¹ = (1/det A)·[[d,−b],[−c,a]]  (det A ≠ 0)",
+          "det(AB) = det(A)·det(B)",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "statistiques",
+    title: "Statistiques",
+    category: "Probabilités",
+    summary: "Moyenne, médiane, variance, écart-type et corrélation.",
+    sections: [
+      {
+        heading: "Indicateurs",
+        content: "Sur une série de n valeurs :",
+        formulas: [
+          "x̄ = (1/n)·Σ xᵢ",
+          "V = (1/n)·Σ (xᵢ − x̄)²",
+          "σ = √V",
+          "V(ax) = a²·V(x)",
+        ],
+      },
+      {
+        heading: "Loi normale",
+        content: "Pour X ~ N(μ, σ²) :",
+        formulas: [
+          "P(μ−σ ≤ X ≤ μ+σ) ≈ 68 %",
+          "P(μ−2σ ≤ X ≤ μ+2σ) ≈ 95 %",
+          "P(μ−3σ ≤ X ≤ μ+3σ) ≈ 99,7 %",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "trigonometrie",
+    title: "Trigonométrie",
+    category: "Géométrie",
+    summary: "Cercle trigonométrique, valeurs usuelles et formules d'addition.",
+    sections: [
+      {
+        heading: "Valeurs usuelles",
+        content: "Angles remarquables :",
+        formulas: [
+          "cos 0 = 1, sin 0 = 0",
+          "cos π/6 = √3/2, sin π/6 = 1/2",
+          "cos π/4 = sin π/4 = √2/2",
+          "cos π/3 = 1/2, sin π/3 = √3/2",
+          "cos π/2 = 0, sin π/2 = 1",
+        ],
+      },
+      {
+        heading: "Formules",
+        content: "Pour tous réels a et b :",
+        formulas: [
+          "cos²x + sin²x = 1",
+          "sin(a+b) = sin a·cos b + cos a·sin b",
+          "cos(a+b) = cos a·cos b − sin a·sin b",
+          "cos 2x = 1 − 2 sin²x = 2 cos²x − 1",
+          "tan x = sin x / cos x",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "python",
+    title: "Programmation Python",
+    category: "Programmation",
+    summary: "Types, boucles, listes, fonctions et complexité.",
+    sections: [
+      {
+        heading: "Bases",
+        content: "Opérateurs et types courants :",
+        formulas: [
+          "7 // 2 → 3 (division entière)",
+          "7 % 3 → 1 (reste)",
+          "range(a, b, p) → a, a+p, … < b",
+          "len(liste) → nombre d'éléments",
+        ],
+      },
+      {
+        heading: "Fonctions et listes",
+        content: "Définition, récursivité et compréhension de liste :",
+        formulas: [
+          "def f(x): return x*x",
+          "[i*i for i in range(3)] → [0, 1, 4]",
+          "b = a copie la référence, pas la liste",
+          "Dichotomie : O(log n)",
+        ],
+      },
+    ],
+  },
+  {
+    slug: "java",
+    title: "Programmation Java",
+    category: "Programmation",
+    summary: "Typage, tableaux, classes et pièges classiques.",
+    sections: [
+      {
+        heading: "Bases",
+        content: "Langage typé statiquement :",
+        formulas: [
+          "int, double, boolean, char, String",
+          "7 / 2 → 3 (deux int)",
+          "tab.length (tableau), liste.size() (List)",
+          "System.out.println(x)",
+        ],
+      },
+      {
+        heading: "Objets",
+        content: "Classes et méthodes :",
+        formulas: [
+          "class A extends B { }",
+          "a.equals(b) pour comparer des String",
+          "static → membre de la classe",
+          "5 / 0 → ArithmeticException",
+        ],
+      },
+    ],
+  },
 ];
 
 export const getFiche = (slug: string) => fiches.find((f) => f.slug === slug);
