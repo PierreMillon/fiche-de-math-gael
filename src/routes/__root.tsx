@@ -127,7 +127,9 @@ function RootComponent() {
                 Fiches Maths
               </Link>
               <span className="text-xs opacity-90">
-                Fiches de révision interactives basées sur les fiches de Gaël Boury, pour réserver un cours : gaelboury@gmail.com
+                Fiches de révision interactives basées sur les fiches de Gaël Boury.
+                <br />
+                Réserver un cours : gaelboury@gmail.com
               </span>
             </div>
             <span className="text-xs opacity-90">Révisions</span>

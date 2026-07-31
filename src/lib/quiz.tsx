@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { fmt } from "@/lib/mathFormat";
-import { PyramidView, usePyramid } from "@/lib/pyramid";
+import { PyramidView, pyramidLabel, usePyramid } from "@/lib/pyramid";
 import { exercises, type QItem } from "@/data/exercises";
 
 const shuffle = <T,>(arr: T[]): T[] => {
@@ -14,31 +14,45 @@ const shuffle = <T,>(arr: T[]): T[] => {
 
 type Built = { item: QItem; choices: string[]; answer: number };
 
+// Always returns exactly 4 distinct choices, even if the data has
+// duplicate distractors or a distractor equal to the answer.
 const build = (item: QItem): Built => {
-  const all = shuffle([item.a, ...item.d]);
+  const uniqueD: string[] = [];
+  for (const d of item.d) {
+    if (d !== item.a && !uniqueD.includes(d)) uniqueD.push(d);
+  }
+  let filler = 1;
+  while (uniqueD.length < 3) {
+    const candidate = `${item.a} (${filler})`;
+    if (candidate !== item.a && !uniqueD.includes(candidate)) uniqueD.push(candidate);
+    filler++;
+  }
+  const all = shuffle([item.a, ...uniqueD.slice(0, 3)]);
   return { item, choices: all, answer: all.indexOf(item.a) };
 };
 
 export function ExerciseQuiz({ slug }: { slug: string }) {
   const bank = exercises[slug];
   const { pyramid, onCorrect, onWrong, reset } = usePyramid(`fiche:${slug}`);
-  const [q, setQ] = useState<Built | null>(null);
+  const lastQ = useRef<string | null>(null);
+
+  const pick = (tier: 1 | 2 | 3): Built | null => {
+    if (!bank) return null;
+    const pool = bank[tier];
+    let item = pool[Math.floor(Math.random() * pool.length)];
+    if (pool.length > 1) {
+      let tries = 0;
+      while (item.q === lastQ.current && tries < 10) {
+        item = pool[Math.floor(Math.random() * pool.length)];
+        tries++;
+      }
+    }
+    lastQ.current = item.q;
+    return build(item);
+  };
+
+  const [q, setQ] = useState<Built | null>(() => pick(1));
   const [picked, setPicked] = useState<number | null>(null);
-
-  const pick = useCallback(
-    (tier: 1 | 2 | 3) => {
-      if (!bank) return null;
-      const pool = bank[tier];
-      return build(pool[Math.floor(Math.random() * pool.length)]);
-    },
-    [bank],
-  );
-
-  // First question on mount only; later questions come from "Question suivante".
-  useEffect(() => {
-    setQ(pick(1));
-    setPicked(null);
-  }, [pick]);
 
   if (!bank || !q) return null;
 
@@ -55,19 +69,12 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
     setPicked(null);
   };
 
-  const need = pyramid.tier === 1 ? 3 : pyramid.tier === 2 ? 2 : 1;
-  const tierLabel = pyramid.complete
-    ? "Pyramide complète ✨"
-    : `Palier ${pyramid.tier} · ${pyramid.filled}/${need}`;
-
   return (
     <section className="rounded-xl border border-border bg-card p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-card-foreground">
-            Exercices
-          </h2>
-          <p className="mt-1 text-xs text-muted-foreground">{tierLabel}</p>
+          <h2 className="text-lg font-semibold text-card-foreground">Exercices</h2>
+          <p className="mt-1 text-xs text-muted-foreground">{pyramidLabel(pyramid)}</p>
         </div>
         <PyramidView p={pyramid} size="md" />
       </div>
@@ -98,10 +105,18 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
         })}
       </div>
 
+      {picked !== null && (
+        <p className="mt-3 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
+          {picked === q.answer ? "✅ " : "❌ "}
+          {fmt(q.item.e)}
+        </p>
+      )}
+
       <div className="mt-4 flex items-center justify-between">
         <button
           onClick={() => {
             reset();
+            lastQ.current = null;
             setQ(pick(1));
             setPicked(null);
           }}

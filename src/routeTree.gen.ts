@@ -10,29 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as FichesTangenteRouteImport } from './routes/fiches.tangente'
-import { Route as FichesPemdasRouteImport } from './routes/fiches.pemdas'
-import { Route as FichesLogiqueBooleenneRouteImport } from './routes/fiches.logique-booleenne'
 import { Route as FichesSlugRouteImport } from './routes/fiches.$slug'
+import { Route as FichesEquationsRouteImport } from './routes/fiches.equations'
+import { Route as FichesLogiqueBooleenneRouteImport } from './routes/fiches.logique-booleenne'
+import { Route as FichesPemdasRouteImport } from './routes/fiches.pemdas'
+import { Route as FichesTangenteRouteImport } from './routes/fiches.tangente'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FichesTangenteRoute = FichesTangenteRouteImport.update({
-  id: '/fiches/tangente',
-  path: '/fiches/tangente',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FichesPemdasRoute = FichesPemdasRouteImport.update({
-  id: '/fiches/pemdas',
-  path: '/fiches/pemdas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FichesLogiqueBooleenneRoute = FichesLogiqueBooleenneRouteImport.update({
-  id: '/fiches/logique-booleenne',
-  path: '/fiches/logique-booleenne',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FichesSlugRoute = FichesSlugRouteImport.update({
@@ -40,10 +26,31 @@ const FichesSlugRoute = FichesSlugRouteImport.update({
   path: '/fiches/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FichesEquationsRoute = FichesEquationsRouteImport.update({
+  id: '/fiches/equations',
+  path: '/fiches/equations',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichesLogiqueBooleenneRoute = FichesLogiqueBooleenneRouteImport.update({
+  id: '/fiches/logique-booleenne',
+  path: '/fiches/logique-booleenne',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichesPemdasRoute = FichesPemdasRouteImport.update({
+  id: '/fiches/pemdas',
+  path: '/fiches/pemdas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichesTangenteRoute = FichesTangenteRouteImport.update({
+  id: '/fiches/tangente',
+  path: '/fiches/tangente',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/equations': typeof FichesEquationsRoute
   '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
   '/fiches/tangente': typeof FichesTangenteRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/equations': typeof FichesEquationsRoute
   '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
   '/fiches/tangente': typeof FichesTangenteRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/equations': typeof FichesEquationsRoute
   '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
   '/fiches/tangente': typeof FichesTangenteRoute
@@ -68,6 +77,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/fiches/$slug'
+    | '/fiches/equations'
     | '/fiches/logique-booleenne'
     | '/fiches/pemdas'
     | '/fiches/tangente'
@@ -75,6 +85,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/fiches/$slug'
+    | '/fiches/equations'
     | '/fiches/logique-booleenne'
     | '/fiches/pemdas'
     | '/fiches/tangente'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/fiches/$slug'
+    | '/fiches/equations'
     | '/fiches/logique-booleenne'
     | '/fiches/pemdas'
     | '/fiches/tangente'
@@ -90,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FichesSlugRoute: typeof FichesSlugRoute
+  FichesEquationsRoute: typeof FichesEquationsRoute
   FichesLogiqueBooleenneRoute: typeof FichesLogiqueBooleenneRoute
   FichesPemdasRoute: typeof FichesPemdasRoute
   FichesTangenteRoute: typeof FichesTangenteRoute
@@ -104,18 +117,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/fiches/tangente': {
-      id: '/fiches/tangente'
-      path: '/fiches/tangente'
-      fullPath: '/fiches/tangente'
-      preLoaderRoute: typeof FichesTangenteRouteImport
+    '/fiches/$slug': {
+      id: '/fiches/$slug'
+      path: '/fiches/$slug'
+      fullPath: '/fiches/$slug'
+      preLoaderRoute: typeof FichesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/fiches/pemdas': {
-      id: '/fiches/pemdas'
-      path: '/fiches/pemdas'
-      fullPath: '/fiches/pemdas'
-      preLoaderRoute: typeof FichesPemdasRouteImport
+    '/fiches/equations': {
+      id: '/fiches/equations'
+      path: '/fiches/equations'
+      fullPath: '/fiches/equations'
+      preLoaderRoute: typeof FichesEquationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fiches/logique-booleenne': {
@@ -125,11 +138,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FichesLogiqueBooleenneRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/fiches/$slug': {
-      id: '/fiches/$slug'
-      path: '/fiches/$slug'
-      fullPath: '/fiches/$slug'
-      preLoaderRoute: typeof FichesSlugRouteImport
+    '/fiches/pemdas': {
+      id: '/fiches/pemdas'
+      path: '/fiches/pemdas'
+      fullPath: '/fiches/pemdas'
+      preLoaderRoute: typeof FichesPemdasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fiches/tangente': {
+      id: '/fiches/tangente'
+      path: '/fiches/tangente'
+      fullPath: '/fiches/tangente'
+      preLoaderRoute: typeof FichesTangenteRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -138,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FichesSlugRoute: FichesSlugRoute,
+  FichesEquationsRoute: FichesEquationsRoute,
   FichesLogiqueBooleenneRoute: FichesLogiqueBooleenneRoute,
   FichesPemdasRoute: FichesPemdasRoute,
   FichesTangenteRoute: FichesTangenteRoute,
@@ -145,3 +166,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

@@ -23,21 +23,6 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <p className="text-sm uppercase tracking-[0.2em] text-primary">
-            Révisions
-          </p>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-            Fiches de mathématiques
-          </h1>
-          <p className="mt-4 max-w-xl text-muted-foreground">
-            Une sélection de fiches synthétiques classées par sujet. Choisis un
-            thème pour ouvrir la fiche correspondante.
-          </p>
-        </div>
-      </header>
-
       <main className="mx-auto max-w-6xl px-6 py-12">
         {categories.map((cat) => (
           <section key={cat} className="mb-12">
@@ -55,16 +40,12 @@ function Index() {
                     className="group relative rounded-xl border border-border bg-card p-6 transition hover:border-primary hover:-translate-y-0.5"
                   >
                     <div className="flex items-start justify-between">
-                      <h3 className="text-lg font-semibold text-card-foreground">
-                        {f.title}
-                      </h3>
+                      <h3 className="text-lg font-semibold text-card-foreground">{f.title}</h3>
                       <span className="text-primary opacity-0 transition group-hover:opacity-100">
                         →
                       </span>
                     </div>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {f.summary}
-                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">{f.summary}</p>
                   </Link>
                 ))}
             </div>

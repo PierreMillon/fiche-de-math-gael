@@ -20,14 +20,16 @@ export function fmt(s: string): ReactNode {
       flush();
       i++;
       let exp = "";
-      if (s[i] === "(") {
+      if (s[i] === "(" || s[i] === "{") {
+        const open = s[i];
+        const close = open === "(" ? ")" : "}";
         let depth = 1;
         i++;
         while (i < s.length && depth > 0) {
-          if (s[i] === "(") {
+          if (s[i] === open) {
             depth++;
             exp += s[i];
-          } else if (s[i] === ")") {
+          } else if (s[i] === close) {
             depth--;
             if (depth === 0) {
               i++;
@@ -53,10 +55,7 @@ export function fmt(s: string): ReactNode {
         }
       }
       parts.push(
-        <sup
-          key={`s${parts.length}`}
-          className="relative -top-1 text-[0.7em] font-normal"
-        >
+        <sup key={`s${parts.length}`} className="relative -top-1 text-[0.7em] font-normal">
           {fmt(exp)}
         </sup>,
       );

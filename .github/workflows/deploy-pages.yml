@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Client-only SPA build (vite.spa.config.ts) — GitHub Pages only serves
+      # static files, and the nitro static preset currently fails to build
+      # with this project's TanStack Start + nitro (pre-release) combination,
+      # so this bypasses that pipeline entirely instead of the SSR build.
+      # GH_PAGES_BASE tells Vite/TanStack Router this app is served from
+      # /<repo>/ instead of the domain root.
+      - run: npx vite build --config vite.spa.config.ts
+        env:
+          GH_PAGES_BASE: /${{ github.event.repository.name }}/
+
+      # SPA fallback: GitHub Pages has no server-side rewrites, so a direct
+      # visit/refresh on e.g. /fiches/pemdas would 404. Serving our own
+      # index.html as the 404 page lets the client-side router take over
+      # and render the right route once it reads the URL.
+      - run: cp dist-spa/index.html dist-spa/404.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-spa
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
