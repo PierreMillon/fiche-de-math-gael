@@ -682,7 +682,15 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "square-minus",
-    left: plus(powW(n("a"), n(2)), jux(n("−2"), n("a"), n("b")), powW(n("b"), n(2))),
+    left: (
+      <span className="inline-flex items-center">
+        {powW(n("a"), n(2))}
+        <span className="text-blue-400 mx-0.5">−</span>
+        {jux(n(2), n("a"), n("b"))}
+        <span className="text-blue-400 mx-0.5">+</span>
+        {powW(n("b"), n(2))}
+      </span>
+    ),
     right: pow(paren(minusW(n("a"), n("b"))), n(2)),
     leftCol: "Somme",
     rightCol: "Exposant",

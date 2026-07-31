@@ -142,7 +142,10 @@ export function PyramidView({ p, size = "sm" }: { p: Pyramid; size?: "sm" | "md"
       }`}
     />
   );
-  const radius = size === "md" ? 20 : 16;
+  // Radius must clear the pyramid's diagonal extent (its widest points are the
+  // bottom row's corners, not its cardinal edges), plus half the ray's own
+  // length, so every ray sits outside the triangle uniformly, like a crown.
+  const radius = size === "md" ? 44 : 34;
 
   return (
     <div className="relative flex flex-col items-center gap-0.5">
