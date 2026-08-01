@@ -264,8 +264,18 @@ export const rows: PemdasRow[] = [
           `${k}×${t} = additionner ${k} un total de ${t} fois : ${Array(t).fill(k).join("+")}.`,
         );
       }
-      const k = rnd(2, lvl >= 2 ? 12 : 6);
-      const t = rnd(3, lvl >= 2 ? 7 : 5);
+      if (lvl >= 3) {
+        const k = rnd(4, 12);
+        const t = rnd(5, 8);
+        return makeQ(
+          <>Écris {Array(t).fill(k).join("+")} sous forme d'un produit.</>,
+          `${k}×${t}`,
+          [`${k}+${t}`, `${k}×${t + 1}`, `${k}${t}`],
+          `Additionner ${k} un total de ${t} fois revient à calculer ${k}×${t}.`,
+        );
+      }
+      const k = rnd(2, lvl >= 2 ? 9 : 6);
+      const t = rnd(3, lvl >= 2 ? 6 : 5);
       return makeQ(
         <>Écris {Array(t).fill(k).join("+")} sous forme d'un produit.</>,
         `${k}×${t}`,
@@ -298,8 +308,18 @@ export const rows: PemdasRow[] = [
           `${b}^${e} = multiplier ${b} par lui-même ${e} fois : ${Array(e).fill(b).join("×")}.`,
         );
       }
-      const b = rnd(2, lvl >= 2 ? 9 : 5);
-      const e = rnd(2, lvl >= 2 ? 5 : 4);
+      if (lvl >= 3) {
+        const b = rnd(3, 9);
+        const e = rnd(4, 6);
+        return makeQ(
+          <>Écris {Array(e).fill(b).join("×")} sous forme d'une puissance.</>,
+          `${b}^${e}`,
+          [`${b}×${e}`, `${b}^${e + 1}`, `${e}^${b}`],
+          `Multiplier ${b} par lui-même ${e} fois revient à calculer ${b}^${e}.`,
+        );
+      }
+      const b = rnd(2, lvl >= 2 ? 7 : 5);
+      const e = rnd(2, lvl >= 2 ? 4 : 4);
       return makeQ(
         <>Écris {Array(e).fill(b).join("×")} sous forme d'une puissance.</>,
         `${b}^${e}`,
@@ -331,7 +351,18 @@ export const rows: PemdasRow[] = [
           `Le plus grand facteur commun de ${c1} et ${c2} est ${g} : ${c1}a+${c2}b = ${g}(${m}a+${n}b).`,
         );
       }
-      const k = rnd(2, lvl >= 2 ? 12 : 7);
+      if (lvl >= 3) {
+        const k = rnd(8, 18);
+        return makeQ(
+          <>
+            Factorise : {k}a + {k}b
+          </>,
+          `${k}(a+b)`,
+          [`${k}(a−b)`, `${2 * k}(a+b)`, `${k}ab`],
+          `${k} est un facteur commun : ${k}a+${k}b = ${k}(a+b).`,
+        );
+      }
+      const k = rnd(2, lvl >= 2 ? 9 : 7);
       return makeQ(
         <>
           Factorise : {k}a + {k}b
@@ -365,7 +396,18 @@ export const rows: PemdasRow[] = [
           `Le plus grand facteur commun de ${c1} et ${c2} est ${g} : ${c1}a−${c2}b = ${g}(${m}a−${n}b).`,
         );
       }
-      const k = rnd(2, lvl >= 2 ? 12 : 7);
+      if (lvl >= 3) {
+        const k = rnd(8, 18);
+        return makeQ(
+          <>
+            Factorise : {k}a − {k}b
+          </>,
+          `${k}(a−b)`,
+          [`${k}(a+b)`, `${2 * k}(a−b)`, `${k}(b−a)`],
+          `${k} est un facteur commun : ${k}a−${k}b = ${k}(a−b).`,
+        );
+      }
+      const k = rnd(2, lvl >= 2 ? 9 : 7);
       return makeQ(
         <>
           Factorise : {k}a − {k}b
@@ -405,7 +447,19 @@ export const rows: PemdasRow[] = [
           `a²−b² = (a+b)(a−b) = ${a + b}×${a - b}.`,
         );
       }
-      const a = rnd(2, lvl >= 2 ? 12 : 8);
+      if (lvl >= 3) {
+        const a = rnd(9, 16);
+        const b = rnd(1, a - 1);
+        return makeQ(
+          <>
+            Factorise : {fmt(`${a}^2`)} − {fmt(`${b}^2`)}
+          </>,
+          `(${a}+${b})(${a}−${b})`,
+          [`(${a}−${b})^2`, `${a}^2 − ${b}^2`, `${a * a - b * b}`],
+          `Identité remarquable : a²−b² = (a+b)(a−b), avec a=${a}, b=${b}.`,
+        );
+      }
+      const a = rnd(2, lvl >= 2 ? 8 : 5);
       const b = rnd(1, a - 1);
       return makeQ(
         <>
@@ -441,7 +495,20 @@ export const rows: PemdasRow[] = [
           `Dénominateur commun ${c1}×${c2}=${den} : ${a}/${c1}=${a * c2}/${den}, ${b}/${c2}=${b * c1}/${den}, somme = ${num}/${den}.`,
         );
       }
-      const c = rnd(3, lvl >= 2 ? 15 : 9);
+      if (lvl >= 3) {
+        const c = rnd(10, 20);
+        const a = rnd(1, c - 1);
+        const b = rnd(1, c - 1);
+        return makeQ(
+          <>
+            Calcule : {a}/{c} + {b}/{c}
+          </>,
+          `${a + b}/${c}`,
+          [`${a + b}/${2 * c}`, `${a * b}/${c}`, `${a}+${b}/${c}`],
+          `Même dénominateur : on additionne seulement les numérateurs, ${a}+${b}=${a + b}.`,
+        );
+      }
+      const c = rnd(3, lvl >= 2 ? 10 : 9);
       const a = rnd(1, c - 1);
       const b = rnd(1, c - 1);
       return makeQ(
@@ -475,10 +542,24 @@ export const rows: PemdasRow[] = [
           `On multiplie les numérateurs entre eux (${a}×${c}=${a * c}), et les dénominateurs entre eux (${b}×${d}=${b * d}).`,
         );
       }
-      const a = rnd(1, lvl >= 2 ? 9 : 5);
-      const b = rnd(2, lvl >= 2 ? 9 : 5);
-      const c = rnd(1, lvl >= 2 ? 9 : 5);
-      const d = rnd(2, lvl >= 2 ? 9 : 5);
+      if (lvl >= 3) {
+        const a = rnd(3, 12);
+        const b = rnd(4, 13);
+        const c = rnd(3, 12);
+        const d = rnd(4, 13);
+        return makeQ(
+          <>
+            Calcule : ({a}/{b}) × ({c}/{d})
+          </>,
+          `${a * c}/${b * d}`,
+          [`${a + c}/${b + d}`, `${a * b}/${c * d}`, `${a * d}/${b * c}`],
+          `On multiplie les numérateurs entre eux (${a}×${c}=${a * c}), et les dénominateurs entre eux (${b}×${d}=${b * d}).`,
+        );
+      }
+      const a = rnd(1, lvl >= 2 ? 7 : 5);
+      const b = rnd(2, lvl >= 2 ? 7 : 5);
+      const c = rnd(1, lvl >= 2 ? 7 : 5);
+      const d = rnd(2, lvl >= 2 ? 7 : 5);
       return makeQ(
         <>
           Calcule : ({a}/{b}) × ({c}/{d})
@@ -510,10 +591,24 @@ export const rows: PemdasRow[] = [
           `Diviser par une fraction revient à multiplier par son inverse : (${a}/${b}) × (${d}/${c}) = ${a * d}/${b * c}.`,
         );
       }
-      const a = rnd(1, lvl >= 2 ? 9 : 5);
-      const b = rnd(2, lvl >= 2 ? 9 : 5);
-      const c = rnd(1, lvl >= 2 ? 9 : 5);
-      const d = rnd(2, lvl >= 2 ? 9 : 5);
+      if (lvl >= 3) {
+        const a = rnd(3, 12);
+        const b = rnd(4, 13);
+        const c = rnd(3, 12);
+        const d = rnd(4, 13);
+        return makeQ(
+          <>
+            Calcule : ({a}/{b}) ÷ ({c}/{d})
+          </>,
+          `${a * d}/${b * c}`,
+          [`${a * c}/${b * d}`, `${b * c}/${a * d}`, `${a + d}/${b + c}`],
+          `Diviser par une fraction revient à multiplier par son inverse : (${a}/${b}) × (${d}/${c}) = ${a * d}/${b * c}.`,
+        );
+      }
+      const a = rnd(1, lvl >= 2 ? 7 : 5);
+      const b = rnd(2, lvl >= 2 ? 7 : 5);
+      const c = rnd(1, lvl >= 2 ? 7 : 5);
+      const d = rnd(2, lvl >= 2 ? 7 : 5);
       return makeQ(
         <>
           Calcule : ({a}/{b}) ÷ ({c}/{d})
@@ -544,9 +639,22 @@ export const rows: PemdasRow[] = [
           `Le facteur commun ${c} se simplifie au numérateur et au dénominateur.`,
         );
       }
-      const a = rnd(2, lvl >= 2 ? 9 : 5);
-      const b = rnd(2, lvl >= 2 ? 9 : 5);
-      const c = rnd(2, lvl >= 2 ? 9 : 5);
+      if (lvl >= 3) {
+        const a = rnd(4, 12);
+        const b = rnd(4, 12);
+        const c = rnd(6, 13);
+        return makeQ(
+          <>
+            Simplifie : {a * c}/{b * c}
+          </>,
+          simp(a, b),
+          [`${a}/${b * c}`, `${a * c}/${b}`, `${c}/${b}`],
+          `Le facteur commun ${c} se simplifie au numérateur et au dénominateur.`,
+        );
+      }
+      const a = rnd(2, lvl >= 2 ? 7 : 5);
+      const b = rnd(2, lvl >= 2 ? 7 : 5);
+      const c = rnd(2, lvl >= 2 ? 7 : 5);
       return makeQ(
         <>
           Simplifie : {a * c}/{b * c}

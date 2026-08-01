@@ -295,12 +295,19 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
 
   return (
     <Modal open={!!row} onClose={closeAndReset}>
-      <div className="flex items-center justify-between pr-6">
-        <span className="text-lg font-semibold">QCM</span>
-        <span className="flex items-center gap-3 text-xs font-normal text-muted-foreground">
-          <span>{pyramidLabel(pyramid)}</span>
+      <div className="pr-6">
+        <div className="flex items-center justify-between">
+          <span className="text-lg font-semibold">QCM</span>
+          <span className="text-xs font-normal text-muted-foreground">{pyramidLabel(pyramid)}</span>
+        </div>
+        {/* The boss halo's rays extend well past the pyramid cells (see
+            BossHalo/HALO_CENTER_Y in pyramid.tsx) — on its own row, with
+            extra clearance once the pyramid is complete, they can't reach
+            up into the Modal's close button the way they could when this
+            sat inline next to the palier label. */}
+        <div className={`flex justify-end ${pyramid.complete ? "mt-10" : "mt-2"}`}>
           <PyramidView p={pyramid} size="md" />
-        </span>
+        </div>
       </div>
       <div className="pt-2 text-base text-foreground">{q.prompt}</div>
 
