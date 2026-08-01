@@ -94,6 +94,13 @@ export function pyramidLabel(p: Pyramid): string {
   return `Palier ${p.tier} · ${p.filled}/${need}`;
 }
 
+// The pyramid's bounding box is square, but the shape inside it isn't: the
+// bottom row (3 cells) outweighs the top row (1 cell), so its visual center
+// of gravity sits below the box's geometric center. Anchoring the ray ring
+// there — instead of at 50% — is what makes it read as centered on the
+// triangle rather than on its invisible bounding square.
+const HALO_CENTER_Y = "61.6%";
+
 function BossHalo({ rays, radius }: { rays: number; radius: number }) {
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -102,8 +109,9 @@ function BossHalo({ rays, radius }: { rays: number; radius: number }) {
         return (
           <div
             key={i}
-            className="absolute left-1/2 top-1/2 h-3 w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-yellow-300 shadow-[0_0_6px_2px_rgba(250,204,21,0.85)]"
+            className="absolute left-1/2 h-3 w-[3px] rounded-full bg-yellow-300 shadow-[0_0_6px_2px_rgba(250,204,21,0.85)]"
             style={{
+              top: HALO_CENTER_Y,
               transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${radius}px)`,
             }}
           />
@@ -157,7 +165,7 @@ export function PyramidView({ p, size = "sm" }: { p: Pyramid; size?: "sm" | "md"
   // Radius must clear the pyramid's diagonal extent (its widest points are the
   // bottom row's corners, not its cardinal edges), plus half the ray's own
   // length, so every ray sits outside the triangle uniformly, like a crown.
-  const radius = size === "md" ? 44 : 34;
+  const radius = size === "md" ? 44 : 36;
 
   return (
     <div className="relative flex flex-col items-center gap-0.5">
