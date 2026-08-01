@@ -175,6 +175,10 @@ function TransferSection({ onImported }: { onImported: () => void }) {
             value={pasted}
             onChange={(e) => setPasted(e.target.value)}
             placeholder="chat-tigre-lune-..."
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
             className="flex-1 rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground"
           />
           <button

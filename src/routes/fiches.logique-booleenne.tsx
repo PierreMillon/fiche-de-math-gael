@@ -297,13 +297,16 @@ function LogiquePage() {
 
 function CircuitExercise() {
   const { pyramid, onCorrect, onWrong } = usePyramid("logique-circuit");
-  const [seed, setSeed] = useState(0);
   const tier = pyramid.complete ? 3 : pyramid.tier;
 
-  // `seed` isn't read inside makeCircuit — it's bumped by "Suivant" purely to
-  // force a new random circuit for the same tier.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const node = useMemo(() => makeCircuit(tier), [seed, tier]);
+  // The circuit is only regenerated when the learner explicitly clicks
+  // "Nouveau circuit" — never reactively from `tier`. A correct answer can
+  // bump `pyramid.tier` mid-round (e.g. finishing palier 1's last question),
+  // and deriving the circuit straight from `tier` via useMemo used to
+  // regenerate it — silently re-randomizing the inputs and wiping the
+  // just-picked answer's ✓/✗ feedback — the instant that happened, before
+  // the learner ever saw whether they'd gotten it right.
+  const [node, setNode] = useState<Node>(() => makeCircuit(tier));
   const inputIds = useMemo(() => collectInputs(node), [node]);
 
   const [inputs, setInputs] = useState<Record<string, 0 | 1>>({});
@@ -326,7 +329,7 @@ function CircuitExercise() {
     else onWrong();
   };
 
-  const next = () => setSeed((s) => s + 1);
+  const next = () => setNode(makeCircuit(tier));
 
   const toggle = (id: string) => {
     if (picking) return;
