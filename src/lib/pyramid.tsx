@@ -11,6 +11,12 @@ export type Pyramid = {
   // src/routes/progression.tsx) even after the pyramid itself is reset by
   // a wrong answer or a manual reset of tier/filled.
   wrongTotal: number;
+  // Lifetime count of answers that were CORRECT but took unusually long
+  // (see isHesitant below) — an implicit "not really sure" signal that
+  // doesn't cost the learner an extra tap, unlike a self-rated confidence
+  // button would. Feeds into the same weak-points ranking as wrongTotal,
+  // just weighted lower since hesitating isn't the same as being wrong.
+  hesitations: number;
 };
 export const TIER_SIZE: Record<1 | 2 | 3, number> = { 1: 3, 2: 2, 3: 1 };
 export const BOSS_TARGET = 6;
@@ -21,7 +27,22 @@ export const initialPyramid: Pyramid = {
   bossRays: 0,
   bossDone: false,
   wrongTotal: 0,
+  hesitations: 0,
 };
+
+// How long a correct answer can take before it counts as a "hesitation"
+// rather than a confident answer — looser for harder levels, since a boss
+// question genuinely takes longer to work out even when known cold.
+const HESITATION_THRESHOLD_MS: Record<1 | 2 | 3 | 4, number> = {
+  1: 10_000,
+  2: 15_000,
+  3: 20_000,
+  4: 25_000,
+};
+
+export function isHesitant(elapsedMs: number, level: 1 | 2 | 3 | 4): boolean {
+  return elapsedMs > HESITATION_THRESHOLD_MS[level];
+}
 
 export function usePyramid(storageKey: string) {
   const [p, setP] = useState<Pyramid>(initialPyramid);
@@ -58,28 +79,30 @@ export function usePyramid(storageKey: string) {
     }
   }, [storageKey, p]);
 
-  const onCorrect = () =>
+  const onCorrect = (hesitant = false) =>
     setP((prev) => {
-      if (prev.bossDone) return prev;
+      const hesitations = hesitant ? prev.hesitations + 1 : prev.hesitations;
+      if (prev.bossDone) return { ...prev, hesitations };
 
       // Pyramid already gold: we're in the boss round, correct answers add rays.
       if (prev.complete) {
         const bossRays = Math.min(BOSS_TARGET, prev.bossRays + 1);
-        return { ...prev, bossRays, bossDone: bossRays >= BOSS_TARGET };
+        return { ...prev, bossRays, bossDone: bossRays >= BOSS_TARGET, hesitations };
       }
 
       const need = TIER_SIZE[prev.tier];
       const filled = prev.filled + 1;
       if (filled >= need) {
-        if (prev.tier === 3) return { ...prev, tier: 3, filled: need, complete: true };
+        if (prev.tier === 3) return { ...prev, tier: 3, filled: need, complete: true, hesitations };
         return {
           ...prev,
           tier: (prev.tier + 1) as 2 | 3,
           filled: 0,
           complete: false,
+          hesitations,
         };
       }
-      return { ...prev, filled };
+      return { ...prev, filled, hesitations };
     });
 
   const onWrong = () =>

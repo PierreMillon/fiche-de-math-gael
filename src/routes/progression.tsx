@@ -6,6 +6,7 @@ import {
   categoryAverage,
   competencyMastery,
   competencyWrongTotal,
+  competencyWeakness,
   resetAllProgress,
   type Competency,
 } from "@/lib/competencies";
@@ -233,9 +234,16 @@ function ProgressionPage() {
 
   const axes = CATEGORIES.map((cat) => ({ label: cat, value: categoryAverage(cat) }));
 
-  const weakest = ALL_COMPETENCIES.map((c) => ({ c, wrong: competencyWrongTotal(c) }))
-    .filter((x) => x.wrong > 0)
-    .sort((a, b) => b.wrong - a.wrong)
+  // Ranked by weakness (mistakes + half-weighted hesitations), not just
+  // mistakes — a correct-but-slow streak is still worth surfacing here even
+  // with zero wrong answers.
+  const weakest = ALL_COMPETENCIES.map((c) => ({
+    c,
+    wrong: competencyWrongTotal(c),
+    weakness: competencyWeakness(c),
+  }))
+    .filter((x) => x.weakness > 0)
+    .sort((a, b) => b.weakness - a.weakness)
     .slice(0, 8);
 
   const overall =
@@ -281,7 +289,17 @@ function ProgressionPage() {
         <TransferSection onImported={() => setTick((t) => t + 1)} />
 
         <section className="rounded-xl border border-border bg-card p-6">
-          <h2 className="text-lg font-semibold text-card-foreground">Points faibles</h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-card-foreground">Points faibles</h2>
+            {weakest.length > 0 && (
+              <Link
+                to="/revision"
+                className="shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground"
+              >
+                Réviser →
+              </Link>
+            )}
+          </div>
           {weakest.length === 0 ? (
             <p className="mt-2 text-sm text-muted-foreground">
               Pas encore assez de mauvaises réponses pour dégager une tendance — bon signe.

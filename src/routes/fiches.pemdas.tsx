@@ -2,7 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { rows, COLS, COL_COLOR, type PemdasRow, type QuizQ } from "@/data/pemdas";
-import { PyramidView, pyramidLabel, readStoredPyramid, usePyramid } from "@/lib/pyramid";
+import {
+  PyramidView,
+  pyramidLabel,
+  readStoredPyramid,
+  usePyramid,
+  isHesitant,
+} from "@/lib/pyramid";
 import { extractText } from "@/lib/testUtils";
 
 export const Route = createFileRoute("/fiches/pemdas")({
@@ -219,6 +225,11 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
   const [picked, setPicked] = useState<number | null>(null);
   const [q, setQ] = useState<QuizQ | null>(null);
   const lastPrompt = useRef<string | null>(null);
+  // Tracks when the current question appeared and at what level, so a
+  // correct answer can be judged "hesitant" (see isHesitant) relative to
+  // how long that level should reasonably take.
+  const shownAt = useRef<number>(Date.now());
+  const questionLevel = useRef<1 | 2 | 3 | 4>(1);
 
   // Level 4 is boss-only: pyramid.tier stays pinned at 3 once the pyramid is
   // complete (see usePyramid), so without this the boss round would just
@@ -237,6 +248,8 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
       tries++;
     }
     lastPrompt.current = extractText(question.prompt);
+    shownAt.current = Date.now();
+    questionLevel.current = tier;
     return question;
   };
 
@@ -270,7 +283,7 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
   const onPick = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
-    if (i === q.answer) onCorrect();
+    if (i === q.answer) onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
     else onWrong();
   };
 

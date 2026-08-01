@@ -129,13 +129,21 @@ function RootComponent() {
               </Link>
               <span className="text-xs opacity-90">Réserver un cours : gaelboury@gmail.com</span>
             </div>
-            <Link
-              to="/progression"
-              className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm ring-1 ring-white/40 transition hover:bg-white/25"
-            >
-              <ChartColumn className="h-3.5 w-3.5" />
-              Ma progression
-            </Link>
+            <div className="flex w-fit items-center gap-3">
+              <Link
+                to="/comment-ca-marche"
+                className="text-xs text-white/80 underline-offset-2 transition hover:text-white hover:underline"
+              >
+                Comment ça marche ?
+              </Link>
+              <Link
+                to="/progression"
+                className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm ring-1 ring-white/40 transition hover:bg-white/25"
+              >
+                <ChartColumn className="h-3.5 w-3.5" />
+                Ma progression
+              </Link>
+            </div>
           </div>
         </div>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

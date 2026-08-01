@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CommentCaMarcheRouteImport } from './routes/comment-ca-marche'
 import { Route as ProgressionRouteImport } from './routes/progression'
+import { Route as RevisionRouteImport } from './routes/revision'
 import { Route as FichesSlugRouteImport } from './routes/fiches.$slug'
 import { Route as FichesDenombrementRouteImport } from './routes/fiches.denombrement'
 import { Route as FichesEquationsRouteImport } from './routes/fiches.equations'
@@ -25,9 +27,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommentCaMarcheRoute = CommentCaMarcheRouteImport.update({
+  id: '/comment-ca-marche',
+  path: '/comment-ca-marche',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgressionRoute = ProgressionRouteImport.update({
   id: '/progression',
   path: '/progression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevisionRoute = RevisionRouteImport.update({
+  id: '/revision',
+  path: '/revision',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FichesSlugRoute = FichesSlugRouteImport.update({
@@ -73,7 +85,9 @@ const FichesTangenteRoute = FichesTangenteRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/comment-ca-marche': typeof CommentCaMarcheRoute
   '/progression': typeof ProgressionRoute
+  '/revision': typeof RevisionRoute
   '/fiches/$slug': typeof FichesSlugRoute
   '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
@@ -85,7 +99,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/comment-ca-marche': typeof CommentCaMarcheRoute
   '/progression': typeof ProgressionRoute
+  '/revision': typeof RevisionRoute
   '/fiches/$slug': typeof FichesSlugRoute
   '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
@@ -98,7 +114,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/comment-ca-marche': typeof CommentCaMarcheRoute
   '/progression': typeof ProgressionRoute
+  '/revision': typeof RevisionRoute
   '/fiches/$slug': typeof FichesSlugRoute
   '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
@@ -112,7 +130,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/comment-ca-marche'
     | '/progression'
+    | '/revision'
     | '/fiches/$slug'
     | '/fiches/denombrement'
     | '/fiches/equations'
@@ -124,7 +144,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/comment-ca-marche'
     | '/progression'
+    | '/revision'
     | '/fiches/$slug'
     | '/fiches/denombrement'
     | '/fiches/equations'
@@ -136,7 +158,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/comment-ca-marche'
     | '/progression'
+    | '/revision'
     | '/fiches/$slug'
     | '/fiches/denombrement'
     | '/fiches/equations'
@@ -149,7 +173,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CommentCaMarcheRoute: typeof CommentCaMarcheRoute
   ProgressionRoute: typeof ProgressionRoute
+  RevisionRoute: typeof RevisionRoute
   FichesSlugRoute: typeof FichesSlugRoute
   FichesDenombrementRoute: typeof FichesDenombrementRoute
   FichesEquationsRoute: typeof FichesEquationsRoute
@@ -169,11 +195,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comment-ca-marche': {
+      id: '/comment-ca-marche'
+      path: '/comment-ca-marche'
+      fullPath: '/comment-ca-marche'
+      preLoaderRoute: typeof CommentCaMarcheRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/progression': {
       id: '/progression'
       path: '/progression'
       fullPath: '/progression'
       preLoaderRoute: typeof ProgressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revision': {
+      id: '/revision'
+      path: '/revision'
+      fullPath: '/revision'
+      preLoaderRoute: typeof RevisionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fiches/$slug': {
@@ -237,7 +277,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CommentCaMarcheRoute: CommentCaMarcheRoute,
   ProgressionRoute: ProgressionRoute,
+  RevisionRoute: RevisionRoute,
   FichesSlugRoute: FichesSlugRoute,
   FichesDenombrementRoute: FichesDenombrementRoute,
   FichesEquationsRoute: FichesEquationsRoute,

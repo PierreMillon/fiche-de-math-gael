@@ -268,10 +268,10 @@ export const WORDLIST: string[] = [
 const WORD_INDEX: Map<string, number> = new Map(WORDLIST.map((w, i) => [w, i]));
 
 // A pyramid's whole progress state (tier/filled/complete/bossRays/bossDone)
-// collapses into one of 13 values, so it fits a nibble. wrongTotal is
-// deliberately not carried over — it's a nice-to-have on the device that
-// earned it, not essential to transfer, and leaving it out keeps the
-// phrase shorter.
+// collapses into one of 13 values, so it fits a nibble. wrongTotal and
+// hesitations are deliberately not carried over — they're a nice-to-have on
+// the device that earned them, not essential to transfer, and leaving them
+// out keeps the phrase shorter.
 export function pyramidToCode(p: Pyramid | null): number {
   if (!p) return 0;
   if (p.complete) return 6 + Math.min(BOSS_TARGET, p.bossRays);
@@ -280,7 +280,11 @@ export function pyramidToCode(p: Pyramid | null): number {
   return 5;
 }
 
-export function codeToPyramid(code: number, existingWrongTotal: number): Pyramid {
+export function codeToPyramid(
+  code: number,
+  existingWrongTotal: number,
+  existingHesitations = 0,
+): Pyramid {
   if (code >= 6) {
     const bossRays = code - 6;
     return {
@@ -290,13 +294,32 @@ export function codeToPyramid(code: number, existingWrongTotal: number): Pyramid
       bossRays,
       bossDone: bossRays >= BOSS_TARGET,
       wrongTotal: existingWrongTotal,
+      hesitations: existingHesitations,
     };
   }
   if (code <= 2)
-    return { ...initialPyramid, tier: 1, filled: code, wrongTotal: existingWrongTotal };
+    return {
+      ...initialPyramid,
+      tier: 1,
+      filled: code,
+      wrongTotal: existingWrongTotal,
+      hesitations: existingHesitations,
+    };
   if (code <= 4)
-    return { ...initialPyramid, tier: 2, filled: code - 3, wrongTotal: existingWrongTotal };
-  return { ...initialPyramid, tier: 3, filled: 0, wrongTotal: existingWrongTotal };
+    return {
+      ...initialPyramid,
+      tier: 2,
+      filled: code - 3,
+      wrongTotal: existingWrongTotal,
+      hesitations: existingHesitations,
+    };
+  return {
+    ...initialPyramid,
+    tier: 3,
+    filled: 0,
+    wrongTotal: existingWrongTotal,
+    hesitations: existingHesitations,
+  };
 }
 
 // One byte per two competencies (a nibble each), prefixed with a header
@@ -374,7 +397,7 @@ export function importProgressPhrase(phrase: string): ImportResult | null {
     const code = decoded.codes[i] ?? 0;
     const key = c.keys[0];
     const existing = readStoredPyramid(key);
-    const next = codeToPyramid(code, existing?.wrongTotal ?? 0);
+    const next = codeToPyramid(code, existing?.wrongTotal ?? 0, existing?.hesitations ?? 0);
     localStorage.setItem("pyramid:" + key, JSON.stringify(next));
     applied++;
   });

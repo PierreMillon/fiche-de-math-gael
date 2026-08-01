@@ -1,6 +1,12 @@
 import { useRef, useState } from "react";
 import { fmt } from "@/lib/mathFormat";
-import { PyramidView, pyramidLabel, usePyramid } from "@/lib/pyramid";
+import {
+  PyramidView,
+  pyramidLabel,
+  usePyramid,
+  readStoredPyramid,
+  isHesitant,
+} from "@/lib/pyramid";
 import { exercises, type QItem } from "@/data/exercises";
 
 const shuffle = <T,>(arr: T[]): T[] => {
@@ -36,8 +42,13 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
   const bank = exercises[slug];
   const { pyramid, onCorrect, onWrong, reset } = usePyramid(`fiche:${slug}`);
   const lastQ = useRef<string | null>(null);
+  // Tracks when the current question appeared and at what level, so a
+  // correct answer can be judged "hesitant" (see isHesitant) relative to
+  // how long that level should reasonably take.
+  const shownAt = useRef<number>(Date.now());
+  const questionLevel = useRef<1 | 2 | 3 | 4>(1);
 
-  const pick = (tier: 1 | 2 | 3): Built | null => {
+  const pick = (tier: 1 | 2 | 3 | 4): Built | null => {
     if (!bank) return null;
     const pool = bank[tier];
     let item = pool[Math.floor(Math.random() * pool.length)];
@@ -49,10 +60,22 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
       }
     }
     lastQ.current = item.q;
+    shownAt.current = Date.now();
+    questionLevel.current = tier;
     return build(item);
   };
 
-  const [q, setQ] = useState<Built | null>(() => pick(1));
+  // The initial level is read straight from localStorage instead of
+  // `pyramid.tier`/`pyramid.complete` — usePyramid's own hydration effect
+  // hasn't necessarily applied yet on this first render (see the identical
+  // fix in fiches.pemdas.tsx), so using the live pyramid state here would
+  // race and show a tier-1 question even when this fiche is already at
+  // boss level.
+  const [q, setQ] = useState<Built | null>(() => {
+    const stored = readStoredPyramid(`fiche:${slug}`);
+    const level = stored?.complete ? 4 : (stored?.tier ?? 1);
+    return pick(level);
+  });
   const [picked, setPicked] = useState<number | null>(null);
 
   if (!bank || !q) return null;
@@ -60,13 +83,13 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
   const answer = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
-    if (i === q.answer) onCorrect();
+    if (i === q.answer) onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
     else onWrong();
   };
 
   const next = () => {
     if (picked === null) return;
-    setQ(pick(pyramid.tier));
+    setQ(pick(pyramid.complete ? 4 : pyramid.tier));
     setPicked(null);
   };
 

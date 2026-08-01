@@ -105,6 +105,17 @@ export function competencyWrongTotal(c: Competency): number {
   return readCompetencyPyramids(c).reduce((sum, p) => sum + (p?.wrongTotal ?? 0), 0);
 }
 
+export function competencyHesitations(c: Competency): number {
+  return readCompetencyPyramids(c).reduce((sum, p) => sum + (p?.hesitations ?? 0), 0);
+}
+
+// Ranks competencies for "points faibles": actual mistakes count fully,
+// slow-but-correct answers count half — a hesitation isn't as telling as a
+// wrong answer, but it's still a real signal that the answer wasn't solid.
+export function competencyWeakness(c: Competency): number {
+  return competencyWrongTotal(c) + competencyHesitations(c) * 0.5;
+}
+
 export function categoryAverage(category: string): number {
   const inCat = ALL_COMPETENCIES.filter((c) => c.category === category);
   if (inCat.length === 0) return 0;

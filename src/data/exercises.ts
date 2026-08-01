@@ -1,5 +1,5 @@
 export type QItem = { q: string; a: string; d: [string, string, string]; e: string };
-export type Bank = { 1: QItem[]; 2: QItem[]; 3: QItem[] };
+export type Bank = { 1: QItem[]; 2: QItem[]; 3: QItem[]; 4: QItem[] };
 
 export const exercises: Record<string, Bank> = {
   derivees: {
@@ -61,6 +61,26 @@ export const exercises: Record<string, Bank> = {
         a: "2x e^(x^2)",
         d: ["e^(x^2)", "x^2 e^(x^2)", "2x e^x"],
         e: "Composée : (e^u)' = u'·e^u avec u=x², u'=2x.",
+      },
+    ],
+    4: [
+      {
+        q: "Dérivée de f(x) = ln(x^2 + 1) ?",
+        a: "2x/(x^2+1)",
+        d: ["1/(x^2+1)", "2x", "x/(x^2+1)"],
+        e: "(ln u)' = u'/u avec u=x²+1, u'=2x.",
+      },
+      {
+        q: "Dérivée de f(x) = x^2 · ln x ?",
+        a: "2x ln x + x",
+        d: ["2x ln x", "x^2/x", "2x ln x + x^2"],
+        e: "Produit : (uv)'=u'v+uv' avec u=x² (u'=2x), v=ln x (v'=1/x) : 2x ln x + x²/x = 2x ln x + x.",
+      },
+      {
+        q: "Dérivée de f(x) = (ln x)^2 ?",
+        a: "2 ln x / x",
+        d: ["2 ln x", "1/x^2", "(ln x)^2/x"],
+        e: "Composée : (u^2)'=2u·u' avec u=ln x, u'=1/x.",
       },
     ],
   },
@@ -125,6 +145,26 @@ export const exercises: Record<string, Bank> = {
         e: "Primitive de xⁿ avec n=1/2.",
       },
     ],
+    4: [
+      {
+        q: "∫ x ln x dx = ?",
+        a: "(x^2/2)ln x − x^2/4 + C",
+        d: ["x^2 ln x − x^2/4 + C", "(x^2/2)ln x + C", "(x^2/2)ln x − x^2/2 + C"],
+        e: "Par parties : u=ln x, v'=x ⇒ v=x²/2. ∫u'v = uv−∫uv' = (x²/2)ln x − ∫x/2 dx.",
+      },
+      {
+        q: "∫ de 1 à e de 1/x dx = ?",
+        a: "1",
+        d: ["e", "e−1", "0"],
+        e: "[ln x] de 1 à e = ln e − ln 1 = 1 − 0 = 1.",
+      },
+      {
+        q: "∫ x/(x^2+1) dx = ?",
+        a: "(1/2)ln(x^2+1) + C",
+        d: ["ln(x^2+1) + C", "2x/(x^2+1) + C", "(1/2)ln x + C"],
+        e: "Forme u'/u avec u=x²+1, u'=2x : ∫x/(x²+1)dx = (1/2)∫u'/u dx = (1/2)ln(x²+1)+C.",
+      },
+    ],
   },
   limites: {
     1: [
@@ -185,6 +225,26 @@ export const exercises: Record<string, Bank> = {
         a: "1",
         d: ["0", "+∞", "e"],
         e: "x^(1/x) = e^(ln x / x) et ln x/x → 0.",
+      },
+    ],
+    4: [
+      {
+        q: "lim (x→+∞) (x^2 − x)/e^x = ?",
+        a: "0",
+        d: ["+∞", "1", "−∞"],
+        e: "Croissance comparée : l'exponentielle l'emporte sur tout polynôme.",
+      },
+      {
+        q: "lim (x→0) (1 − cos x)/x^2 = ?",
+        a: "1/2",
+        d: ["0", "1", "+∞"],
+        e: "Limite usuelle liée au DL de cos x : 1−cos x ~ x²/2.",
+      },
+      {
+        q: "lim (x→+∞) (ln(x+1) − ln x) = ?",
+        a: "0",
+        d: ["+∞", "1", "e"],
+        e: "ln(x+1)−ln x = ln(1+1/x) → ln 1 = 0.",
       },
     ],
   },
@@ -249,6 +309,26 @@ export const exercises: Record<string, Bank> = {
         e: "L'étape suivante d'une récurrence est l'hérédité.",
       },
     ],
+    4: [
+      {
+        q: "u(n+1) = 2u(n) − 3, u0 = 5. Calcule u3.",
+        a: "19",
+        d: ["17", "40", "13"],
+        e: "u1=2×5−3=7, u2=2×7−3=11, u3=2×11−3=19.",
+      },
+      {
+        q: "u(n+1) = (1/3)u(n) + 4 converge vers ?",
+        a: "6",
+        d: ["4", "12", "3"],
+        e: "Point fixe : l=(1/3)l+4 ⇒ (2/3)l=4 ⇒ l=6.",
+      },
+      {
+        q: "Pour u(n+1) = a·u(n) + b avec a≠1, le point fixe l vérifie ?",
+        a: "l = b/(1−a)",
+        d: ["l = a/(1−b)", "l = b/(1+a)", "l = ab"],
+        e: "l=al+b ⇔ l(1−a)=b ⇔ l=b/(1−a).",
+      },
+    ],
   },
   probabilites: {
     1: [
@@ -311,6 +391,26 @@ export const exercises: Record<string, Bank> = {
         e: "1 − P(aucun succès) = 1 − 0,7² = 0,51.",
       },
     ],
+    4: [
+      {
+        q: "P(A)=0,5 et P(B)=0,5 (partition). P(S|A)=0,2, P(S|B)=0,6. Sachant S réalisé, P(B|S) = ?",
+        a: "0,75",
+        d: ["0,6", "0,4", "0,5"],
+        e: "Bayes : P(S)=0,5×0,2+0,5×0,6=0,4 ; P(B|S)=0,5×0,6/0,4=0,75.",
+      },
+      {
+        q: "X ~ B(6 ; 0,5) : P(X ≥ 5) = ?",
+        a: "7/64",
+        d: ["6/64", "1/64", "1/2"],
+        e: "P(X=5)+P(X=6) = C(6,5)×0,5⁶+C(6,6)×0,5⁶ = (6+1)/64.",
+      },
+      {
+        q: "Loi géométrique de paramètre p=0,2 : P(premier succès au 3e essai) = ?",
+        a: "0,128",
+        d: ["0,2", "0,64", "0,032"],
+        e: "P = (1−p)²×p = 0,8²×0,2 = 0,128.",
+      },
+    ],
   },
   vecteurs: {
     1: [
@@ -363,6 +463,26 @@ export const exercises: Record<string, Bank> = {
         e: "v = 2u ⇒ k = 2×3 = 6.",
       },
     ],
+    4: [
+      {
+        q: "u(1;2;−1), v(3;0;2), w(2;−1;1) : (u+v)·w = ?",
+        a: "7",
+        d: ["9", "5", "3"],
+        e: "u+v=(4;2;1). (u+v)·w = 4×2+2×(−1)+1×1 = 8−2+1 = 7.",
+      },
+      {
+        q: "Plan passant par A(1;0;0), de vecteur normal n(2;−1;3) : équation ?",
+        a: "2x−y+3z−2=0",
+        d: ["2x−y+3z+2=0", "2x+y+3z−2=0", "x−y+z−2=0"],
+        e: "2(x−1)−1(y−0)+3(z−0)=0 ⟺ 2x−y+3z−2=0.",
+      },
+      {
+        q: "u(2;−1;2) (‖u‖=3). Trouve v colinéaire à u, de même sens, avec ‖v‖=6.",
+        a: "(4;−2;4)",
+        d: ["(2;−1;2)", "(6;−3;6)", "(−4;2;−4)"],
+        e: "‖v‖=6=2×3 ⇒ v=2u=(4;−2;4).",
+      },
+    ],
   },
   complexes: {
     1: [
@@ -410,6 +530,26 @@ export const exercises: Record<string, Bank> = {
         e: "z² = −4 ⇔ z = ±2i.",
       },
     ],
+    4: [
+      {
+        q: "Résoudre z^2 − 2z + 5 = 0 ?",
+        a: "1+2i et 1−2i",
+        d: ["2+i et 2−i", "1+4i et 1−4i", "−1+2i et −1−2i"],
+        e: "Δ=4−20=−16, z=(2±4i)/2 = 1±2i.",
+      },
+      {
+        q: "Écris z = 3^(1/2) + i sous forme exponentielle.",
+        a: "2e^(iπ/6)",
+        d: ["2e^(iπ/3)", "2^(1/2) e^(iπ/6)", "2e^(iπ/4)"],
+        e: "|z|=√(3+1)=2, arg z = arctan(1/√3) = π/6.",
+      },
+      {
+        q: "z1 = 1+i, z2 = 2−i. |z1 × z2| = ?",
+        a: "10^(1/2)",
+        d: ["2^(1/2)", "5^(1/2)", "3"],
+        e: "z1×z2 = 3+i, |3+i| = √(9+1) = √10.",
+      },
+    ],
   },
   logarithme: {
     1: [
@@ -455,6 +595,26 @@ export const exercises: Record<string, Bank> = {
         a: "(1/2)ln x",
         d: ["2 ln x", "(ln x)^(1/2)", "ln x − 2"],
         e: "ln(xⁿ) = n ln x avec n = 1/2.",
+      },
+    ],
+    4: [
+      {
+        q: "Résoudre : ln(x) + ln(x−1) = ln(6)",
+        a: "x=3",
+        d: ["x=3 ou x=−2", "x=−2", "x=6"],
+        e: "ln(x(x−1))=ln 6 ⇒ x²−x−6=0 ⇒ (x−3)(x+2)=0. x=−2 rejeté (domaine x>1).",
+      },
+      {
+        q: "lim (x→+∞) (ln x)^2 / x = ?",
+        a: "0",
+        d: ["+∞", "1", "e"],
+        e: "Croissance comparée : toute puissance de ln x est négligeable devant x.",
+      },
+      {
+        q: "Résoudre : 3^x = 5",
+        a: "ln5/ln3",
+        d: ["ln3/ln5", "5/3", "ln(5/3)"],
+        e: "x ln3 = ln5 ⇒ x = ln5/ln3 en appliquant ln aux deux membres.",
       },
     ],
   },
@@ -519,6 +679,26 @@ export const exercises: Record<string, Bank> = {
         e: "ln(1+x)=x−x²/2+o(x²), donc la limite vaut −1/2.",
       },
     ],
+    4: [
+      {
+        q: "DL2 en 0 de e^x · cos x ?",
+        a: "1 + x + o(x^2)",
+        d: ["1 + x + x^2 + o(x^2)", "1 − x + o(x^2)", "1 + x/2 + o(x^2)"],
+        e: "(1+x+x²/2)(1−x²/2) : les termes en x² s'annulent (−x²/2+x²/2=0), il reste 1+x+o(x²).",
+      },
+      {
+        q: "DL3 en 0 de x/(1−x) ?",
+        a: "x + x^2 + x^3 + o(x^3)",
+        d: ["x − x^2 + x^3 + o(x^3)", "x + x^2 + o(x^3)", "1 + x + x^2 + o(x^3)"],
+        e: "x/(1−x) = x×(1+x+x²+o(x²)) = x+x²+x³+o(x³).",
+      },
+      {
+        q: "lim (x→0) (cos x − 1 + x^2/2)/x^4 (via DL) = ?",
+        a: "1/24",
+        d: ["1/2", "0", "1/12"],
+        e: "cos x = 1−x²/2+x⁴/24+o(x⁴), donc le numérateur vaut x⁴/24+o(x⁴).",
+      },
+    ],
   },
   denombrement: {
     1: [
@@ -564,6 +744,26 @@ export const exercises: Record<string, Bank> = {
         a: "C(32,3) = 4960",
         d: ["A(32,3) = 29760", "32^3", "3^32"],
         e: "Tirage simultané : l'ordre ne compte pas, on utilise C.",
+      },
+    ],
+    4: [
+      {
+        q: "Main de 5 cartes parmi 32 (dont 4 as) contenant exactement 2 as : combien ?",
+        a: "C(4,2)×C(28,3)",
+        d: ["C(4,2)×C(28,2)", "A(4,2)×C(28,3)", "C(4,2)+C(28,3)"],
+        e: "On choisit 2 as parmi 4 ET 3 cartes non-as parmi 28 : les deux choix se combinent par un produit.",
+      },
+      {
+        q: "Nombre d'anagrammes du mot ANANAS (A×3, N×2, S×1) ?",
+        a: "60",
+        d: ["720", "120", "20"],
+        e: "6!/(3!·2!·1!) = 720/12 = 60.",
+      },
+      {
+        q: "Façons de ranger 5 livres distincts sur une étagère si 2 précis doivent rester côte à côte ?",
+        a: "48",
+        d: ["120", "24", "96"],
+        e: "On regroupe les 2 livres en 1 bloc : 4 éléments à ranger (4!) × 2 ordres internes du bloc = 48.",
       },
     ],
   },
@@ -628,6 +828,26 @@ export const exercises: Record<string, Bank> = {
         e: "Pour une matrice diagonale, les valeurs propres sont les termes diagonaux.",
       },
     ],
+    4: [
+      {
+        q: "A=[[1,2],[3,4]]. Calcule A^2.",
+        a: "[[7,10],[15,22]]",
+        d: ["[[1,4],[9,16]]", "[[7,8],[15,16]]", "[[2,4],[6,8]]"],
+        e: "A²=A×A : chaque terme est le produit ligne×colonne, ex. (1,1)=1×1+2×3=7.",
+      },
+      {
+        q: "Résous AX=B avec A=[[2,1],[1,1]], B=[[5],[3]] : X = ?",
+        a: "x=2, y=1",
+        d: ["x=1, y=2", "x=3, y=0", "x=5, y=−2"],
+        e: "2e ligne : x+y=3 ⇒ y=3−x. 1ère ligne : 2x+(3−x)=5 ⇒ x=2, y=1.",
+      },
+      {
+        q: "Pour A=[[a,b],[c,d]] inversible, A^(−1) = ?",
+        a: "(1/det A)×[[d,−b],[−c,a]]",
+        d: ["(1/det A)×[[a,b],[c,d]]", "det A×[[d,−b],[−c,a]]", "(1/det A)×[[a,−b],[−c,d]]"],
+        e: "Formule standard de l'inverse d'une matrice 2×2 via la comatrice et le déterminant.",
+      },
+    ],
   },
   statistiques: {
     1: [
@@ -683,6 +903,26 @@ export const exercises: Record<string, Bank> = {
         a: "une forte liaison linéaire décroissante",
         d: ["aucune liaison", "une liaison croissante", "une erreur de calcul"],
         e: "r proche de −1 signale une forte corrélation linéaire négative.",
+      },
+    ],
+    4: [
+      {
+        q: "X : moyenne 10, écart-type 2. Y = 3X − 4. Écart-type(Y) = ?",
+        a: "6",
+        d: ["2", "26", "−4"],
+        e: "σ(aX+b) = |a|×σ(X) = 3×2 = 6 (seul le facteur multiplicatif compte).",
+      },
+      {
+        q: "Y = 2X + 5 (relation affine, a>0). Coefficient de corrélation r(X,Y) = ?",
+        a: "1",
+        d: ["0", "2", "0,5"],
+        e: "Une relation affine croissante donne une corrélation parfaite, r=1.",
+      },
+      {
+        q: "Loi normale N(100 ; 15²) : P(85 < X < 115) ≈ ?",
+        a: "environ 68 %",
+        d: ["environ 95 %", "environ 50 %", "environ 99,7 %"],
+        e: "[μ−σ ; μ+σ] contient environ 68 % des valeurs (règle empirique).",
       },
     ],
   },
@@ -747,6 +987,26 @@ export const exercises: Record<string, Bank> = {
         e: "Le cosinus s'annule en π/2 modulo π.",
       },
     ],
+    4: [
+      {
+        q: "Résous cos(x) = 1/2 sur [0 ; 2π[.",
+        a: "x = π/3 ou x = 5π/3",
+        d: ["x = π/3 ou x = 2π/3", "x = π/6 ou x = 11π/6", "x = π/3 seulement"],
+        e: "cos x = 1/2 ⇔ x = ±π/3 + 2kπ ; sur [0;2π[, cela donne π/3 et 2π−π/3 = 5π/3.",
+      },
+      {
+        q: "sin(a)cos(b) = ?",
+        a: "(1/2)[sin(a+b)+sin(a−b)]",
+        d: ["(1/2)[cos(a+b)+cos(a−b)]", "sin(a+b)−sin(a−b)", "(1/2)[sin(a+b)−sin(a−b)]"],
+        e: "Formule de linéarisation du produit sinus×cosinus.",
+      },
+      {
+        q: "tan(π/12) = ?",
+        a: "2 − 3^(1/2)",
+        d: ["3^(1/2) − 1", "2 + 3^(1/2)", "1 − 3^(1/2)/2"],
+        e: "π/12 = π/3−π/4 : tan(a−b)=(tan a−tan b)/(1+tan a·tan b), puis on rationalise.",
+      },
+    ],
   },
   python: {
     1: [
@@ -809,6 +1069,26 @@ export const exercises: Record<string, Bank> = {
         e: "On divise l'intervalle de recherche par 2 à chaque étape.",
       },
     ],
+    4: [
+      {
+        q: "def f(n): return 0 if n==0 else n + f(n-1). Que vaut f(5) ?",
+        a: "15",
+        d: ["10", "20", "5"],
+        e: "f(5)=5+4+3+2+1+0 = 15.",
+      },
+      {
+        q: "Que vaut sorted([3, 1, 2], reverse=True) ?",
+        a: "[3, 2, 1]",
+        d: ["[1, 2, 3]", "[2, 1, 3]", "erreur"],
+        e: "reverse=True trie par ordre décroissant.",
+      },
+      {
+        q: "Complexité du tri par insertion dans le pire cas ?",
+        a: "O(n^2)",
+        d: ["O(n log n)", "O(n)", "O(log n)"],
+        e: "Pire cas (liste triée à l'envers) : chaque insertion parcourt jusqu'à n éléments.",
+      },
+    ],
   },
   java: {
     1: [
@@ -869,6 +1149,26 @@ export const exercises: Record<string, Bank> = {
         a: "ArithmeticException",
         d: ["NullPointerException", "Infinity", "0"],
         e: "La division entière par 0 lève une ArithmeticException en Java.",
+      },
+    ],
+    4: [
+      {
+        q: "int[] a = {1,2,3}; int s=0; for (int x : a) s += x; Que vaut s ?",
+        a: "6",
+        d: ["3", "1", "erreur de compilation"],
+        e: "La boucle for-each additionne chaque élément : 1+2+3 = 6.",
+      },
+      {
+        q: "Une classe Java ne peut hériter que d'une seule classe mais peut implémenter…",
+        a: "plusieurs interfaces",
+        d: ["une seule interface", "aucune interface", "plusieurs classes abstraites"],
+        e: "L'héritage simple ne concerne que les classes ; une classe peut implémenter plusieurs interfaces.",
+      },
+      {
+        q: "Que vaut 5 % -3 en Java ?",
+        a: "2",
+        d: ["−2", "−1", "1"],
+        e: "En Java, le reste garde le signe du dividende : 5 = −3×(−1)+2.",
       },
     ],
   },
@@ -949,6 +1249,26 @@ export const exercises: Record<string, Bank> = {
         e: "On étudie les variations de la fonction puis on applique le théorème des valeurs intermédiaires.",
       },
     ],
+    4: [
+      {
+        q: "Résoudre : e^(2x) − 3e^x + 2 = 0",
+        a: "x=0 ou x=ln 2",
+        d: ["x=1 ou x=2", "x=ln 2 seulement", "x=0 ou x=2"],
+        e: "On pose t=eˣ : t²−3t+2=0 ⟺ (t−1)(t−2)=0 ⟺ t=1 ou t=2 ⟺ x=0 ou x=ln 2.",
+      },
+      {
+        q: "Résoudre : |2x − 3| = 5",
+        a: "x=4 ou x=−1",
+        d: ["x=4 seulement", "x=1 ou x=−4", "x=8 ou x=−2"],
+        e: "2x−3=5 ⟹ x=4, ou 2x−3=−5 ⟹ x=−1.",
+      },
+      {
+        q: "Résoudre : (x−1)/(x+2) ≥ 0",
+        a: "x∈]−∞;−2[ ∪ [1;+∞[",
+        d: ["x∈[−2;1]", "x∈]−2;1]", "x∈]−∞;−2] ∪ [1;+∞["],
+        e: "Tableau de signes : le quotient est positif (ou nul en x=1) hors de ]−2;1], et x=−2 est exclu (dénominateur nul).",
+      },
+    ],
   },
   "series-numeriques": {
     1: [
@@ -1009,6 +1329,26 @@ export const exercises: Record<string, Bank> = {
         a: "convergente",
         d: ["divergente", "indéterminée", "on ne peut pas conclure"],
         e: "Comparaison : Σ1/n³ converge (Riemann α=3>1), donc Σuₙ converge aussi.",
+      },
+    ],
+    4: [
+      {
+        q: "Nature de Σ n/(n^2+1) ?",
+        a: "divergente",
+        d: ["convergente", "convergente vers 1", "indéterminée"],
+        e: "n/(n²+1) ∼ 1/n, et Σ1/n diverge (Riemann α=1) : même nature par comparaison.",
+      },
+      {
+        q: "Règle de Cauchy : lim (uₙ)^(1/n) = 1/2. Nature de Σuₙ ?",
+        a: "convergente",
+        d: ["divergente", "divergente grossièrement", "indéterminée"],
+        e: "Limite L=1/2<1 : convergente d'après la règle de Cauchy.",
+      },
+      {
+        q: "Nature de Σ (−1)^n/n^(1/2) ?",
+        a: "convergente (non absolument)",
+        d: ["divergente", "absolument convergente", "divergente grossièrement"],
+        e: "Série alternée qui converge (critère des séries alternées), mais Σ1/√n diverge (Riemann α=1/2≤1) : convergence non absolue.",
       },
     ],
   },
