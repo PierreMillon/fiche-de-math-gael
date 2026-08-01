@@ -6,6 +6,11 @@ export type Pyramid = {
   complete: boolean;
   bossRays: number;
   bossDone: boolean;
+  // Lifetime count of wrong answers — unlike the other fields, never
+  // decreases, so it can be used to rank the weakest competencies (see
+  // src/routes/progression.tsx) even after the pyramid itself is reset by
+  // a wrong answer or a manual reset of tier/filled.
+  wrongTotal: number;
 };
 export const TIER_SIZE: Record<1 | 2 | 3, number> = { 1: 3, 2: 2, 3: 1 };
 export const BOSS_TARGET = 6;
@@ -15,6 +20,7 @@ export const initialPyramid: Pyramid = {
   complete: false,
   bossRays: 0,
   bossDone: false,
+  wrongTotal: 0,
 };
 
 export function usePyramid(storageKey: string) {
@@ -64,10 +70,11 @@ export function usePyramid(storageKey: string) {
 
   const onWrong = () =>
     setP((prev) => {
-      if (prev.bossDone) return prev;
+      const wrongTotal = prev.wrongTotal + 1;
+      if (prev.bossDone) return { ...prev, wrongTotal };
       // Boss round: any mistake resets the halo to zero.
-      if (prev.complete) return { ...prev, bossRays: 0 };
-      return { ...prev, filled: Math.max(0, prev.filled - 1) };
+      if (prev.complete) return { ...prev, bossRays: 0, wrongTotal };
+      return { ...prev, filled: Math.max(0, prev.filled - 1), wrongTotal };
     });
 
   const reset = () => setP(initialPyramid);

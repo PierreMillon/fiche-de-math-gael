@@ -132,7 +132,9 @@ function RootComponent() {
                 Réserver un cours : gaelboury@gmail.com
               </span>
             </div>
-            <span className="text-xs opacity-90">Révisions</span>
+            <Link to="/progression" className="text-xs font-medium opacity-90 hover:underline">
+              Ma progression
+            </Link>
           </div>
         </div>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

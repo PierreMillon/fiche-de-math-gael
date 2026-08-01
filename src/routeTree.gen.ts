@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProgressionRouteImport } from './routes/progression'
 import { Route as FichesSlugRouteImport } from './routes/fiches.$slug'
 import { Route as FichesDenombrementRouteImport } from './routes/fiches.denombrement'
 import { Route as FichesEquationsRouteImport } from './routes/fiches.equations'
@@ -22,6 +23,11 @@ import { Route as FichesTangenteRouteImport } from './routes/fiches.tangente'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressionRoute = ProgressionRouteImport.update({
+  id: '/progression',
+  path: '/progression',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FichesSlugRoute = FichesSlugRouteImport.update({
@@ -67,6 +73,7 @@ const FichesTangenteRoute = FichesTangenteRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/progression': typeof ProgressionRoute
   '/fiches/$slug': typeof FichesSlugRoute
   '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/progression': typeof ProgressionRoute
   '/fiches/$slug': typeof FichesSlugRoute
   '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/progression': typeof ProgressionRoute
   '/fiches/$slug': typeof FichesSlugRoute
   '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/progression'
     | '/fiches/$slug'
     | '/fiches/denombrement'
     | '/fiches/equations'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/progression'
     | '/fiches/$slug'
     | '/fiches/denombrement'
     | '/fiches/equations'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/progression'
     | '/fiches/$slug'
     | '/fiches/denombrement'
     | '/fiches/equations'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProgressionRoute: typeof ProgressionRoute
   FichesSlugRoute: typeof FichesSlugRoute
   FichesDenombrementRoute: typeof FichesDenombrementRoute
   FichesEquationsRoute: typeof FichesEquationsRoute
@@ -154,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progression': {
+      id: '/progression'
+      path: '/progression'
+      fullPath: '/progression'
+      preLoaderRoute: typeof ProgressionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fiches/$slug': {
@@ -217,6 +237,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProgressionRoute: ProgressionRoute,
   FichesSlugRoute: FichesSlugRoute,
   FichesDenombrementRoute: FichesDenombrementRoute,
   FichesEquationsRoute: FichesEquationsRoute,
@@ -229,13 +250,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

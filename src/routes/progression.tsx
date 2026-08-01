@@ -1,0 +1,177 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import {
+  ALL_COMPETENCIES,
+  CATEGORIES,
+  categoryAverage,
+  competencyMastery,
+  competencyWrongTotal,
+  resetAllProgress,
+  type Competency,
+} from "@/lib/competencies";
+import { RadarChart } from "@/lib/radarChart";
+
+export const Route = createFileRoute("/progression")({
+  head: () => ({
+    meta: [
+      { title: "Ma progression — Fiches Maths" },
+      {
+        name: "description",
+        content: "Radar de compétences, grille de progression et points faibles à retravailler.",
+      },
+    ],
+  }),
+  component: ProgressionPage,
+});
+
+function masteryColor(pct: number): string {
+  if (pct >= 100) return "bg-yellow-400 border-yellow-200";
+  if (pct >= 60) return "bg-green-400 border-green-300";
+  if (pct >= 25) return "bg-teal-500/60 border-teal-300";
+  if (pct > 0) return "bg-muted border-border";
+  return "bg-transparent border-white/20";
+}
+
+function CompetencyCell({ c, mastery }: { c: Competency; mastery: number }) {
+  return (
+    <Link
+      to="/fiches/$slug"
+      params={{ slug: c.fiche }}
+      title={`${c.label} — ${Math.round(mastery)}%`}
+      className={`flex aspect-square items-center justify-center rounded-md border text-[9px] leading-tight text-foreground/70 transition hover:border-primary hover:text-primary ${masteryColor(mastery)}`}
+    >
+      <span className="sr-only">{c.label}</span>
+    </Link>
+  );
+}
+
+function ProgressionPage() {
+  const [ready, setReady] = useState(false);
+  const [tick, setTick] = useState(0);
+
+  // Reading localStorage must wait until mount (SSR has no localStorage);
+  // `tick` forces a recompute after "Réinitialiser toute la progression".
+  useEffect(() => setReady(true), []);
+
+  if (!ready) {
+    return <div className="min-h-screen bg-background" />;
+  }
+
+  const axes = CATEGORIES.map((cat) => ({ label: cat, value: categoryAverage(cat) }));
+
+  const weakest = ALL_COMPETENCIES.map((c) => ({ c, wrong: competencyWrongTotal(c) }))
+    .filter((x) => x.wrong > 0)
+    .sort((a, b) => b.wrong - a.wrong)
+    .slice(0, 8);
+
+  const overall =
+    ALL_COMPETENCIES.reduce((sum, c) => sum + competencyMastery(c), 0) / ALL_COMPETENCIES.length;
+
+  const handleReset = () => {
+    if (
+      !window.confirm(
+        "Réinitialiser toute la progression, sur toutes les fiches ? Impossible à annuler.",
+      )
+    ) {
+      return;
+    }
+    resetAllProgress();
+    setTick((t) => t + 1);
+  };
+
+  return (
+    <div key={tick} className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border">
+        <div className="mx-auto max-w-4xl px-6 py-10">
+          <Link to="/" className="text-sm text-muted-foreground transition hover:text-primary">
+            ← Toutes les fiches
+          </Link>
+          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">Progression</p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Ma progression</h1>
+          <p className="mt-3 text-muted-foreground">
+            {Math.round(overall)}% de maîtrise globale, sur {ALL_COMPETENCIES.length} compétences —
+            stocké uniquement sur cet appareil.
+          </p>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-4xl space-y-8 px-6 py-10">
+        <section className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold text-card-foreground">
+            Vue d'ensemble par catégorie
+          </h2>
+          <RadarChart axes={axes} />
+        </section>
+
+        <section className="rounded-xl border border-border bg-card p-6">
+          <h2 className="text-lg font-semibold text-card-foreground">Points faibles</h2>
+          {weakest.length === 0 ? (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Pas encore assez de mauvaises réponses pour dégager une tendance — bon signe.
+            </p>
+          ) : (
+            <ul className="mt-4 space-y-2">
+              {weakest.map(({ c, wrong }) => (
+                <li key={c.id}>
+                  <Link
+                    to="/fiches/$slug"
+                    params={{ slug: c.fiche }}
+                    className="flex items-center justify-between rounded-md border border-border bg-muted px-3 py-2 text-sm transition hover:border-primary"
+                  >
+                    <span className="text-foreground">{c.label}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {wrong} erreur{wrong > 1 ? "s" : ""}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="rounded-xl border border-border bg-card p-6">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-lg font-semibold text-card-foreground">Grille de compétences</h2>
+            <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm border border-white/20 bg-transparent" /> à
+                faire
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm border border-teal-300 bg-teal-500/60" /> en
+                cours
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm border border-green-300 bg-green-400" />{" "}
+                avancé
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-2.5 w-2.5 rounded-sm border border-yellow-200 bg-yellow-400" />{" "}
+                validé
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-8 gap-1.5 sm:grid-cols-10">
+            {ALL_COMPETENCIES.map((c) => (
+              <CompetencyCell key={c.id} c={c} mastery={competencyMastery(c)} />
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-red-500/30 bg-card p-6">
+          <h2 className="text-sm font-semibold text-red-300">Zone de réinitialisation</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Pour repartir de zéro sur une seule fiche, utilise le bouton « Réinitialiser la pyramide
+            » directement sur cette fiche. Ce bouton-ci efface tout, partout.
+          </p>
+          <button
+            onClick={handleReset}
+            className="mt-3 rounded-md border border-red-500/50 px-4 py-2 text-sm font-medium text-red-300 transition hover:bg-red-500/10"
+          >
+            Réinitialiser toute la progression
+          </button>
+        </section>
+      </main>
+    </div>
+  );
+}
