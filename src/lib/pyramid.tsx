@@ -44,6 +44,16 @@ export function isHesitant(elapsedMs: number, level: 1 | 2 | 3 | 4): boolean {
   return elapsedMs > HESITATION_THRESHOLD_MS[level];
 }
 
+// Every usePyramid(key) call gets its own independent React state, synced to
+// localStorage but not to each other — e.g. the PEMDAS row list and the quiz
+// dialog for that same row are two separate instances. Without this bus, a
+// correct answer in the dialog updates localStorage and the dialog's own
+// state, but the row list behind it (already mounted, not re-reading
+// localStorage on its own) stays stale until a full page reload. Every
+// instance broadcasts on write and every instance for the same key listens,
+// so they all resync immediately.
+const pyramidBus: EventTarget | null = typeof window !== "undefined" ? new EventTarget() : null;
+
 export function usePyramid(storageKey: string) {
   const [p, setP] = useState<Pyramid>(initialPyramid);
   // On mount (and whenever storageKey changes) the read effect below hasn't
@@ -74,10 +84,33 @@ export function usePyramid(storageKey: string) {
     }
     try {
       localStorage.setItem("pyramid:" + storageKey, JSON.stringify(p));
+      pyramidBus?.dispatchEvent(new CustomEvent("change", { detail: storageKey }));
     } catch {
       /* noop */
     }
   }, [storageKey, p]);
+
+  // Resync from localStorage whenever ANY usePyramid(storageKey) instance —
+  // including this one, harmlessly — writes. The content check before
+  // setP matters: without it, this instance's own write would re-trigger
+  // this same effect with a new-but-equal object, which the write effect
+  // above would then persist again, dispatch again, and loop forever.
+  useEffect(() => {
+    if (!pyramidBus) return;
+    const onChange = (e: Event) => {
+      const key = (e as CustomEvent<string>).detail;
+      if (key !== storageKey) return;
+      try {
+        const raw = localStorage.getItem("pyramid:" + storageKey);
+        const next = raw ? { ...initialPyramid, ...JSON.parse(raw) } : initialPyramid;
+        setP((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
+      } catch {
+        /* noop */
+      }
+    };
+    pyramidBus.addEventListener("change", onChange);
+    return () => pyramidBus.removeEventListener("change", onChange);
+  }, [storageKey]);
 
   const onCorrect = (hesitant = false) =>
     setP((prev) => {
