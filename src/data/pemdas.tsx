@@ -245,6 +245,25 @@ export const rows: PemdasRow[] = [
     leftCol: "Somme",
     rightCol: "Multiplication",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const k = rnd(2, 9);
+        const t = rnd(6, 9);
+        const wrongT = t + (Math.random() < 0.5 ? 1 : -1);
+        return makeQ(
+          <>
+            Quelle somme correspond à {k}×{t} ?
+          </>,
+          Array(t).fill(k).join("+"),
+          [
+            Array(Math.max(1, wrongT)).fill(k).join("+"),
+            Array(t)
+              .fill(k + 1)
+              .join("+"),
+            `${k * t}`,
+          ],
+          `${k}×${t} = additionner ${k} un total de ${t} fois : ${Array(t).fill(k).join("+")}.`,
+        );
+      }
       const k = rnd(2, lvl >= 2 ? 12 : 6);
       const t = rnd(3, lvl >= 2 ? 7 : 5);
       return makeQ(
@@ -262,6 +281,23 @@ export const rows: PemdasRow[] = [
     leftCol: "Multiplication",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const b = rnd(2, 8);
+        const e = rnd(5, 8);
+        const wrongE = e + (Math.random() < 0.5 ? 1 : -1);
+        return makeQ(
+          <>Quelle multiplication correspond à {fmt(`${b}^${e}`)} ?</>,
+          Array(e).fill(b).join("×"),
+          [
+            Array(Math.max(1, wrongE)).fill(b).join("×"),
+            Array(e)
+              .fill(b + 1)
+              .join("×"),
+            `${b}×${e}`,
+          ],
+          `${b}^${e} = multiplier ${b} par lui-même ${e} fois : ${Array(e).fill(b).join("×")}.`,
+        );
+      }
       const b = rnd(2, lvl >= 2 ? 9 : 5);
       const e = rnd(2, lvl >= 2 ? 5 : 4);
       return makeQ(
@@ -279,6 +315,22 @@ export const rows: PemdasRow[] = [
     leftCol: "Somme",
     rightCol: "Multiplication",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const g = rnd(3, 9);
+        const m = rnd(2, 6);
+        let n = rnd(2, 6);
+        while (gcd(m, n) !== 1) n = rnd(2, 6);
+        const c1 = g * m;
+        const c2 = g * n;
+        return makeQ(
+          <>
+            Factorise : {c1}a + {c2}b
+          </>,
+          `${g}(${m}a+${n}b)`,
+          [`${g}(${m}a−${n}b)`, `${c1}(a+${n}b)`, `${m}(${g}a+${n}b)`],
+          `Le plus grand facteur commun de ${c1} et ${c2} est ${g} : ${c1}a+${c2}b = ${g}(${m}a+${n}b).`,
+        );
+      }
       const k = rnd(2, lvl >= 2 ? 12 : 7);
       return makeQ(
         <>
@@ -297,6 +349,22 @@ export const rows: PemdasRow[] = [
     leftCol: "Somme",
     rightCol: "Multiplication",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const g = rnd(3, 9);
+        const m = rnd(2, 6);
+        let n = rnd(2, 6);
+        while (gcd(m, n) !== 1) n = rnd(2, 6);
+        const c1 = g * m;
+        const c2 = g * n;
+        return makeQ(
+          <>
+            Factorise : {c1}a − {c2}b
+          </>,
+          `${g}(${m}a−${n}b)`,
+          [`${g}(${m}a+${n}b)`, `${c1}(a−${n}b)`, `${m}(${g}a−${n}b)`],
+          `Le plus grand facteur commun de ${c1} et ${c2} est ${g} : ${c1}a−${c2}b = ${g}(${m}a−${n}b).`,
+        );
+      }
       const k = rnd(2, lvl >= 2 ? 12 : 7);
       return makeQ(
         <>
@@ -315,6 +383,28 @@ export const rows: PemdasRow[] = [
     leftCol: "Somme",
     rightCol: "Multiplication",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(10, 20);
+        const b = rnd(1, a - 1);
+        if (Math.random() < 0.5) {
+          return makeQ(
+            <>
+              Factorise : {fmt(`${a}^2`)} − {fmt(`${b}^2`)}
+            </>,
+            `(${a}+${b})(${a}−${b})`,
+            [`(${a}−${b})^2`, `${a}^2 − ${b}^2`, `${a * a - b * b}`],
+            `Identité remarquable : a²−b² = (a+b)(a−b), avec a=${a}, b=${b}.`,
+          );
+        }
+        return makeQ(
+          <>
+            {a}² − {b}² vaut aussi :
+          </>,
+          `${a + b}×${a - b}`,
+          [`${a - b}×${a - b}`, `${a}×${b}`, `${a + b}+${a - b}`],
+          `a²−b² = (a+b)(a−b) = ${a + b}×${a - b}.`,
+        );
+      }
       const a = rnd(2, lvl >= 2 ? 12 : 8);
       const b = rnd(1, a - 1);
       return makeQ(
@@ -334,6 +424,23 @@ export const rows: PemdasRow[] = [
     leftCol: "Somme",
     rightCol: "Division",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const c1 = rnd(2, 6);
+        let c2 = rnd(2, 6);
+        while (c2 === c1) c2 = rnd(2, 6);
+        const a = rnd(1, c1 - 1);
+        const b = rnd(1, c2 - 1);
+        const num = a * c2 + b * c1;
+        const den = c1 * c2;
+        return makeQ(
+          <>
+            Calcule : {a}/{c1} + {b}/{c2}
+          </>,
+          `${num}/${den}`,
+          [`${a + b}/${c1 + c2}`, `${a * c2}/${den}`, `${num}/${c1}`],
+          `Dénominateur commun ${c1}×${c2}=${den} : ${a}/${c1}=${a * c2}/${den}, ${b}/${c2}=${b * c1}/${den}, somme = ${num}/${den}.`,
+        );
+      }
       const c = rnd(3, lvl >= 2 ? 15 : 9);
       const a = rnd(1, c - 1);
       const b = rnd(1, c - 1);
@@ -354,6 +461,20 @@ export const rows: PemdasRow[] = [
     leftCol: "Multiplication",
     rightCol: "Division",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(5, 15);
+        const b = rnd(6, 16);
+        const c = rnd(5, 15);
+        const d = rnd(6, 16);
+        return makeQ(
+          <>
+            Calcule : ({a}/{b}) × ({c}/{d})
+          </>,
+          `${a * c}/${b * d}`,
+          [`${a + c}/${b + d}`, `${a * b}/${c * d}`, `${a * d}/${b * c}`],
+          `On multiplie les numérateurs entre eux (${a}×${c}=${a * c}), et les dénominateurs entre eux (${b}×${d}=${b * d}).`,
+        );
+      }
       const a = rnd(1, lvl >= 2 ? 9 : 5);
       const b = rnd(2, lvl >= 2 ? 9 : 5);
       const c = rnd(1, lvl >= 2 ? 9 : 5);
@@ -375,6 +496,20 @@ export const rows: PemdasRow[] = [
     leftCol: "Division",
     rightCol: "Multiplication",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(5, 15);
+        const b = rnd(6, 16);
+        const c = rnd(5, 15);
+        const d = rnd(6, 16);
+        return makeQ(
+          <>
+            Calcule : ({a}/{b}) ÷ ({c}/{d})
+          </>,
+          `${a * d}/${b * c}`,
+          [`${a * c}/${b * d}`, `${b * c}/${a * d}`, `${a + d}/${b + c}`],
+          `Diviser par une fraction revient à multiplier par son inverse : (${a}/${b}) × (${d}/${c}) = ${a * d}/${b * c}.`,
+        );
+      }
       const a = rnd(1, lvl >= 2 ? 9 : 5);
       const b = rnd(2, lvl >= 2 ? 9 : 5);
       const c = rnd(1, lvl >= 2 ? 9 : 5);
@@ -396,6 +531,19 @@ export const rows: PemdasRow[] = [
     leftCol: "Division",
     rightCol: "Division",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(2, 15);
+        const b = rnd(2, 15);
+        const c = rnd(2, 9);
+        return makeQ(
+          <>
+            Simplifie : {a * c}/{b * c}
+          </>,
+          simp(a, b),
+          [`${a}/${b * c}`, `${a * c}/${b}`, `${c}/${b}`],
+          `Le facteur commun ${c} se simplifie au numérateur et au dénominateur.`,
+        );
+      }
       const a = rnd(2, lvl >= 2 ? 9 : 5);
       const b = rnd(2, lvl >= 2 ? 9 : 5);
       const c = rnd(2, lvl >= 2 ? 9 : 5);
@@ -416,6 +564,26 @@ export const rows: PemdasRow[] = [
     leftCol: "Multiplication",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const d = fracDen();
+        let p = rnd(1, 2 * d - 1);
+        if (p % d === 0) p++;
+        const a = -p;
+        const b = rnd(1, d - 1);
+        const sum = expStr(a + b, d);
+        return makeQ(
+          <>
+            Simplifie : {fmt(`x^(${a}/${d})`)} × {fmt(`x^(${b}/${d})`)}
+          </>,
+          powTerm("x", sum),
+          [
+            powTerm("x", expStr(a * b, d)),
+            powTerm("x", expStr(a + b, d * 2)),
+            powTerm("x", expStr(Math.abs(a - b), d)),
+          ],
+          `Même base : on additionne les exposants, ${a}/${d}+${b}/${d}=${sum}.`,
+        );
+      }
       if (lvl >= 3) {
         if (Math.random() < 0.5) {
           const d = fracDen();
@@ -471,6 +639,21 @@ export const rows: PemdasRow[] = [
     leftCol: "Multiplication",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const d = fracDen();
+        let p = rnd(1, 2 * d - 1);
+        if (p % d === 0) p++;
+        const a = -p;
+        const e = expStr(a, d);
+        return makeQ(
+          <>
+            Simplifie : {fmt(`x^(${e})`)} × {fmt(`y^(${e})`)}
+          </>,
+          `(xy)^(${e})`,
+          [`(xy)^${d}`, `x^(${e})+y^(${e})`, `(x+y)^(${e})`],
+          `Même exposant : on multiplie les bases, l'exposant ${e} reste inchangé.`,
+        );
+      }
       if (lvl >= 3) {
         if (Math.random() < 0.5) {
           const d = fracDen();
@@ -515,6 +698,26 @@ export const rows: PemdasRow[] = [
     leftCol: "Division",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const d = fracDen();
+        let p = rnd(1, 2 * d - 1);
+        if (p % d === 0) p++;
+        const a = -p;
+        const q = rnd(1, d - 1);
+        const diff = expStr(a - q, d);
+        return makeQ(
+          <>
+            Simplifie : {fmt(`x^(${a}/${d})`)} / {fmt(`x^(${q}/${d})`)}
+          </>,
+          powTerm("x", diff),
+          [
+            powTerm("x", expStr(a + q, d)),
+            powTerm("x", expStr(q - a, d)),
+            powTerm("x", expStr(a * q, d)),
+          ],
+          `Même base : on soustrait les exposants, ${a}/${d}−${q}/${d}=${diff}.`,
+        );
+      }
       if (lvl >= 3) {
         if (Math.random() < 0.5) {
           const d = fracDen();
@@ -566,6 +769,21 @@ export const rows: PemdasRow[] = [
     leftCol: "Division",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const d = fracDen();
+        let p = rnd(1, 2 * d - 1);
+        if (p % d === 0) p++;
+        const a = -p;
+        const e = expStr(a, d);
+        return makeQ(
+          <>
+            Simplifie : {fmt(`x^(${e})`)} / {fmt(`y^(${e})`)}
+          </>,
+          `(x/y)^(${e})`,
+          [`(x/y)^${d}`, `(x−y)^(${e})`, `x^(${e})−y^(${e})`],
+          `Même exposant : on divise les bases, l'exposant ${e} reste inchangé.`,
+        );
+      }
       if (lvl >= 3) {
         if (Math.random() < 0.5) {
           const d = fracDen();
@@ -611,6 +829,20 @@ export const rows: PemdasRow[] = [
     leftCol: "Exposant",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const d = fracDen();
+        let p = rnd(1, 2 * d - 1);
+        if (p % d === 0) p++;
+        const a = -p;
+        const b = rnd(2, 4);
+        const prodExp = expStr(a * b, d);
+        return makeQ(
+          <>Simplifie : {fmt(`(x^(${a}/${d}))^${b}`)}</>,
+          powTerm("x", prodExp),
+          [powTerm("x", expStr(a + b, d)), powTerm("x", expStr(a, d)), powTerm("x", String(b))],
+          `Puissance de puissance : on multiplie les exposants, ${a}/${d}×${b}=${prodExp}.`,
+        );
+      }
       if (lvl >= 3) {
         if (Math.random() < 0.5) {
           const d = fracDen();
@@ -656,6 +888,15 @@ export const rows: PemdasRow[] = [
     leftCol: "Somme",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const k = rnd(4, 12);
+        return makeQ(
+          <>Factorise : {fmt(`x^2+${2 * k}x+${k * k}`)}</>,
+          `(x+${k})^2`,
+          [`(x−${k})^2`, `(x+${2 * k})^2`, `x^2+${k}`],
+          `x²+${2 * k}x+${k * k} est le développement de (x+${k})² : a²+2ab+b² avec a=x, b=${k}.`,
+        );
+      }
       if (lvl >= 3) {
         const useFraction = Math.random() < 0.5;
         const den = useFraction ? fracDen() : 1;
@@ -695,6 +936,15 @@ export const rows: PemdasRow[] = [
     leftCol: "Somme",
     rightCol: "Exposant",
     quiz: (lvl) => {
+      if (lvl >= 4) {
+        const k = rnd(4, 12);
+        return makeQ(
+          <>Factorise : {fmt(`x^2−${2 * k}x+${k * k}`)}</>,
+          `(x−${k})^2`,
+          [`(x+${k})^2`, `(x−${2 * k})^2`, `x^2−${k}`],
+          `x²−${2 * k}x+${k * k} est le développement de (x−${k})² : a²−2ab+b² avec a=x, b=${k}.`,
+        );
+      }
       if (lvl >= 3) {
         const useFraction = Math.random() < 0.5;
         const den = useFraction ? fracDen() : 1;

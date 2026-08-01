@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { rows, COLS, COL_COLOR, type PemdasRow, type QuizQ } from "@/data/pemdas";
-import { PyramidView, pyramidLabel, usePyramid } from "@/lib/pyramid";
+import { PyramidView, pyramidLabel, readStoredPyramid, usePyramid } from "@/lib/pyramid";
 import { extractText } from "@/lib/testUtils";
 
 export const Route = createFileRoute("/fiches/pemdas")({
@@ -74,8 +74,14 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
       <PyramidView p={pyramid} />
     </div>
   );
+  // The boss halo's rays are absolutely positioned and extend well above the
+  // pyramid cells themselves (see BossHalo/HALO_CENTER_Y in pyramid.tsx), so
+  // once the pyramid is complete we need extra top clearance in the stacked
+  // mobile layout — otherwise the rays overlap the row's equation text.
+  // Reserved as soon as the pyramid is complete (not only once rays > 0) so
+  // there's no layout jump the moment the first ray appears.
   const pyramidMobile = (
-    <div className="pointer-events-none mt-2 landscape:hidden">
+    <div className={`pointer-events-none landscape:hidden ${pyramid.complete ? "mt-12" : "mt-2"}`}>
       <PyramidView p={pyramid} />
     </div>
   );
@@ -214,7 +220,10 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
   const [q, setQ] = useState<QuizQ | null>(null);
   const lastPrompt = useRef<string | null>(null);
 
-  const pickQuestion = (tier: 1 | 2 | 3): QuizQ | null => {
+  // Level 4 is boss-only: pyramid.tier stays pinned at 3 once the pyramid is
+  // complete (see usePyramid), so without this the boss round would just
+  // keep drawing from the tier-3 pool instead of getting genuinely harder.
+  const pickQuestion = (tier: 1 | 2 | 3 | 4): QuizQ | null => {
     if (!row) return null;
     let question = row.quiz(tier);
     let tries = 0;
@@ -234,9 +243,19 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
   // Generate the first question when the dialog opens on a new row.
   // Subsequent questions are generated only when the user clicks
   // "Question suivante", so the feedback always matches the shown question.
+  //
+  // The level for this first question is read straight from localStorage
+  // instead of the `pyramid` state above: usePyramid's own hydration effect
+  // hasn't necessarily run yet in this same effect pass (it starts from
+  // initialPyramid and patches in the stored value asynchronously), so using
+  // `pyramid.tier`/`pyramid.complete` here would race and show a tier-1
+  // question even when the row is already at boss level.
   useEffect(() => {
     lastPrompt.current = null;
-    if (row) setQ(pickQuestion(1));
+    if (!row) return;
+    const stored = readStoredPyramid(row.id);
+    const level = stored?.complete ? 4 : (stored?.tier ?? 1);
+    setQ(pickQuestion(level));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [row]);
 
@@ -257,7 +276,7 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
 
   const next = () => {
     if (picked === null) return;
-    setQ(pickQuestion(pyramid.tier));
+    setQ(pickQuestion(pyramid.complete ? 4 : pyramid.tier));
     setPicked(null);
   };
 

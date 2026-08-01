@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type Pyramid = {
   tier: 1 | 2 | 3;
@@ -25,8 +25,18 @@ export const initialPyramid: Pyramid = {
 
 export function usePyramid(storageKey: string) {
   const [p, setP] = useState<Pyramid>(initialPyramid);
+  // On mount (and whenever storageKey changes) the read effect below hasn't
+  // applied its setP yet by the time the write effect first runs in the same
+  // commit — that write effect would otherwise still see the pre-hydration
+  // `p` (initialPyramid, or the previous key's leftover value) and persist
+  // it, clobbering whatever was already stored for the new key. Skipping
+  // exactly one write right after a key change avoids that stale write; the
+  // render triggered by the read effect's setP fires the write effect again
+  // with the real value.
+  const skipNextWrite = useRef(true);
 
   useEffect(() => {
+    skipNextWrite.current = true;
     try {
       const raw = localStorage.getItem("pyramid:" + storageKey);
       if (raw) setP({ ...initialPyramid, ...JSON.parse(raw) });
@@ -37,6 +47,10 @@ export function usePyramid(storageKey: string) {
   }, [storageKey]);
 
   useEffect(() => {
+    if (skipNextWrite.current) {
+      skipNextWrite.current = false;
+      return;
+    }
     try {
       localStorage.setItem("pyramid:" + storageKey, JSON.stringify(p));
     } catch {
