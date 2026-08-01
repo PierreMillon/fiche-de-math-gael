@@ -329,8 +329,8 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "frac-add",
-    left: plusW(fracW(n("a"), n("c")), fracW(n("b"), n("c"))),
-    right: fracW(plus(n("a"), n("b")), n("c")),
+    left: plus(fracW(n("a"), n("c")), fracW(n("b"), n("c"))),
+    right: frac(plusW(n("a"), n("b")), n("c")),
     leftCol: "Somme",
     rightCol: "Division",
     quiz: (lvl) => {
@@ -350,7 +350,7 @@ export const rows: PemdasRow[] = [
   {
     id: "frac-mul",
     left: times(fracW(n("a"), n("b")), fracW(n("c"), n("d"))),
-    right: fracW(timesW(n("a"), n("c")), timesW(n("b"), n("d"))),
+    right: frac(timesW(n("a"), n("c")), timesW(n("b"), n("d"))),
     leftCol: "Multiplication",
     rightCol: "Division",
     quiz: (lvl) => {
@@ -370,7 +370,7 @@ export const rows: PemdasRow[] = [
   },
   {
     id: "frac-div",
-    left: fracW(fracW(n("a"), n("b")), fracW(n("c"), n("d"))),
+    left: frac(fracW(n("a"), n("b")), fracW(n("c"), n("d"))),
     right: times(fracW(n("a"), n("b")), fracW(n("d"), n("c"))),
     leftCol: "Division",
     rightCol: "Multiplication",
