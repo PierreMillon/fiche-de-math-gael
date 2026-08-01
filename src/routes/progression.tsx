@@ -95,6 +95,42 @@ function TransferSection({ onImported }: { onImported: () => void }) {
         copier-coller.
       </p>
 
+      <details className="mt-3 rounded-md border border-border bg-muted px-3 py-2 text-sm">
+        <summary className="cursor-pointer font-medium text-foreground">
+          Comment ça marche exactement ?
+        </summary>
+        <div className="mt-2 space-y-2 text-muted-foreground">
+          <p>
+            « Générer ma phrase » prend une <strong className="text-foreground">photo</strong> de ta
+            progression à cet instant précis et la transforme en quelques mots. Coller cette phrase
+            (ou ouvrir le lien) sur un autre appareil recopie cette photo là-bas.
+          </p>
+          <p>
+            Ce n'est <strong className="text-foreground">pas</strong> une synchronisation en direct
+            : si tu progresses encore après avoir généré la phrase, ces nouveaux progrès n'y sont
+            pas inclus. Il faut en générer une nouvelle à chaque fois que tu veux mettre l'autre
+            appareil à jour.
+          </p>
+          <p className="text-foreground">Avantages :</p>
+          <ul className="list-disc space-y-1 pl-4">
+            <li>Aucun compte, aucun mot de passe à retenir.</li>
+            <li>
+              Rien n'est envoyé à un serveur : la phrase ne sort de tes appareils que si toi tu la
+              copies.
+            </li>
+            <li>Fonctionne même hors connexion, juste du texte à transmettre.</li>
+          </ul>
+          <p className="text-foreground">Inconvénients :</p>
+          <ul className="list-disc space-y-1 pl-4">
+            <li>Pas automatique : il faut y penser et régénérer une phrase à chaque fois.</li>
+            <li>
+              Si tu avances sur deux appareils en parallèle sans jamais réimporter entre les deux,
+              le dernier import écrase l'autre — pas de fusion intelligente des deux progressions.
+            </li>
+          </ul>
+        </div>
+      </details>
+
       <div className="mt-4">
         {!phrase ? (
           <button
@@ -224,7 +260,8 @@ function ProgressionPage() {
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Ma progression</h1>
           <p className="mt-3 text-muted-foreground">
             {Math.round(overall)}% de maîtrise globale, sur {ALL_COMPETENCIES.length} compétences —
-            stocké uniquement sur cet appareil.
+            stocké uniquement sur cet appareil, sauf si tu génères une phrase à coller ailleurs
+            (voir plus bas).
           </p>
         </div>
       </header>
@@ -266,28 +303,28 @@ function ProgressionPage() {
         </section>
 
         <section className="rounded-xl border border-border bg-card p-6">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold text-card-foreground">Grille de compétences</h2>
-            <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded-sm border border-white/20 bg-transparent" /> à
-                faire
+                <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-white/20 bg-transparent" />
+                à faire
               </span>
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded-sm border border-teal-300 bg-teal-500/60" /> en
-                cours
+                <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-teal-300 bg-teal-500/60" />
+                en cours
               </span>
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded-sm border border-green-300 bg-green-400" />{" "}
+                <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-green-300 bg-green-400" />
                 avancé
               </span>
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 rounded-sm border border-yellow-200 bg-yellow-400" />{" "}
+                <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-yellow-200 bg-yellow-400" />
                 validé
               </span>
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-8 gap-1.5 sm:grid-cols-10">
+          <div className="mt-4 grid grid-cols-6 gap-1.5 sm:grid-cols-9 md:grid-cols-10">
             {ALL_COMPETENCIES.map((c) => (
               <CompetencyCell key={c.id} c={c} mastery={competencyMastery(c)} />
             ))}
