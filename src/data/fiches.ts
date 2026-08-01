@@ -111,23 +111,17 @@ export const fiches: Fiche[] = [
     slug: "suites",
     title: "Suites",
     category: "Analyse",
-    summary: "Suites arithmétiques, géométriques et raisonnement par récurrence.",
-    sections: [
-      {
-        heading: "Suite arithmétique",
-        content: "Raison r, premier terme u₀ :",
-        formulas: ["uₙ = u₀ + n·r", "Sₙ = (n+1)(u₀ + uₙ)/2"],
-      },
-      {
-        heading: "Suite géométrique",
-        content: "Raison q ≠ 1 :",
-        formulas: ["uₙ = u₀ · qⁿ", "Sₙ = u₀ · (1 − qⁿ⁺¹)/(1 − q)"],
-      },
-      {
-        heading: "Récurrence",
-        content: "Initialisation, hérédité, conclusion. Vérifier P(0), puis P(n) ⇒ P(n+1).",
-      },
-    ],
+    summary:
+      "Suites arithmétiques, géométriques, et l'arbre de décision pour trouver la bonne méthode de convergence.",
+    sections: [],
+  },
+  {
+    slug: "series-numeriques",
+    title: "Séries numériques",
+    category: "Analyse",
+    summary:
+      "Deux arbres de décision interactifs pour déterminer la nature d'une série : cas général, puis termes positifs.",
+    sections: [],
   },
   {
     slug: "probabilites",
