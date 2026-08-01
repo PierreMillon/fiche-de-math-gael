@@ -892,6 +892,12 @@ export const exercises: Record<string, Bank> = {
         d: ["x>1/2", "x<−1/2", "x>−1/2"],
         e: "1−2x>0 ⟺ −2x>−1 ⟺ x<1/2 (on divise par un négatif : le sens change).",
       },
+      {
+        q: "Résoudre : −3x+6>0",
+        a: "x<2",
+        d: ["x>2", "x<−2", "x>−2"],
+        e: "−3x+6>0 ⟺ −3x>−6 ⟺ x<2 (on divise par −3, négatif : le sens s'inverse).",
+      },
     ],
     2: [
       {
@@ -899,6 +905,12 @@ export const exercises: Record<string, Bank> = {
         a: "positif si x<(1/3)ln 2",
         d: ["positif si x>(1/3)ln 2", "toujours positif", "toujours négatif"],
         e: "−e^(3x)+2>0 ⟺ e^(3x)<2 ⟺ 3x<ln 2 ⟺ x<(1/3)ln 2.",
+      },
+      {
+        q: "Résoudre : −2e^x+6>0",
+        a: "x<ln 3",
+        d: ["x>ln 3", "x<−ln 3", "x>−ln 3"],
+        e: "−2e^x+6>0 ⟺ −2e^x>−6 ⟺ e^x<3 (on divise par −2, négatif : le sens s'inverse) ⟺ x<ln 3.",
       },
       {
         q: "Résoudre : 3x+2 = x+5",
@@ -935,6 +947,68 @@ export const exercises: Record<string, Bank> = {
           "prend le logarithme des deux côtés",
         ],
         e: "On étudie les variations de la fonction puis on applique le théorème des valeurs intermédiaires.",
+      },
+    ],
+  },
+  "series-numeriques": {
+    1: [
+      {
+        q: "Nature de Σ 1/n^2 ?",
+        a: "convergente",
+        d: ["divergente", "indéterminée", "nulle"],
+        e: "Série de Riemann avec α=2>1 : convergente.",
+      },
+      {
+        q: "Nature de Σ (1/2)^n ?",
+        a: "convergente",
+        d: ["divergente", "indéterminée", "nulle"],
+        e: "Série géométrique de raison ρ=1/2, |ρ|<1 : convergente.",
+      },
+      {
+        q: "uₙ → 2 (≠0) : nature de Σuₙ ?",
+        a: "divergente grossièrement",
+        d: ["convergente", "convergente vers 2", "indéterminée"],
+        e: "uₙ ne tend pas vers 0 : divergence grossière.",
+      },
+    ],
+    2: [
+      {
+        q: "Nature de Σ 1/n ?",
+        a: "divergente",
+        d: ["convergente", "convergente vers 1", "indéterminée"],
+        e: "Série de Riemann avec α=1≤1 : divergente (série harmonique).",
+      },
+      {
+        q: "D'Alembert : lim uₙ₊₁/uₙ = 1/3. Nature de Σuₙ ?",
+        a: "convergente",
+        d: ["divergente", "divergente grossièrement", "indéterminée"],
+        e: "L=1/3<1 : convergente d'après la règle de d'Alembert.",
+      },
+      {
+        q: "Nature de Σ (−1)^n/n ?",
+        a: "convergente",
+        d: ["divergente", "divergente grossièrement", "absolument convergente"],
+        e: "Série alternée : (−1)ⁿ/n change de signe, tend vers 0, valeur absolue décroissante.",
+      },
+    ],
+    3: [
+      {
+        q: "D'Alembert : lim uₙ₊₁/uₙ = 2. Nature de Σuₙ ?",
+        a: "divergente grossièrement",
+        d: ["convergente", "divergente (sans plus)", "indéterminée"],
+        e: "L=2>1 : divergence grossière d'après la règle de d'Alembert.",
+      },
+      {
+        q: "uₙ ∼ 1/n^2 : nature de Σuₙ ?",
+        a: "convergente",
+        d: ["divergente", "indéterminée", "absolument divergente"],
+        e: "uₙ∼vₙ ⇒ même nature ; Σ1/n² converge (Riemann α=2>1).",
+      },
+      {
+        q: "0≤uₙ≤1/n^3 pour tout n : nature de Σuₙ ?",
+        a: "convergente",
+        d: ["divergente", "indéterminée", "on ne peut pas conclure"],
+        e: "Comparaison : Σ1/n³ converge (Riemann α=3>1), donc Σuₙ converge aussi.",
       },
     ],
   },

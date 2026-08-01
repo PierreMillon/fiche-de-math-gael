@@ -10,10 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProgressionRouteImport } from './routes/progression'
 import { Route as FichesSlugRouteImport } from './routes/fiches.$slug'
+import { Route as FichesDenombrementRouteImport } from './routes/fiches.denombrement'
 import { Route as FichesEquationsRouteImport } from './routes/fiches.equations'
 import { Route as FichesLogiqueBooleenneRouteImport } from './routes/fiches.logique-booleenne'
 import { Route as FichesPemdasRouteImport } from './routes/fiches.pemdas'
+import { Route as FichesSeriesNumeriquesRouteImport } from './routes/fiches.series-numeriques'
+import { Route as FichesSuitesRouteImport } from './routes/fiches.suites'
 import { Route as FichesTangenteRouteImport } from './routes/fiches.tangente'
 
 const IndexRoute = IndexRouteImport.update({
@@ -21,9 +25,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgressionRoute = ProgressionRouteImport.update({
+  id: '/progression',
+  path: '/progression',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FichesSlugRoute = FichesSlugRouteImport.update({
   id: '/fiches/$slug',
   path: '/fiches/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichesDenombrementRoute = FichesDenombrementRouteImport.update({
+  id: '/fiches/denombrement',
+  path: '/fiches/denombrement',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FichesEquationsRoute = FichesEquationsRouteImport.update({
@@ -41,6 +55,16 @@ const FichesPemdasRoute = FichesPemdasRouteImport.update({
   path: '/fiches/pemdas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FichesSeriesNumeriquesRoute = FichesSeriesNumeriquesRouteImport.update({
+  id: '/fiches/series-numeriques',
+  path: '/fiches/series-numeriques',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichesSuitesRoute = FichesSuitesRouteImport.update({
+  id: '/fiches/suites',
+  path: '/fiches/suites',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FichesTangenteRoute = FichesTangenteRouteImport.update({
   id: '/fiches/tangente',
   path: '/fiches/tangente',
@@ -49,62 +73,90 @@ const FichesTangenteRoute = FichesTangenteRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/progression': typeof ProgressionRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
   '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
+  '/fiches/series-numeriques': typeof FichesSeriesNumeriquesRoute
+  '/fiches/suites': typeof FichesSuitesRoute
   '/fiches/tangente': typeof FichesTangenteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/progression': typeof ProgressionRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
   '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
+  '/fiches/series-numeriques': typeof FichesSeriesNumeriquesRoute
+  '/fiches/suites': typeof FichesSuitesRoute
   '/fiches/tangente': typeof FichesTangenteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/progression': typeof ProgressionRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
   '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
+  '/fiches/series-numeriques': typeof FichesSeriesNumeriquesRoute
+  '/fiches/suites': typeof FichesSuitesRoute
   '/fiches/tangente': typeof FichesTangenteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/progression'
     | '/fiches/$slug'
+    | '/fiches/denombrement'
     | '/fiches/equations'
     | '/fiches/logique-booleenne'
     | '/fiches/pemdas'
+    | '/fiches/series-numeriques'
+    | '/fiches/suites'
     | '/fiches/tangente'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/progression'
     | '/fiches/$slug'
+    | '/fiches/denombrement'
     | '/fiches/equations'
     | '/fiches/logique-booleenne'
     | '/fiches/pemdas'
+    | '/fiches/series-numeriques'
+    | '/fiches/suites'
     | '/fiches/tangente'
   id:
     | '__root__'
     | '/'
+    | '/progression'
     | '/fiches/$slug'
+    | '/fiches/denombrement'
     | '/fiches/equations'
     | '/fiches/logique-booleenne'
     | '/fiches/pemdas'
+    | '/fiches/series-numeriques'
+    | '/fiches/suites'
     | '/fiches/tangente'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProgressionRoute: typeof ProgressionRoute
   FichesSlugRoute: typeof FichesSlugRoute
+  FichesDenombrementRoute: typeof FichesDenombrementRoute
   FichesEquationsRoute: typeof FichesEquationsRoute
   FichesLogiqueBooleenneRoute: typeof FichesLogiqueBooleenneRoute
   FichesPemdasRoute: typeof FichesPemdasRoute
+  FichesSeriesNumeriquesRoute: typeof FichesSeriesNumeriquesRoute
+  FichesSuitesRoute: typeof FichesSuitesRoute
   FichesTangenteRoute: typeof FichesTangenteRoute
 }
 
@@ -117,11 +169,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/progression': {
+      id: '/progression'
+      path: '/progression'
+      fullPath: '/progression'
+      preLoaderRoute: typeof ProgressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fiches/$slug': {
       id: '/fiches/$slug'
       path: '/fiches/$slug'
       fullPath: '/fiches/$slug'
       preLoaderRoute: typeof FichesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fiches/denombrement': {
+      id: '/fiches/denombrement'
+      path: '/fiches/denombrement'
+      fullPath: '/fiches/denombrement'
+      preLoaderRoute: typeof FichesDenombrementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fiches/equations': {
@@ -145,6 +211,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FichesPemdasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/fiches/series-numeriques': {
+      id: '/fiches/series-numeriques'
+      path: '/fiches/series-numeriques'
+      fullPath: '/fiches/series-numeriques'
+      preLoaderRoute: typeof FichesSeriesNumeriquesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fiches/suites': {
+      id: '/fiches/suites'
+      path: '/fiches/suites'
+      fullPath: '/fiches/suites'
+      preLoaderRoute: typeof FichesSuitesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fiches/tangente': {
       id: '/fiches/tangente'
       path: '/fiches/tangente'
@@ -157,10 +237,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProgressionRoute: ProgressionRoute,
   FichesSlugRoute: FichesSlugRoute,
+  FichesDenombrementRoute: FichesDenombrementRoute,
   FichesEquationsRoute: FichesEquationsRoute,
   FichesLogiqueBooleenneRoute: FichesLogiqueBooleenneRoute,
   FichesPemdasRoute: FichesPemdasRoute,
+  FichesSeriesNumeriquesRoute: FichesSeriesNumeriquesRoute,
+  FichesSuitesRoute: FichesSuitesRoute,
   FichesTangenteRoute: FichesTangenteRoute,
 }
 export const routeTree = rootRouteImport

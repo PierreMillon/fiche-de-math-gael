@@ -6,6 +6,11 @@ export type Pyramid = {
   complete: boolean;
   bossRays: number;
   bossDone: boolean;
+  // Lifetime count of wrong answers — unlike the other fields, never
+  // decreases, so it can be used to rank the weakest competencies (see
+  // src/routes/progression.tsx) even after the pyramid itself is reset by
+  // a wrong answer or a manual reset of tier/filled.
+  wrongTotal: number;
 };
 export const TIER_SIZE: Record<1 | 2 | 3, number> = { 1: 3, 2: 2, 3: 1 };
 export const BOSS_TARGET = 6;
@@ -15,6 +20,7 @@ export const initialPyramid: Pyramid = {
   complete: false,
   bossRays: 0,
   bossDone: false,
+  wrongTotal: 0,
 };
 
 export function usePyramid(storageKey: string) {
@@ -64,15 +70,28 @@ export function usePyramid(storageKey: string) {
 
   const onWrong = () =>
     setP((prev) => {
-      if (prev.bossDone) return prev;
+      const wrongTotal = prev.wrongTotal + 1;
+      if (prev.bossDone) return { ...prev, wrongTotal };
       // Boss round: any mistake resets the halo to zero.
-      if (prev.complete) return { ...prev, bossRays: 0 };
-      return { ...prev, filled: Math.max(0, prev.filled - 1) };
+      if (prev.complete) return { ...prev, bossRays: 0, wrongTotal };
+      return { ...prev, filled: Math.max(0, prev.filled - 1), wrongTotal };
     });
 
   const reset = () => setP(initialPyramid);
 
   return { pyramid: p, onCorrect, onWrong, reset };
+}
+
+// Client-only, one-shot read (no subscription) — for places that just want
+// to display a snapshot of progress, e.g. the homepage fiche cards.
+export function readStoredPyramid(key: string): Pyramid | null {
+  try {
+    const raw = localStorage.getItem("pyramid:" + key);
+    if (!raw) return null;
+    return { ...initialPyramid, ...JSON.parse(raw) };
+  } catch {
+    return null;
+  }
 }
 
 export function pyramidLabel(p: Pyramid): string {
@@ -82,6 +101,13 @@ export function pyramidLabel(p: Pyramid): string {
   return `Palier ${p.tier} · ${p.filled}/${need}`;
 }
 
+// The pyramid's bounding box is square, but the shape inside it isn't: the
+// bottom row (3 cells) outweighs the top row (1 cell), so its visual center
+// of gravity sits below the box's geometric center. Anchoring the ray ring
+// there — instead of at 50% — is what makes it read as centered on the
+// triangle rather than on its invisible bounding square.
+const HALO_CENTER_Y = "61.6%";
+
 function BossHalo({ rays, radius }: { rays: number; radius: number }) {
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -90,8 +116,9 @@ function BossHalo({ rays, radius }: { rays: number; radius: number }) {
         return (
           <div
             key={i}
-            className="absolute left-1/2 top-1/2 h-3 w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-yellow-300 shadow-[0_0_6px_2px_rgba(250,204,21,0.85)]"
+            className="absolute left-1/2 h-3 w-[3px] rounded-full bg-yellow-300 shadow-[0_0_6px_2px_rgba(250,204,21,0.85)]"
             style={{
+              top: HALO_CENTER_Y,
               transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${radius}px)`,
             }}
           />
@@ -142,7 +169,10 @@ export function PyramidView({ p, size = "sm" }: { p: Pyramid; size?: "sm" | "md"
       }`}
     />
   );
-  const radius = size === "md" ? 20 : 16;
+  // Radius must clear the pyramid's diagonal extent (its widest points are the
+  // bottom row's corners, not its cardinal edges), plus half the ray's own
+  // length, so every ray sits outside the triangle uniformly, like a crown.
+  const radius = size === "md" ? 44 : 36;
 
   return (
     <div className="relative flex flex-col items-center gap-0.5">

@@ -111,23 +111,17 @@ export const fiches: Fiche[] = [
     slug: "suites",
     title: "Suites",
     category: "Analyse",
-    summary: "Suites arithmétiques, géométriques et raisonnement par récurrence.",
-    sections: [
-      {
-        heading: "Suite arithmétique",
-        content: "Raison r, premier terme u₀ :",
-        formulas: ["uₙ = u₀ + n·r", "Sₙ = (n+1)(u₀ + uₙ)/2"],
-      },
-      {
-        heading: "Suite géométrique",
-        content: "Raison q ≠ 1 :",
-        formulas: ["uₙ = u₀ · qⁿ", "Sₙ = u₀ · (1 − qⁿ⁺¹)/(1 − q)"],
-      },
-      {
-        heading: "Récurrence",
-        content: "Initialisation, hérédité, conclusion. Vérifier P(0), puis P(n) ⇒ P(n+1).",
-      },
-    ],
+    summary:
+      "Suites arithmétiques, géométriques, et l'arbre de décision pour trouver la bonne méthode de convergence.",
+    sections: [],
+  },
+  {
+    slug: "series-numeriques",
+    title: "Séries numériques",
+    category: "Analyse",
+    summary:
+      "Deux arbres de décision interactifs pour déterminer la nature d'une série : cas général, puis termes positifs.",
+    sections: [],
   },
   {
     slug: "probabilites",
@@ -254,25 +248,9 @@ export const fiches: Fiche[] = [
     slug: "denombrement",
     title: "Dénombrement",
     category: "Probabilités",
-    summary: "Permutations, arrangements, combinaisons et cardinaux.",
-    sections: [
-      {
-        heading: "Formules clés",
-        content: "Sur un ensemble à n éléments :",
-        formulas: [
-          "n! permutations",
-          "A(n,k) = n! / (n−k)!  (ordre, sans répétition)",
-          "C(n,k) = n! / (k!(n−k)!)  (sans ordre)",
-          "nᵏ listes de k éléments avec répétition",
-          "2ⁿ parties d'un ensemble à n éléments",
-        ],
-      },
-      {
-        heading: "Propriétés des combinaisons",
-        content: "Symétrie et triangle de Pascal :",
-        formulas: ["C(n,k) = C(n,n−k)", "C(n,k) + C(n,k+1) = C(n+1,k+1)"],
-      },
-    ],
+    summary:
+      "L'arbre pour choisir la bonne formule de comptage, plus l'exemple du chemin sur grille.",
+    sections: [],
   },
   {
     slug: "matrices",

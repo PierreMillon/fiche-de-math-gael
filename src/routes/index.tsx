@@ -1,5 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { fiches, categories } from "@/data/fiches";
+import { hasExercises } from "@/data/exercises";
+import { rows as pemdasRows } from "@/data/pemdas";
+import { pyramidLabel, readStoredPyramid, type Pyramid } from "@/lib/pyramid";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,6 +23,44 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
+
+// Maps a fiche slug to the localStorage pyramid key(s) that track its
+// progress. Returns null for fiches with no quiz (e.g. the pure animation
+// "tangente" fiche) — nothing to show there.
+function progressKeysFor(slug: string): string[] | null {
+  if (slug === "pemdas") return pemdasRows.map((r) => r.id);
+  if (slug === "logique-booleenne") return ["logique-circuit"];
+  if (hasExercises(slug)) return [`fiche:${slug}`];
+  return null;
+}
+
+// Reads localStorage on mount only (progress is written by the quiz pages,
+// never by this one) and renders a small pill if anything has been started.
+function FicheProgress({ slug }: { slug: string }) {
+  const [label, setLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    const keys = progressKeysFor(slug);
+    if (!keys) return;
+    const found = keys.map(readStoredPyramid).filter((p): p is Pyramid => p !== null);
+    if (found.length === 0) return;
+
+    if (keys.length === 1) {
+      setLabel(pyramidLabel(found[0]));
+      return;
+    }
+    // Aggregate across many rows (pemdas): how many have reached the boss tier.
+    const done = found.filter((p) => p.complete).length;
+    if (done > 0) setLabel(`${done}/${keys.length} lignes en palier boss`);
+  }, [slug]);
+
+  if (!label) return null;
+  return (
+    <span className="mt-3 inline-block rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+      {label}
+    </span>
+  );
+}
 
 function Index() {
   return (
@@ -46,6 +88,7 @@ function Index() {
                       </span>
                     </div>
                     <p className="mt-2 text-sm text-muted-foreground">{f.summary}</p>
+                    <FicheProgress slug={f.slug} />
                   </Link>
                 ))}
             </div>
