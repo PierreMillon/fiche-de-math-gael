@@ -133,6 +133,55 @@ function SignTable({
   );
 }
 
+const INEQUALITY_RULES: { op: string; eq: string; ineq: string }[] = [
+  { op: "+ C", eq: "A + C = B + C", ineq: "A + C < B + C" },
+  { op: "− C", eq: "A − C = B − C", ineq: "A − C < B − C" },
+  { op: "× C", eq: "A × C = B × C (C≠0)", ineq: "A×C < B×C si C>0 ; A×C > B×C si C<0" },
+  { op: "÷ C", eq: "A/C = B/C (C≠0)", ineq: "A/C < B/C si C>0 ; A/C > B/C si C<0" },
+  {
+    op: "f( )",
+    eq: "f(A) = f(B)",
+    ineq: "f(A) < f(B) si f croissante ; f(A) > f(B) si f décroissante",
+  },
+];
+
+function InequalityRules() {
+  return (
+    <section className="rounded-xl border border-border bg-card p-5 sm:p-6">
+      <h2 className="text-sm font-semibold uppercase tracking-[0.15em] text-primary">
+        Manipuler une (in)égalité
+      </h2>
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full min-w-[480px] border-collapse text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+              <th className="py-2 pr-3 font-medium">Opération</th>
+              <th className="py-2 pr-3 font-medium">A = B</th>
+              <th className="py-2 font-medium">A &lt; B</th>
+            </tr>
+          </thead>
+          <tbody>
+            {INEQUALITY_RULES.map((r) => (
+              <tr key={r.op} className="border-b border-border last:border-0">
+                <td className="py-2 pr-3 font-mono text-foreground">{r.op}</td>
+                <td className="py-2 pr-3 font-mono text-xs text-muted-foreground sm:text-sm">
+                  {r.eq}
+                </td>
+                <td className="py-2 font-mono text-xs text-muted-foreground sm:text-sm">
+                  {r.ineq}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+        ⚠ Si on ne connaît pas le signe de C (ou les variations de f), on ne peut pas conclure.
+      </p>
+    </section>
+  );
+}
+
 function EquationsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -153,6 +202,8 @@ function EquationsPage() {
       </header>
 
       <main className="mx-auto max-w-5xl space-y-6 px-6 py-10">
+        <InequalityRules />
+
         <div className="grid grid-cols-1 gap-6 text-center text-xs font-semibold uppercase tracking-[0.15em] sm:grid-cols-2">
           <div className="text-blue-400">Trouver un signe ou résoudre une inéquation</div>
           <div className="text-pink-400">Résoudre une équation, trouver l'inconnue</div>

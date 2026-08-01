@@ -4,6 +4,73 @@ import type { TreeNode } from "@/lib/decisionTree";
 // numériques" (Lyon 1, PCSI) schémas récapitulatifs — the flowcharts, not
 // the surrounding wall of theorem text.
 
+// From "Dénombrement — Cadre 2" : which counting formula applies to a
+// given tirage.
+export const denombrementTree: TreeNode = {
+  type: "question",
+  text: "L'ordre du tirage compte-t-il ? (tirages successifs)",
+  branches: [
+    {
+      label: "Non (tirages simultanés)",
+      color: "red",
+      node: {
+        type: "leaf",
+        text: "Combinaisons : Cₙᵖ = n!/(p!(n−p)!)",
+        detail:
+          "Pas de remise possible (les éléments sont distincts). Ex : équipe de volleyball (6 joueurs indifférenciés parmi 25) → C²⁵₆.",
+      },
+    },
+    {
+      label: "Oui",
+      color: "green",
+      node: {
+        type: "question",
+        text: "Y a-t-il remise (répétitions possibles) ?",
+        branches: [
+          {
+            label: "Oui",
+            color: "green",
+            node: {
+              type: "leaf",
+              text: "p-listes : nᵖ",
+              detail: "Ex : code d'un cadenas de vélo à 4 chiffres parmi 10 → 10⁴.",
+            },
+          },
+          {
+            label: "Non",
+            color: "red",
+            node: {
+              type: "question",
+              text: "On tire tous les éléments disponibles (p = n) ?",
+              branches: [
+                {
+                  label: "Oui",
+                  color: "green",
+                  node: {
+                    type: "leaf",
+                    text: "Permutations : n!",
+                    detail: "Ex : anagrammes d'un mot dont toutes les lettres sont distinctes.",
+                  },
+                },
+                {
+                  label: "Non",
+                  color: "red",
+                  node: {
+                    type: "leaf",
+                    text: "Arrangements : Aₙᵖ = n!/(n−p)!",
+                    detail:
+                      "Ex : équipe de football (11 postes différents parmi 25 joueurs) → A²⁵₁₁.",
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+};
+
 export const suitesTree: TreeNode = {
   type: "question",
   text: "(uₙ) est-elle monotone ?",

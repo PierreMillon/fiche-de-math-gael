@@ -248,25 +248,9 @@ export const fiches: Fiche[] = [
     slug: "denombrement",
     title: "Dénombrement",
     category: "Probabilités",
-    summary: "Permutations, arrangements, combinaisons et cardinaux.",
-    sections: [
-      {
-        heading: "Formules clés",
-        content: "Sur un ensemble à n éléments :",
-        formulas: [
-          "n! permutations",
-          "A(n,k) = n! / (n−k)!  (ordre, sans répétition)",
-          "C(n,k) = n! / (k!(n−k)!)  (sans ordre)",
-          "nᵏ listes de k éléments avec répétition",
-          "2ⁿ parties d'un ensemble à n éléments",
-        ],
-      },
-      {
-        heading: "Propriétés des combinaisons",
-        content: "Symétrie et triangle de Pascal :",
-        formulas: ["C(n,k) = C(n,n−k)", "C(n,k) + C(n,k+1) = C(n+1,k+1)"],
-      },
-    ],
+    summary:
+      "L'arbre pour choisir la bonne formule de comptage, plus l'exemple du chemin sur grille.",
+    sections: [],
   },
   {
     slug: "matrices",

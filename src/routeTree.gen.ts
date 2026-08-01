@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FichesSlugRouteImport } from './routes/fiches.$slug'
+import { Route as FichesDenombrementRouteImport } from './routes/fiches.denombrement'
 import { Route as FichesEquationsRouteImport } from './routes/fiches.equations'
 import { Route as FichesLogiqueBooleenneRouteImport } from './routes/fiches.logique-booleenne'
 import { Route as FichesPemdasRouteImport } from './routes/fiches.pemdas'
@@ -26,6 +27,11 @@ const IndexRoute = IndexRouteImport.update({
 const FichesSlugRoute = FichesSlugRouteImport.update({
   id: '/fiches/$slug',
   path: '/fiches/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichesDenombrementRoute = FichesDenombrementRouteImport.update({
+  id: '/fiches/denombrement',
+  path: '/fiches/denombrement',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FichesEquationsRoute = FichesEquationsRouteImport.update({
@@ -62,6 +68,7 @@ const FichesTangenteRoute = FichesTangenteRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
   '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
   '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/fiches/$slug': typeof FichesSlugRoute
+  '/fiches/denombrement': typeof FichesDenombrementRoute
   '/fiches/equations': typeof FichesEquationsRoute
   '/fiches/logique-booleenne': typeof FichesLogiqueBooleenneRoute
   '/fiches/pemdas': typeof FichesPemdasRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/fiches/$slug'
+    | '/fiches/denombrement'
     | '/fiches/equations'
     | '/fiches/logique-booleenne'
     | '/fiches/pemdas'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/fiches/$slug'
+    | '/fiches/denombrement'
     | '/fiches/equations'
     | '/fiches/logique-booleenne'
     | '/fiches/pemdas'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/fiches/$slug'
+    | '/fiches/denombrement'
     | '/fiches/equations'
     | '/fiches/logique-booleenne'
     | '/fiches/pemdas'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FichesSlugRoute: typeof FichesSlugRoute
+  FichesDenombrementRoute: typeof FichesDenombrementRoute
   FichesEquationsRoute: typeof FichesEquationsRoute
   FichesLogiqueBooleenneRoute: typeof FichesLogiqueBooleenneRoute
   FichesPemdasRoute: typeof FichesPemdasRoute
@@ -148,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/fiches/$slug'
       fullPath: '/fiches/$slug'
       preLoaderRoute: typeof FichesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fiches/denombrement': {
+      id: '/fiches/denombrement'
+      path: '/fiches/denombrement'
+      fullPath: '/fiches/denombrement'
+      preLoaderRoute: typeof FichesDenombrementRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/fiches/equations': {
@@ -198,6 +218,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FichesSlugRoute: FichesSlugRoute,
+  FichesDenombrementRoute: FichesDenombrementRoute,
   FichesEquationsRoute: FichesEquationsRoute,
   FichesLogiqueBooleenneRoute: FichesLogiqueBooleenneRoute,
   FichesPemdasRoute: FichesPemdasRoute,
