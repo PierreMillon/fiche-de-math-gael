@@ -20,19 +20,29 @@ describe("encodeCodes / decodeCodes round-trip", () => {
       const decoded = decodeCodes(phrase);
       expect(decoded).not.toBeNull();
       expect(decoded!.header).toBe(n % 256);
-      // decodeCodes always yields an even-length array (2 nibbles/byte);
-      // the tail may be padding zeros beyond what was actually encoded.
-      expect(decoded!.codes.slice(0, n)).toEqual(codes);
+      // Trailing all-zero bytes are trimmed off by encodeCodes, and a
+      // position past the end of decoded.codes means "untouched" (0) —
+      // pad before comparing to model how importProgressPhrase reads it.
+      const padded = decoded!.codes.slice();
+      while (padded.length < n) padded.push(0);
+      expect(padded.slice(0, n)).toEqual(codes);
     }
+  });
+
+  it("trims an all-untouched export down to just the header word", () => {
+    const phrase = encodeCodes(new Array(34).fill(0), 34);
+    expect(phrase.split("-")).toHaveLength(1);
+    const decoded = decodeCodes(phrase);
+    expect(decoded).toEqual({ header: 34, codes: [] });
   });
 
   it("rejects a phrase containing a word outside the list", () => {
     expect(decodeCodes("chat-nonexistentword-chien")).toBeNull();
   });
 
-  it("rejects an empty or single-word phrase (no room for a header + data byte)", () => {
+  it("rejects only an empty phrase — a single header-only word is valid", () => {
     expect(decodeCodes("")).toBeNull();
-    expect(decodeCodes("chat")).toBeNull();
+    expect(decodeCodes("chat")).toEqual({ header: 0, codes: [] });
   });
 });
 
