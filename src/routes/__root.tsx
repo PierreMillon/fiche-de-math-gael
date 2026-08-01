@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { ChartColumn } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -126,13 +127,13 @@ function RootComponent() {
               <Link to="/" className="text-sm font-semibold tracking-wide">
                 Fiches Maths
               </Link>
-              <span className="text-xs opacity-90">
-                Fiches de révision interactives basées sur les fiches de Gaël Boury.
-                <br />
-                Réserver un cours : gaelboury@gmail.com
-              </span>
+              <span className="text-xs opacity-90">Réserver un cours : gaelboury@gmail.com</span>
             </div>
-            <Link to="/progression" className="text-xs font-medium opacity-90 hover:underline">
+            <Link
+              to="/progression"
+              className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm ring-1 ring-white/40 transition hover:bg-white/25"
+            >
+              <ChartColumn className="h-3.5 w-3.5" />
               Ma progression
             </Link>
           </div>
