@@ -4,7 +4,7 @@ import { exercises } from "@/data/exercises";
 
 describe("exercises.ts data integrity", () => {
   for (const [slug, bank] of Object.entries(exercises)) {
-    for (const tier of [1, 2, 3] as const) {
+    for (const tier of [1, 2, 3, 4] as const) {
       it(`${slug} tier ${tier}: every item has exactly 3 distractors distinct from the answer`, () => {
         for (const item of bank[tier]) {
           expect(item.d).toHaveLength(3);
@@ -19,7 +19,7 @@ describe("exercises.ts data integrity", () => {
 
 describe("ExerciseQuiz build()", () => {
   for (const [slug, bank] of Object.entries(exercises)) {
-    for (const tier of [1, 2, 3] as const) {
+    for (const tier of [1, 2, 3, 4] as const) {
       it(`${slug} tier ${tier}: always yields exactly 4 distinct choices with a valid answer`, () => {
         for (const item of bank[tier]) {
           for (let i = 0; i < 20; i++) {

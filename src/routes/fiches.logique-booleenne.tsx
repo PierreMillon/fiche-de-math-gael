@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { PyramidView, pyramidLabel, usePyramid } from "@/lib/pyramid";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { PyramidView, pyramidLabel, usePyramid, isHesitant } from "@/lib/pyramid";
 
 export const Route = createFileRoute("/fiches/logique-booleenne")({
   head: () => ({
@@ -295,7 +295,7 @@ function LogiquePage() {
   );
 }
 
-function CircuitExercise() {
+export function CircuitExercise() {
   const { pyramid, onCorrect, onWrong } = usePyramid("logique-circuit");
   const tier = pyramid.complete ? 3 : pyramid.tier;
 
@@ -311,12 +311,17 @@ function CircuitExercise() {
 
   const [inputs, setInputs] = useState<Record<string, 0 | 1>>({});
   const [picked, setPicked] = useState<0 | 1 | null>(null);
+  // Marks when the current circuit's inputs were (re-)randomized, so a
+  // correct answer can be judged "hesitant" (see isHesitant) relative to
+  // how long that tier should reasonably take.
+  const shownAt = useRef<number>(Date.now());
 
   useEffect(() => {
     const init: Record<string, 0 | 1> = {};
     for (const id of inputIds) init[id] = Math.random() < 0.5 ? 1 : 0;
     setInputs(init);
     setPicked(null);
+    shownAt.current = Date.now();
   }, [inputIds]);
 
   const expected = evalNode(node, inputs);
@@ -325,7 +330,7 @@ function CircuitExercise() {
   const pick = (v: 0 | 1) => {
     if (picking) return;
     setPicked(v);
-    if (v === expected) onCorrect();
+    if (v === expected) onCorrect(isHesitant(Date.now() - shownAt.current, tier));
     else onWrong();
   };
 
