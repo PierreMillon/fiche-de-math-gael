@@ -1,7 +1,7 @@
 // Single source of truth for the version badge shown in the site header
-// (see __root.tsx). MAJOR.MINOR: MINOR goes up by one on every change
-// shipped to main; MAJOR goes up (and MINOR resets to 0) once MINOR would
-// pass 99, or by hand for a milestone worth marking on its own. Bump this by
-// hand alongside whatever change is being shipped — there's no build step
-// generating it.
-export const APP_VERSION = "1.0";
+// (see __root.tsx). Computed at build time from the repo's commit count —
+// see vite.appVersion.ts — so it reflects every change shipped since the
+// very first commit, not a hand-maintained counter someone has to remember
+// to bump. `typeof` guard covers contexts (tests, non-Vite tooling) where
+// the `define` replacement never runs.
+export const APP_VERSION = typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "dev";

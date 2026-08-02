@@ -18,7 +18,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # fetch-depth: 0 (full history, not the default shallow clone) — the
+      # version badge (src/lib/version.ts / vite.appVersion.ts) is derived
+      # from the total commit count, which a shallow clone would report as 1.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:

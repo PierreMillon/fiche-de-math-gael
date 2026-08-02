@@ -16,6 +16,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import { computeAppVersion } from "./vite.appVersion";
 
 const ghPagesBase = process.env.GH_PAGES_BASE || "/";
 
@@ -29,6 +30,9 @@ export default defineConfig({
   base: ghPagesBase,
   root: "spa",
   publicDir: "../public",
+  define: {
+    __APP_VERSION__: JSON.stringify(computeAppVersion()),
+  },
   plugins: [
     // Must run before react(). Matches what tanstackStart() already does for
     // the Cloudflare build (vite.config.ts) — without it, this SPA build has
