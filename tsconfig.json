@@ -5,6 +5,7 @@
     "spa/**/*.tsx",
     "vite.config.ts",
     "vite.spa.config.ts",
+    "vite.appVersion.ts",
     "eslint.config.js"
   ],
   "compilerOptions": {
