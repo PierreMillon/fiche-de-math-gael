@@ -12,6 +12,7 @@ import { ChartColumn } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { APP_VERSION } from "../lib/version";
 
 function NotFoundComponent() {
   return (
@@ -121,7 +122,13 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
-        <div className="w-full bg-pink-500 text-white">
+        <div className="relative w-full bg-pink-500 text-white">
+          <span
+            className="absolute right-2 top-2 rounded-md bg-black/10 px-1.5 py-0.5 text-[10px] tabular-nums text-white/70"
+            title="Version du site"
+          >
+            v{APP_VERSION}
+          </span>
           <div className="mx-auto flex max-w-6xl flex-col gap-1 px-6 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col">
               <Link to="/" className="text-sm font-semibold tracking-wide">
