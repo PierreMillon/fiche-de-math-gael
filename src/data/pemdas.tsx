@@ -15,35 +15,42 @@ const EXP = "text-green-400";
 
 export const n = (v: string | number): ReactNode => <span className={W}>{v}</span>;
 
-export const plus = (...parts: ReactNode[]): ReactNode => (
+// plus/minus/times/frac each come in a colored (the operator's own color)
+// and a white (plusW/minusW/timesW/fracW, see below) variant — same markup,
+// only the operator's color class differs — so the color is a parameter
+// here and each pair is just two one-line wrappers around it.
+const plusImpl = (color: string, parts: ReactNode[]): ReactNode => (
   <span className="inline-flex items-center">
     {parts.map((p, i) => (
       <span key={i} className="inline-flex items-center">
-        {i > 0 && <span className={`${PLUS} mx-0.5`}>+</span>}
+        {i > 0 && <span className={`${color} mx-0.5`}>+</span>}
         {p}
       </span>
     ))}
   </span>
 );
+export const plus = (...parts: ReactNode[]): ReactNode => plusImpl(PLUS, parts);
 
-export const minus = (a: ReactNode, b: ReactNode): ReactNode => (
+const minusImpl = (color: string, a: ReactNode, b: ReactNode): ReactNode => (
   <span className="inline-flex items-center">
     {a}
-    <span className={`${MINUS} mx-0.5`}>−</span>
+    <span className={`${color} mx-0.5`}>−</span>
     {b}
   </span>
 );
+export const minus = (a: ReactNode, b: ReactNode): ReactNode => minusImpl(MINUS, a, b);
 
-export const times = (...parts: ReactNode[]): ReactNode => (
+const timesImpl = (color: string, parts: ReactNode[]): ReactNode => (
   <span className="inline-flex items-center">
     {parts.map((p, i) => (
       <span key={i} className="inline-flex items-center">
-        {i > 0 && <span className={`${TIMES} mx-0.5`}>×</span>}
+        {i > 0 && <span className={`${color} mx-0.5`}>×</span>}
         {p}
       </span>
     ))}
   </span>
 );
+export const times = (...parts: ReactNode[]): ReactNode => timesImpl(TIMES, parts);
 
 // Juxtaposition (implicit multiplication like "ka") — no operator symbol.
 export const jux = (...parts: ReactNode[]): ReactNode => (
@@ -64,13 +71,14 @@ export const paren = (a: ReactNode): ReactNode => (
   </span>
 );
 
-export const frac = (num: ReactNode, den: ReactNode): ReactNode => (
+const fracImpl = (barColor: string, num: ReactNode, den: ReactNode): ReactNode => (
   <span className="inline-flex flex-col items-center align-middle mx-0.5 leading-tight">
     <span className="px-1">{num}</span>
-    <span className={`w-full border-t ${FRAC}`}></span>
+    <span className={`w-full border-t ${barColor}`}></span>
     <span className="px-1">{den}</span>
   </span>
 );
+export const frac = (num: ReactNode, den: ReactNode): ReactNode => fracImpl(FRAC, num, den);
 
 export const pow = (base: ReactNode, exp: ReactNode): ReactNode => (
   <span className="inline-flex items-start">
@@ -93,43 +101,11 @@ export const powRaw = (base: ReactNode, exp: ReactNode): ReactNode => (
 // between the two columns are colored (one on the left member, one on the
 // right member). Every other identical sign on the row stays white.
 
-export const plusW = (...parts: ReactNode[]): ReactNode => (
-  <span className="inline-flex items-center">
-    {parts.map((p, i) => (
-      <span key={i} className="inline-flex items-center">
-        {i > 0 && <span className={`${W} mx-0.5`}>+</span>}
-        {p}
-      </span>
-    ))}
-  </span>
-);
-
-export const minusW = (a: ReactNode, b: ReactNode): ReactNode => (
-  <span className="inline-flex items-center">
-    {a}
-    <span className={`${W} mx-0.5`}>−</span>
-    {b}
-  </span>
-);
-
-export const timesW = (...parts: ReactNode[]): ReactNode => (
-  <span className="inline-flex items-center">
-    {parts.map((p, i) => (
-      <span key={i} className="inline-flex items-center">
-        {i > 0 && <span className={`${W} mx-0.5`}>×</span>}
-        {p}
-      </span>
-    ))}
-  </span>
-);
-
-export const fracW = (num: ReactNode, den: ReactNode): ReactNode => (
-  <span className="inline-flex flex-col items-center align-middle mx-0.5 leading-tight">
-    <span className="px-1">{num}</span>
-    <span className="w-full border-t border-white"></span>
-    <span className="px-1">{den}</span>
-  </span>
-);
+export const plusW = (...parts: ReactNode[]): ReactNode => plusImpl(W, parts);
+export const minusW = (a: ReactNode, b: ReactNode): ReactNode => minusImpl(W, a, b);
+export const timesW = (...parts: ReactNode[]): ReactNode => timesImpl(W, parts);
+export const fracW = (num: ReactNode, den: ReactNode): ReactNode =>
+  fracImpl("border-white", num, den);
 
 // Exponent without the green coloring (position kept, color white).
 export const powW = (base: ReactNode, exp: ReactNode): ReactNode => (
