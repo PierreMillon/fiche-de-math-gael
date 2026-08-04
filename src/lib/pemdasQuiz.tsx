@@ -1,39 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { type PemdasRow, type QuizQ } from "@/data/pemdas";
-import {
-  PyramidView,
-  pyramidLabel,
-  usePyramid,
-  readStoredPyramid,
-  isHesitant,
-} from "@/lib/pyramid";
+import { PyramidView, pyramidLabel } from "@/lib/pyramid";
 import { extractText } from "@/lib/testUtils";
-
-// How long a correct answer stays highlighted before auto-advancing — see
-// the identical constant in fiches.pemdas.tsx.
-const AUTO_ADVANCE_MS = 500;
+import { useAutoAdvanceQuiz } from "@/lib/useAutoAdvanceQuiz";
 
 // A standalone, non-modal version of the PEMDAS quiz — used by the "Réviser
 // mes points faibles" page, which needs to embed a single row's quiz inline
 // among other fiches' quizzes rather than behind a click-to-open dialog.
 // Shares the same question-picking, hesitation-tracking, and pyramid logic
-// as fiches.pemdas.tsx's QuizDialog, just rendered without the modal chrome.
+// as fiches.pemdas.tsx's QuizDialog (see useAutoAdvanceQuiz), just rendered
+// without the modal chrome.
 export function PemdasRowQuiz({ row }: { row: PemdasRow }) {
-  const { pyramid, onCorrect, onWrong } = usePyramid(row.id);
-  const [picked, setPicked] = useState<number | null>(null);
-  const [q, setQ] = useState<QuizQ | null>(null);
   const lastPrompt = useRef<string | null>(null);
-  const shownAt = useRef<number>(Date.now());
-  const questionLevel = useRef<1 | 2 | 3 | 4>(1);
-  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Cancel any pending auto-advance if this slide is swapped out (the
-  // revision page moves to the next competency) before it fires.
-  useEffect(() => {
-    return () => {
-      if (advanceTimer.current) clearTimeout(advanceTimer.current);
-    };
-  }, [row.id]);
 
   const pickQuestion = (tier: 1 | 2 | 3 | 4): QuizQ => {
     let question = row.quiz(tier);
@@ -47,42 +25,16 @@ export function PemdasRowQuiz({ row }: { row: PemdasRow }) {
       tries++;
     }
     lastPrompt.current = extractText(question.prompt);
-    shownAt.current = Date.now();
-    questionLevel.current = tier;
     return question;
   };
 
-  useEffect(() => {
-    lastPrompt.current = null;
-    const stored = readStoredPyramid(row.id);
-    const level = stored?.complete ? 4 : (stored?.tier ?? 1);
-    setQ(pickQuestion(level));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [row.id]);
+  const { pyramid, q, picked, onPick, next } = useAutoAdvanceQuiz({
+    storageKey: row.id,
+    pickQuestion,
+    resetKey: row.id,
+  });
 
   if (!q) return null;
-
-  const onPick = (i: number) => {
-    if (picked !== null) return;
-    setPicked(i);
-    if (i === q.answer) {
-      onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
-      advanceTimer.current = setTimeout(() => {
-        const stored = readStoredPyramid(row.id);
-        const level = stored?.complete ? 4 : (stored?.tier ?? 1);
-        setQ(pickQuestion(level));
-        setPicked(null);
-      }, AUTO_ADVANCE_MS);
-    } else {
-      onWrong();
-    }
-  };
-
-  const next = () => {
-    if (picked === null) return;
-    setQ(pickQuestion(pyramid.complete ? 4 : pyramid.tier));
-    setPicked(null);
-  };
 
   return (
     <div>
