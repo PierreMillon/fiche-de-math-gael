@@ -37,10 +37,6 @@ jobs:
       # type-check and would happily build broken code.
       - run: npm run verify
 
-      # Client-only SPA build (vite.spa.config.ts) — GitHub Pages only serves
-      # static files, and the nitro static preset currently fails to build
-      # with this project's TanStack Start + nitro (pre-release) combination,
-      # so this bypasses that pipeline entirely instead of the SSR build.
       # GH_PAGES_BASE tells Vite/TanStack Router this app is served from
       # /<repo>/ instead of the domain root.
       - run: npm run build
