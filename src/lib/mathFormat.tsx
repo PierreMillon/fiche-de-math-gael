@@ -40,6 +40,35 @@ const SYMBOL_MAP: Record<string, string> = {
   ℝ: "\\mathbb{R} ",
 };
 
+// Finds the "base" a trailing "^"/"_" attaches to, so the whole base+script
+// gets typeset as one glued KaTeX unit instead of a plain-text base sitting
+// next to a separately-rendered script fragment — which looks visibly
+// disconnected (different font, no shared kerning) even when the spacing
+// is technically correct. A balanced trailing "(...)" group is taken whole
+// (e.g. "(2x+1)" in "(2x+1)^2"); otherwise a trailing run of letters/digits
+// (e.g. "x" in "f(x) = x^3" — stops at the space, so surrounding prose is
+// never pulled in). No match (buf is empty, or ends in a space/operator)
+// falls back to an empty base, exactly like the previous behavior.
+function extractTrailingBase(buf: string): { base: string; rest: string } {
+  if (buf.endsWith(")")) {
+    let depth = 1;
+    let j = buf.length - 2;
+    while (j >= 0 && depth > 0) {
+      if (buf[j] === ")") depth++;
+      else if (buf[j] === "(") depth--;
+      j--;
+    }
+    if (depth === 0) {
+      return { base: buf.slice(j + 1), rest: buf.slice(0, j + 1) };
+    }
+  }
+  const m = buf.match(/[0-9a-zA-Zα-ωΑ-Ω]+$/);
+  if (m) {
+    return { base: m[0], rest: buf.slice(0, buf.length - m[0].length) };
+  }
+  return { base: "", rest: buf };
+}
+
 // Reads the exponent/subscript content right after a "^" or "_" at index i,
 // matching a balanced "(...)"/"{...}" group, a "-123" negative number, or a
 // bare run of letters/digits — same grammar the old sup-only parser used.
@@ -147,10 +176,13 @@ export function fmt(s: string): ReactNode {
   while (i < s.length) {
     const c = s[i];
     if (c === "^" || c === "_") {
+      const { base, rest } = extractTrailingBase(buf);
+      buf = rest;
       flush();
       const { raw, next } = readMarkupGroup(s, i + 1);
-      const latex = `{}${c}{${toLatexFragment(raw)}}`;
-      parts.push(katexFragment(`k${parts.length}`, latex, raw));
+      const baseLatex = base ? toLatexFragment(base) : "{}";
+      const latex = `${baseLatex}${c}{${toLatexFragment(raw)}}`;
+      parts.push(katexFragment(`k${parts.length}`, latex, base + raw));
       i = next;
     } else {
       buf += c;
