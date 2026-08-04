@@ -57,4 +57,16 @@ describe("ExerciseQuiz build()", () => {
     expect(new Set(built.choices).size).toBe(4);
     expect(built.choices[built.answer]).toBe("42");
   });
+
+  it("never leaks a debug-looking fallback placeholder, even with every distractor colliding", () => {
+    const built = build({
+      q: "test",
+      a: "42",
+      d: ["42", "42", "42"],
+      e: "test",
+    });
+    expect(built.choices).toHaveLength(4);
+    expect(new Set(built.choices).size).toBe(4);
+    for (const c of built.choices) expect(c).not.toMatch(/\(\?\d+\)/);
+  });
 });
