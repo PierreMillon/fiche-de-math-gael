@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fmt } from "@/lib/mathFormat";
 import {
   PyramidView,
@@ -8,6 +8,10 @@ import {
   isHesitant,
 } from "@/lib/pyramid";
 import { exercises, type QItem } from "@/data/exercises";
+
+// How long a correct answer stays highlighted before auto-advancing — see
+// the identical constant in fiches.pemdas.tsx.
+const AUTO_ADVANCE_MS = 500;
 
 const shuffle = <T,>(arr: T[]): T[] => {
   const a = [...arr];
@@ -47,6 +51,15 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
   // how long that level should reasonably take.
   const shownAt = useRef<number>(Date.now());
   const questionLevel = useRef<1 | 2 | 3 | 4>(1);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancel any pending auto-advance if this fiche is swapped out before it
+  // fires — see the identical cleanup in fiches.pemdas.tsx.
+  useEffect(() => {
+    return () => {
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    };
+  }, [slug]);
 
   const pick = (tier: 1 | 2 | 3 | 4): Built | null => {
     if (!bank) return null;
@@ -83,8 +96,19 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
   const answer = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
-    if (i === q.answer) onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
-    else onWrong();
+    if (i === q.answer) {
+      onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
+      // Read the level fresh from localStorage instead of the `pyramid`
+      // closure — see the identical fix in fiches.pemdas.tsx.
+      advanceTimer.current = setTimeout(() => {
+        const stored = readStoredPyramid(`fiche:${slug}`);
+        const level = stored?.complete ? 4 : (stored?.tier ?? 1);
+        setQ(pick(level));
+        setPicked(null);
+      }, AUTO_ADVANCE_MS);
+    } else {
+      onWrong();
+    }
   };
 
   const next = () => {
@@ -132,10 +156,9 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
         })}
       </div>
 
-      {picked !== null && (
+      {picked !== null && picked !== q.answer && (
         <p className="mt-3 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
-          {picked === q.answer ? "✅ " : "❌ "}
-          {fmt(q.item.e)}
+          ❌ {fmt(q.item.e)}
         </p>
       )}
 
@@ -151,13 +174,14 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
         >
           Réinitialiser la pyramide
         </button>
-        <button
-          onClick={next}
-          disabled={picked === null}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
-        >
-          Question suivante
-        </button>
+        {picked !== null && picked !== q.answer && (
+          <button
+            onClick={next}
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            Question suivante
+          </button>
+        )}
       </div>
     </section>
   );

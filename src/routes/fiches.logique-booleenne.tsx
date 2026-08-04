@@ -1,6 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PyramidView, pyramidLabel, usePyramid, isHesitant } from "@/lib/pyramid";
+import {
+  PyramidView,
+  pyramidLabel,
+  usePyramid,
+  readStoredPyramid,
+  isHesitant,
+} from "@/lib/pyramid";
+
+// How long a correct answer stays highlighted before auto-advancing — see
+// the identical constant in fiches.pemdas.tsx.
+const AUTO_ADVANCE_MS = 500;
 
 export const Route = createFileRoute("/fiches/logique-booleenne")({
   head: () => ({
@@ -315,6 +325,15 @@ export function CircuitExercise() {
   // correct answer can be judged "hesitant" (see isHesitant) relative to
   // how long that tier should reasonably take.
   const shownAt = useRef<number>(Date.now());
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancel any pending auto-advance on unmount — see the identical cleanup
+  // in fiches.pemdas.tsx.
+  useEffect(() => {
+    return () => {
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    };
+  }, []);
 
   useEffect(() => {
     const init: Record<string, 0 | 1> = {};
@@ -330,8 +349,18 @@ export function CircuitExercise() {
   const pick = (v: 0 | 1) => {
     if (picking) return;
     setPicked(v);
-    if (v === expected) onCorrect(isHesitant(Date.now() - shownAt.current, tier));
-    else onWrong();
+    if (v === expected) {
+      onCorrect(isHesitant(Date.now() - shownAt.current, tier));
+      // Read the level fresh from localStorage instead of the `tier`
+      // closure — see the identical fix in fiches.pemdas.tsx.
+      advanceTimer.current = setTimeout(() => {
+        const stored = readStoredPyramid("logique-circuit");
+        const level = stored?.complete ? 3 : (stored?.tier ?? 1);
+        setNode(makeCircuit(level));
+      }, AUTO_ADVANCE_MS);
+    } else {
+      onWrong();
+    }
   };
 
   const next = () => setNode(makeCircuit(tier));
@@ -398,18 +427,17 @@ export function CircuitExercise() {
             </button>
           );
         })}
-        <div className="ml-auto flex items-center gap-2">
-          {picked !== null && picked !== expected && (
+        {picked !== null && picked !== expected && (
+          <div className="ml-auto flex items-center gap-2">
             <span className="text-xs text-red-300">Faux — la bonne réponse était {expected}.</span>
-          )}
-          <button
-            onClick={next}
-            disabled={!picking}
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
-          >
-            Nouveau circuit
-          </button>
-        </div>
+            <button
+              onClick={next}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            >
+              Nouveau circuit
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -9,6 +9,10 @@ import {
 } from "@/lib/pyramid";
 import { extractText } from "@/lib/testUtils";
 
+// How long a correct answer stays highlighted before auto-advancing — see
+// the identical constant in fiches.pemdas.tsx.
+const AUTO_ADVANCE_MS = 500;
+
 // A standalone, non-modal version of the PEMDAS quiz — used by the "Réviser
 // mes points faibles" page, which needs to embed a single row's quiz inline
 // among other fiches' quizzes rather than behind a click-to-open dialog.
@@ -21,6 +25,15 @@ export function PemdasRowQuiz({ row }: { row: PemdasRow }) {
   const lastPrompt = useRef<string | null>(null);
   const shownAt = useRef<number>(Date.now());
   const questionLevel = useRef<1 | 2 | 3 | 4>(1);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancel any pending auto-advance if this slide is swapped out (the
+  // revision page moves to the next competency) before it fires.
+  useEffect(() => {
+    return () => {
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    };
+  }, [row.id]);
 
   const pickQuestion = (tier: 1 | 2 | 3 | 4): QuizQ => {
     let question = row.quiz(tier);
@@ -52,8 +65,17 @@ export function PemdasRowQuiz({ row }: { row: PemdasRow }) {
   const onPick = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
-    if (i === q.answer) onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
-    else onWrong();
+    if (i === q.answer) {
+      onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
+      advanceTimer.current = setTimeout(() => {
+        const stored = readStoredPyramid(row.id);
+        const level = stored?.complete ? 4 : (stored?.tier ?? 1);
+        setQ(pickQuestion(level));
+        setPicked(null);
+      }, AUTO_ADVANCE_MS);
+    } else {
+      onWrong();
+    }
   };
 
   const next = () => {
@@ -97,22 +119,21 @@ export function PemdasRowQuiz({ row }: { row: PemdasRow }) {
         })}
       </div>
 
-      {picked !== null && (
-        <p className="mt-4 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
-          {picked === q.answer ? "✅ " : "❌ "}
-          {q.explanation}
-        </p>
+      {picked !== null && picked !== q.answer && (
+        <>
+          <p className="mt-4 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
+            ❌ {q.explanation}
+          </p>
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={next}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            >
+              Question suivante
+            </button>
+          </div>
+        </>
       )}
-
-      <div className="mt-4 flex justify-end">
-        <button
-          onClick={next}
-          disabled={picked === null}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
-        >
-          Question suivante
-        </button>
-      </div>
     </div>
   );
 }
