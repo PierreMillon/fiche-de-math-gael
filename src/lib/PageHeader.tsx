@@ -21,9 +21,9 @@ export function PageHeader({
 }: {
   backTo?: "/" | "/progression";
   backLabel?: string;
-  eyebrow: string;
+  eyebrow?: string;
   title: ReactNode;
-  description: ReactNode;
+  description?: ReactNode;
   maxWidth?: "3xl" | "4xl" | "5xl";
 }) {
   return (
@@ -32,9 +32,15 @@ export function PageHeader({
         <Link to={backTo} className="text-sm text-muted-foreground transition hover:text-primary">
           {backLabel}
         </Link>
-        <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">{eyebrow}</p>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
-        <p className="mt-3 text-muted-foreground">{description}</p>
+        {eyebrow && (
+          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">{eyebrow}</p>
+        )}
+        <h1
+          className={`text-center text-4xl font-bold tracking-tight sm:text-5xl ${eyebrow ? "mt-2" : "mt-6"}`}
+        >
+          {title}
+        </h1>
+        {description && <p className="mt-3 text-muted-foreground">{description}</p>}
       </div>
     </header>
   );

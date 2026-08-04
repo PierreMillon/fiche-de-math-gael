@@ -10,8 +10,8 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
-    // Matches Vite's `base` (see vite.config.ts / vite.spa.config.ts) — "/"
-    // everywhere except the GitHub Pages build, served from /<repo>/.
+    // Matches Vite's `base` (see vite.config.ts) — "/" everywhere except
+    // the GitHub Pages build, served from /<repo>/.
     basepath: import.meta.env.BASE_URL,
   });
 

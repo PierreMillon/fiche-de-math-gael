@@ -16,24 +16,15 @@ npm run dev
 
 ## Scripts
 
-- `npm run dev` — serveur de développement (TanStack Start, avec SSR).
-- `npm run build` — build de production réellement déployé sur GitHub Pages
-  (SPA statique, voir ci-dessous). Sortie dans `dist-spa/`.
+- `npm run dev` — serveur de développement.
+- `npm run build` — build de production (SPA statique, `vite.config.ts`).
+  Sortie dans `dist-spa/`.
 - `npm run preview` — sert le résultat de `npm run build` en local.
 - `npm run typecheck` — `tsc --noEmit`.
 - `npm run lint` — ESLint (+ Prettier via `eslint-plugin-prettier`).
 - `npm run test` — Vitest.
 - `npm run verify` — enchaîne typecheck, lint et test ; à lancer avant de
   pousser une modification.
-
-## Deux configurations Vite
-
-- `vite.spa.config.ts` — la cible réellement déployée. GitHub Pages ne sert
-  que des fichiers statiques, donc ce build court-circuite entièrement le
-  pipeline SSR/nitro de TanStack Start (voir le commentaire en tête du
-  fichier pour le détail du bug nitro qui a motivé ce choix).
-- `vite.config.ts` — cible Cloudflare/SSR via `@lovable.dev/vite-tanstack-config`,
-  conservée mais **non déployée** (`npm run build:cloudflare`).
 
 ## Structure
 
@@ -52,6 +43,5 @@ npm run dev
 ## Déploiement
 
 Push sur `main` déclenche `.github/workflows/deploy-pages.yml`, qui lance
-`npm run verify` (typecheck + lint + tests), puis build avec
-`vite.spa.config.ts` et publie sur GitHub Pages. Un échec de l'une de ces
-étapes bloque le déploiement.
+`npm run verify` (typecheck + lint + tests), puis `npm run build` et publie
+sur GitHub Pages. Un échec de l'une de ces étapes bloque le déploiement.
