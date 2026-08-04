@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { CHANGELOG } from "@/lib/changelog";
+import { PageHeader } from "@/lib/PageHeader";
 
 export const Route = createFileRoute("/journal")({
   head: () => ({
@@ -20,20 +21,15 @@ function JournalPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-3xl px-6 py-10">
-          <Link to="/" className="text-sm text-muted-foreground transition hover:text-primary">
-            ← Toutes les fiches
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">Journal</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            Historique des versions
-          </h1>
-          <p className="mt-3 text-muted-foreground">
+      <PageHeader
+        eyebrow="Journal"
+        title="Historique des versions"
+        description={
+          <>
             {CHANGELOG.length} modifications, de la v{oldest} à la v{newest}.
-          </p>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       <main className="mx-auto max-w-3xl px-6 py-10">
         <ul className="divide-y divide-border">

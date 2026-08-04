@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { fmt } from "@/lib/mathFormat";
 import { ExerciseQuiz } from "@/lib/quiz";
+import { PageHeader } from "@/lib/PageHeader";
 
 export const Route = createFileRoute("/fiches/equations")({
   head: () => ({
@@ -185,21 +186,12 @@ function InequalityRules() {
 function EquationsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-5xl px-6 py-10">
-          <Link to="/" className="text-sm text-muted-foreground transition hover:text-primary">
-            ← Toutes les fiches
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">Analyse</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            Équations et inéquations
-          </h1>
-          <p className="mt-3 text-muted-foreground">
-            Trouver un signe, trouver l'inconnue — 7 niveaux progressifs, du cas évident à l'étude
-            de fonction.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Analyse"
+        title="Équations et inéquations"
+        description="Trouver un signe, trouver l'inconnue — 7 niveaux progressifs, du cas évident à l'étude de fonction."
+        maxWidth="5xl"
+      />
 
       <main className="mx-auto max-w-5xl space-y-6 px-6 py-10">
         <InequalityRules />

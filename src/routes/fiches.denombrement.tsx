@@ -3,6 +3,7 @@ import { fmt } from "@/lib/mathFormat";
 import { ExerciseQuiz } from "@/lib/quiz";
 import { DecisionTree } from "@/lib/decisionTree";
 import { denombrementTree } from "@/data/decisionTrees";
+import { PageHeader } from "@/lib/PageHeader";
 
 export const Route = createFileRoute("/fiches/denombrement")({
   head: () => ({
@@ -83,18 +84,11 @@ function GridPathExample() {
 function DenombrementPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-3xl px-6 py-10">
-          <Link to="/" className="text-sm text-muted-foreground transition hover:text-primary">
-            ← Toutes les fiches
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">Probabilités</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Dénombrement</h1>
-          <p className="mt-3 text-muted-foreground">
-            L'arbre pour trouver la bonne formule de comptage, puis un exemple travaillé.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Probabilités"
+        title="Dénombrement"
+        description="L'arbre pour trouver la bonne formule de comptage, puis un exemple travaillé."
+      />
 
       <main className="mx-auto max-w-3xl space-y-8 px-6 py-10">
         <section className="rounded-xl border border-border bg-card p-6">

@@ -3,6 +3,7 @@ import { getFiche, fiches, type Fiche } from "@/data/fiches";
 import { hasExercises } from "@/data/exercises";
 import { ExerciseQuiz } from "@/lib/quiz";
 import { fmt } from "@/lib/mathFormat";
+import { PageHeader } from "@/lib/PageHeader";
 
 export const Route = createFileRoute("/fiches/$slug")({
   loader: ({ params }): { fiche: Fiche } => {
@@ -35,16 +36,7 @@ function FichePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-3xl px-6 py-10">
-          <Link to="/" className="text-sm text-muted-foreground transition hover:text-primary">
-            ← Toutes les fiches
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">{fiche.category}</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{fiche.title}</h1>
-          <p className="mt-3 text-muted-foreground">{fiche.summary}</p>
-        </div>
-      </header>
+      <PageHeader eyebrow={fiche.category} title={fiche.title} description={fiche.summary} />
 
       <main className="mx-auto max-w-3xl px-6 py-10">
         <div className="space-y-8">

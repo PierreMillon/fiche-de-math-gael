@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   PyramidView,
@@ -7,6 +7,7 @@ import {
   readStoredPyramid,
   isHesitant,
 } from "@/lib/pyramid";
+import { PageHeader } from "@/lib/PageHeader";
 
 // How long a correct answer stays highlighted before auto-advancing — see
 // the identical constant in fiches.pemdas.tsx.
@@ -257,21 +258,12 @@ function LogiquePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-5xl px-6 py-10">
-          <Link to="/" className="text-sm text-muted-foreground transition hover:text-primary">
-            ← Toutes les fiches
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">Logique</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            Logique booléenne — circuits
-          </h1>
-          <p className="mt-3 text-muted-foreground">
-            Rappel des portes logiques puis exercice interactif : choisis les entrées et devine la
-            sortie du circuit.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Logique"
+        title="Logique booléenne — circuits"
+        description="Rappel des portes logiques puis exercice interactif : choisis les entrées et devine la sortie du circuit."
+        maxWidth="5xl"
+      />
 
       <main className="mx-auto max-w-5xl px-6 py-10">
         <section>

@@ -5,6 +5,8 @@ import { rows as pemdasRows } from "@/data/pemdas";
 import { PemdasRowQuiz } from "@/lib/pemdasQuiz";
 import { ExerciseQuiz } from "@/lib/quiz";
 import { CircuitExercise } from "@/routes/fiches.logique-booleenne";
+import { shuffle } from "@/lib/quizChoices";
+import { PageHeader } from "@/lib/PageHeader";
 
 export const Route = createFileRoute("/revision")({
   head: () => ({
@@ -18,15 +20,6 @@ export const Route = createFileRoute("/revision")({
   }),
   component: RevisionPage,
 });
-
-const shuffle = <T,>(arr: T[]): T[] => {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
 
 function renderSlide(c: Competency) {
   if (c.id === "logique-booleenne") return <CircuitExercise />;
@@ -61,23 +54,17 @@ function RevisionPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-3xl px-6 py-10">
-          <Link
-            to="/progression"
-            className="text-sm text-muted-foreground transition hover:text-primary"
-          >
-            ← Ma progression
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">Révision ciblée</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Mes points faibles</h1>
-          <p className="mt-3 text-muted-foreground">
-            {queue.length === 0
-              ? "Rien à revoir pour l'instant — continue comme ça !"
-              : `Compétence ${index + 1} / ${queue.length} : ${current.label}`}
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        backTo="/progression"
+        backLabel="← Ma progression"
+        eyebrow="Révision ciblée"
+        title="Mes points faibles"
+        description={
+          queue.length === 0
+            ? "Rien à revoir pour l'instant — continue comme ça !"
+            : `Compétence ${index + 1} / ${queue.length} : ${current.label}`
+        }
+      />
 
       <main className="mx-auto max-w-3xl px-6 py-10">
         {queue.length === 0 ? (
