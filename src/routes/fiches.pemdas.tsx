@@ -2,21 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { rows, COLS, COL_COLOR, type PemdasRow, type QuizQ } from "@/data/pemdas";
-import {
-  PyramidView,
-  pyramidLabel,
-  readStoredPyramid,
-  usePyramid,
-  isHesitant,
-} from "@/lib/pyramid";
+import { PyramidView, pyramidLabel, usePyramid } from "@/lib/pyramid";
 import { extractText } from "@/lib/testUtils";
 import { PageHeader } from "@/lib/PageHeader";
-
-// How long a correct answer stays highlighted before auto-advancing to the
-// next question — long enough to register as positive feedback, short
-// enough that it doesn't feel like a forced pause. Wrong answers never
-// auto-advance: they stop and wait for "Question suivante" instead.
-const AUTO_ADVANCE_MS = 500;
+import { useAutoAdvanceQuiz } from "@/lib/useAutoAdvanceQuiz";
 
 export const Route = createFileRoute("/fiches/pemdas")({
   head: () => ({
@@ -219,27 +208,7 @@ function Modal({
 }
 
 function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => void }) {
-  // usePyramid is always called (row is only null when the dialog is closed —
-  // we still need a stable hook order). Use a placeholder key when null.
-  const { pyramid, onCorrect, onWrong } = usePyramid(row?.id ?? "__none__");
-  const [picked, setPicked] = useState<number | null>(null);
-  const [q, setQ] = useState<QuizQ | null>(null);
   const lastPrompt = useRef<string | null>(null);
-  // Tracks when the current question appeared and at what level, so a
-  // correct answer can be judged "hesitant" (see isHesitant) relative to
-  // how long that level should reasonably take.
-  const shownAt = useRef<number>(Date.now());
-  const questionLevel = useRef<1 | 2 | 3 | 4>(1);
-  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Cancel any pending auto-advance when the dialog switches rows or closes
-  // — this component stays mounted the whole time (see PemdasPage), it's
-  // only `row` that goes null, so nothing else would clear this timer.
-  useEffect(() => {
-    return () => {
-      if (advanceTimer.current) clearTimeout(advanceTimer.current);
-    };
-  }, [row]);
 
   // Level 4 is boss-only: pyramid.tier stays pinned at 3 once the pyramid is
   // complete (see usePyramid), so without this the boss round would just
@@ -258,67 +227,25 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
       tries++;
     }
     lastPrompt.current = extractText(question.prompt);
-    shownAt.current = Date.now();
-    questionLevel.current = tier;
     return question;
   };
 
-  // Generate the first question when the dialog opens on a new row.
-  // Subsequent questions are generated only when the user clicks
-  // "Question suivante", so the feedback always matches the shown question.
-  //
-  // The level for this first question is read straight from localStorage
-  // instead of the `pyramid` state above: usePyramid's own hydration effect
-  // hasn't necessarily run yet in this same effect pass (it starts from
-  // initialPyramid and patches in the stored value asynchronously), so using
-  // `pyramid.tier`/`pyramid.complete` here would race and show a tier-1
-  // question even when the row is already at boss level.
-  useEffect(() => {
-    lastPrompt.current = null;
-    if (!row) return;
-    const stored = readStoredPyramid(row.id);
-    const level = stored?.complete ? 4 : (stored?.tier ?? 1);
-    setQ(pickQuestion(level));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [row]);
-
-  const closeAndReset = () => {
-    onClose();
-    setPicked(null);
-    setQ(null);
-  };
+  // usePyramid (inside the hook) is always called with a stable key even
+  // when the dialog is closed — hooks can't be conditional, and `row` is
+  // only null while closed. Closing sets `row` to null on the next render,
+  // which the hook's resetKey picks up and re-derives q=null/picked=null
+  // from (pickQuestion returns null when there's no row) — no separate
+  // "reset on close" handler needed.
+  const { pyramid, q, picked, onPick, next } = useAutoAdvanceQuiz({
+    storageKey: row?.id ?? "__none__",
+    pickQuestion,
+    resetKey: row,
+  });
 
   if (!row || !q) return null;
 
-  const onPick = (i: number) => {
-    if (picked !== null) return;
-    setPicked(i);
-    if (i === q.answer) {
-      onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
-      // A right answer needs no explanation to sit and read — flash the
-      // green state briefly, then move on by itself. Read the level fresh
-      // from localStorage instead of the `pyramid` closure: this answer may
-      // have just completed a palier, and that update won't have reached
-      // this render's `pyramid` by the time the timeout fires.
-      advanceTimer.current = setTimeout(() => {
-        const stored = readStoredPyramid(row.id);
-        const level = stored?.complete ? 4 : (stored?.tier ?? 1);
-        setQ(pickQuestion(level));
-        setPicked(null);
-      }, AUTO_ADVANCE_MS);
-    } else {
-      onWrong();
-    }
-  };
-
-  const next = () => {
-    if (picked === null) return;
-    setQ(pickQuestion(pyramid.complete ? 4 : pyramid.tier));
-    setPicked(null);
-  };
-
   return (
-    <Modal open={!!row} onClose={closeAndReset}>
+    <Modal open={!!row} onClose={onClose}>
       <div className="pr-6">
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold">QCM</span>

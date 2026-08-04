@@ -1,18 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { fmt } from "@/lib/mathFormat";
-import {
-  PyramidView,
-  pyramidLabel,
-  usePyramid,
-  readStoredPyramid,
-  isHesitant,
-} from "@/lib/pyramid";
+import { PyramidView, pyramidLabel } from "@/lib/pyramid";
 import { pickDistinctChoices } from "@/lib/quizChoices";
+import { useAutoAdvanceQuiz } from "@/lib/useAutoAdvanceQuiz";
 import { exercises, type QItem } from "@/data/exercises";
-
-// How long a correct answer stays highlighted before auto-advancing — see
-// the identical constant in fiches.pemdas.tsx.
-const AUTO_ADVANCE_MS = 500;
 
 type Built = { item: QItem; choices: string[]; answer: number };
 
@@ -26,22 +17,7 @@ export const build = (item: QItem): Built => {
 
 export function ExerciseQuiz({ slug }: { slug: string }) {
   const bank = exercises[slug];
-  const { pyramid, onCorrect, onWrong, reset } = usePyramid(`fiche:${slug}`);
   const lastQ = useRef<string | null>(null);
-  // Tracks when the current question appeared and at what level, so a
-  // correct answer can be judged "hesitant" (see isHesitant) relative to
-  // how long that level should reasonably take.
-  const shownAt = useRef<number>(Date.now());
-  const questionLevel = useRef<1 | 2 | 3 | 4>(1);
-  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Cancel any pending auto-advance if this fiche is swapped out before it
-  // fires — see the identical cleanup in fiches.pemdas.tsx.
-  useEffect(() => {
-    return () => {
-      if (advanceTimer.current) clearTimeout(advanceTimer.current);
-    };
-  }, [slug]);
 
   const pick = (tier: 1 | 2 | 3 | 4): Built | null => {
     if (!bank) return null;
@@ -55,49 +31,16 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
       }
     }
     lastQ.current = item.q;
-    shownAt.current = Date.now();
-    questionLevel.current = tier;
     return build(item);
   };
 
-  // The initial level is read straight from localStorage instead of
-  // `pyramid.tier`/`pyramid.complete` — usePyramid's own hydration effect
-  // hasn't necessarily applied yet on this first render (see the identical
-  // fix in fiches.pemdas.tsx), so using the live pyramid state here would
-  // race and show a tier-1 question even when this fiche is already at
-  // boss level.
-  const [q, setQ] = useState<Built | null>(() => {
-    const stored = readStoredPyramid(`fiche:${slug}`);
-    const level = stored?.complete ? 4 : (stored?.tier ?? 1);
-    return pick(level);
+  const { pyramid, q, picked, onPick, next, advance, resetProgress } = useAutoAdvanceQuiz({
+    storageKey: `fiche:${slug}`,
+    pickQuestion: pick,
+    resetKey: slug,
   });
-  const [picked, setPicked] = useState<number | null>(null);
 
   if (!bank || !q) return null;
-
-  const answer = (i: number) => {
-    if (picked !== null) return;
-    setPicked(i);
-    if (i === q.answer) {
-      onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
-      // Read the level fresh from localStorage instead of the `pyramid`
-      // closure — see the identical fix in fiches.pemdas.tsx.
-      advanceTimer.current = setTimeout(() => {
-        const stored = readStoredPyramid(`fiche:${slug}`);
-        const level = stored?.complete ? 4 : (stored?.tier ?? 1);
-        setQ(pick(level));
-        setPicked(null);
-      }, AUTO_ADVANCE_MS);
-    } else {
-      onWrong();
-    }
-  };
-
-  const next = () => {
-    if (picked === null) return;
-    setQ(pick(pyramid.complete ? 4 : pyramid.tier));
-    setPicked(null);
-  };
 
   return (
     <section className="rounded-xl border border-border bg-card p-6">
@@ -126,7 +69,7 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
           return (
             <button
               key={i}
-              onClick={() => answer(i)}
+              onClick={() => onPick(i)}
               className={`flex items-center gap-2 rounded-md border px-3 py-2 text-left text-sm transition ${state}`}
             >
               {picked !== null && (
@@ -147,10 +90,9 @@ export function ExerciseQuiz({ slug }: { slug: string }) {
       <div className="mt-4 flex items-center justify-between">
         <button
           onClick={() => {
-            reset();
+            resetProgress();
             lastQ.current = null;
-            setQ(pick(1));
-            setPicked(null);
+            advance(1);
           }}
           className="text-xs text-muted-foreground underline-offset-4 hover:underline"
         >
