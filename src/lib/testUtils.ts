@@ -7,7 +7,12 @@ export function extractText(node: unknown): string {
   if (typeof node === "string" || typeof node === "number") return String(node);
   if (Array.isArray(node)) return node.map(extractText).join("");
   if (typeof node === "object" && node !== null && "props" in node) {
-    return extractText((node as { props?: { children?: unknown } }).props?.children);
+    const props = (node as { props?: { children?: unknown; "data-text"?: unknown } }).props;
+    // KaTeX fragments (mathFormat.tsx) render via dangerouslySetInnerHTML,
+    // which leaves no `children` to recurse into — they carry their
+    // original source text in `data-text` instead.
+    if (props && typeof props["data-text"] === "string") return props["data-text"];
+    return extractText(props?.children);
   }
   return "";
 }
