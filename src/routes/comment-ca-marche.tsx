@@ -14,48 +14,83 @@ export const Route = createFileRoute("/comment-ca-marche")({
   component: HowItWorksPage,
 });
 
-type Rule = { title: string; body: string };
+type Rule = { title: string; intro?: string; bullets?: string[]; note?: string };
 
 const RULES: Rule[] = [
   {
     title: "Trois paliers par compétence",
-    body: "Chaque compétence (une ligne PEMDAS, le circuit logique, un exercice de fiche) a sa propre pyramide à 3 paliers. Une bonne réponse remplit une case ; une mauvaise réponse fait redescendre d'une case.",
+    intro:
+      "Chaque compétence (une ligne PEMDAS, le circuit logique, un exercice de fiche) a sa propre pyramide à 3 paliers.",
+    bullets: ["Bonne réponse → une case se remplit.", "Mauvaise réponse → une case se vide."],
   },
   {
-    title: "Niveau boss",
-    body: "Une fois les 3 paliers remplis, la pyramide devient dorée : le niveau boss commence. Il faut 6 bonnes réponses d'affilée, sans faute, pour obtenir le triangle final. Une seule erreur remet les rayons à zéro (mais pas le palier — ça reste acquis).",
+    title: "Le niveau boss",
+    intro: "Une fois les 3 paliers remplis, la pyramide devient dorée : le niveau boss commence.",
+    bullets: [
+      "6 bonnes réponses d'affilée, sans erreur → triangle final obtenu.",
+      "Une seule erreur → les rayons repartent à 0 (le palier, lui, reste acquis).",
+    ],
   },
   {
-    title: "Le niveau boss n'est pas juste plus dur",
-    body: "Les questions du niveau boss changent souvent de forme, pas seulement de taille : le sens peut être inversé, un élément habituellement donné doit être retrouvé, les nombres sont moins ronds. Le but est de vérifier une vraie compréhension, pas de reconnaître un motif.",
+    title: "Le niveau boss teste une vraie compréhension",
+    intro: "Les questions ne sont pas juste plus dures : leur forme change.",
+    bullets: [
+      "Le sens de la question peut être inversé.",
+      "Une donnée habituellement fournie doit être retrouvée.",
+      "Les nombres sont moins ronds.",
+    ],
+    note: "Le but : vérifier une vraie compréhension, pas juste reconnaître un motif déjà vu.",
   },
   {
-    title: "Le tableau « Ma progression »",
-    body: "Accessible en haut de chaque page, il montre une toile d'araignée par catégorie, la liste des points les plus fragiles, et une grille colorée de toutes les compétences du site.",
+    title: "La page « Ma progression »",
+    intro: "Accessible depuis le bandeau en haut de chaque page. Elle regroupe :",
+    bullets: [
+      "une toile d'araignée de maîtrise par catégorie,",
+      "la liste des points les plus fragiles,",
+      "une grille colorée de toutes les compétences du site.",
+    ],
   },
   {
     title: "Les couleurs de la grille",
-    body: "Case vide = pas commencé. Gris clair = en cours. Vert = avancé. Jaune = niveau boss réussi.",
+    bullets: [
+      "Case vide → pas commencé.",
+      "Orange → en cours.",
+      "Blanc → avancé.",
+      "Jaune → niveau boss réussi.",
+    ],
   },
   {
-    title: "Les points faibles comptent aussi l'hésitation",
-    body: "Le classement des points faibles ne compte pas que les erreurs : une bonne réponse qui a pris anormalement longtemps compte aussi, un peu, comme un signe d'hésitation — sans qu'il y ait rien à cocher soi-même, juste le temps de réponse mesuré automatiquement.",
+    title: "L'hésitation compte aussi",
+    intro:
+      "Une bonne réponse anormalement lente compte un peu, comme une erreur, dans le classement des points faibles.",
+    note: "Rien à cocher soi-même : le temps de réponse est mesuré automatiquement.",
   },
   {
     title: "Réviser mes points faibles",
-    body: "Le bouton « Réviser → » sur la page progression lance une session qui enchaîne directement les compétences les plus fragiles, toutes fiches mélangées, plutôt que de tout revoir fiche par fiche.",
+    intro:
+      "Le bouton « Réviser → » sur la page progression enchaîne directement les compétences les plus fragiles, toutes fiches mélangées — plutôt que de tout revoir fiche par fiche.",
   },
   {
     title: "Tout est stocké sur cet appareil",
-    body: "Aucun compte, aucun serveur : la progression est enregistrée uniquement dans ce navigateur, sur cet appareil. Changer de navigateur ou d'appareil repart de zéro, sauf transfert manuel (règle suivante).",
+    intro:
+      "Aucun compte, aucun serveur : la progression est enregistrée uniquement dans ce navigateur.",
+    note: "Changer de navigateur ou d'appareil repart de zéro, sauf transfert manuel (voir ci-dessous).",
   },
   {
     title: "Transférer sa progression",
-    body: "La page progression permet de générer une phrase de quelques mots qui résume l'état actuel. La coller (ou ouvrir le lien généré) sur un autre appareil y recopie cette progression. C'est une photo à un instant donné, pas une synchronisation en direct : il faut regénérer une phrase à chaque fois qu'on veut transmettre les derniers progrès.",
+    intro: "Depuis la page progression :",
+    bullets: [
+      "Générer une phrase de quelques mots qui résume l'état actuel.",
+      "La coller (ou ouvrir le lien généré) sur un autre appareil recopie cette progression là-bas.",
+    ],
+    note: "C'est une photo à un instant donné, pas une synchronisation en direct : il faut régénérer une phrase à chaque fois qu'on veut transmettre les derniers progrès.",
   },
   {
     title: "Réinitialiser",
-    body: "Chaque fiche a son propre bouton pour réinitialiser sa pyramide. La page progression a un bouton séparé, dans un encadré rouge, qui efface tout, partout, sur cet appareil.",
+    bullets: [
+      "Bouton sur chaque fiche → réinitialise uniquement sa pyramide.",
+      "Bouton rouge sur la page progression → efface tout, partout, sur cet appareil.",
+    ],
   },
 ];
 
@@ -80,9 +115,22 @@ function HowItWorksPage() {
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
                 {i + 1}
               </span>
-              <div>
+              <div className="min-w-0 flex-1">
                 <h2 className="font-semibold text-foreground">{rule.title}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{rule.body}</p>
+                {rule.intro && <p className="mt-1 text-sm text-muted-foreground">{rule.intro}</p>}
+                {rule.bullets && (
+                  <ul className="mt-2 space-y-1">
+                    {rule.bullets.map((b) => (
+                      <li key={b} className="flex gap-2 text-sm text-muted-foreground">
+                        <span className="text-primary" aria-hidden="true">
+                          •
+                        </span>
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {rule.note && <p className="mt-2 text-xs text-muted-foreground/80">{rule.note}</p>}
               </div>
             </li>
           ))}
