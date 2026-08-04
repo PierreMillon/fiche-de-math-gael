@@ -7,7 +7,7 @@ const TRIALS = 80;
 
 describe("pemdas quiz generators", () => {
   for (const row of rows) {
-    for (const tier of [1, 2, 3] as const) {
+    for (const tier of [1, 2, 3, 4] as const) {
       it(`${row.id} (tier ${tier}) always yields exactly 4 distinct choices with a valid answer`, () => {
         for (let i = 0; i < TRIALS; i++) {
           const q = row.quiz(tier);
@@ -15,6 +15,12 @@ describe("pemdas quiz generators", () => {
 
           const texts = q.choices.map(extractText);
           expect(new Set(texts).size).toBe(4);
+          // makeQ's "(?N)" filler only appears when the row's own distractor
+          // logic accidentally produced fewer than 3 distinct wrong answers
+          // (e.g. two distractor formulas collapsing to the same string for
+          // some random draw) — a real bug in that row, not something that
+          // should ever reach the UI.
+          for (const t of texts) expect(t).not.toMatch(/\(\?\d+\)/);
 
           expect(q.answer).toBeGreaterThanOrEqual(0);
           expect(q.answer).toBeLessThan(4);

@@ -11,6 +11,12 @@ import {
 } from "@/lib/pyramid";
 import { extractText } from "@/lib/testUtils";
 
+// How long a correct answer stays highlighted before auto-advancing to the
+// next question — long enough to register as positive feedback, short
+// enough that it doesn't feel like a forced pause. Wrong answers never
+// auto-advance: they stop and wait for "Question suivante" instead.
+const AUTO_ADVANCE_MS = 500;
+
 export const Route = createFileRoute("/fiches/pemdas")({
   head: () => ({
     meta: [
@@ -230,6 +236,16 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
   // how long that level should reasonably take.
   const shownAt = useRef<number>(Date.now());
   const questionLevel = useRef<1 | 2 | 3 | 4>(1);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancel any pending auto-advance when the dialog switches rows or closes
+  // — this component stays mounted the whole time (see PemdasPage), it's
+  // only `row` that goes null, so nothing else would clear this timer.
+  useEffect(() => {
+    return () => {
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    };
+  }, [row]);
 
   // Level 4 is boss-only: pyramid.tier stays pinned at 3 once the pyramid is
   // complete (see usePyramid), so without this the boss round would just
@@ -283,8 +299,22 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
   const onPick = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
-    if (i === q.answer) onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
-    else onWrong();
+    if (i === q.answer) {
+      onCorrect(isHesitant(Date.now() - shownAt.current, questionLevel.current));
+      // A right answer needs no explanation to sit and read — flash the
+      // green state briefly, then move on by itself. Read the level fresh
+      // from localStorage instead of the `pyramid` closure: this answer may
+      // have just completed a palier, and that update won't have reached
+      // this render's `pyramid` by the time the timeout fires.
+      advanceTimer.current = setTimeout(() => {
+        const stored = readStoredPyramid(row.id);
+        const level = stored?.complete ? 4 : (stored?.tier ?? 1);
+        setQ(pickQuestion(level));
+        setPicked(null);
+      }, AUTO_ADVANCE_MS);
+    } else {
+      onWrong();
+    }
   };
 
   const next = () => {
@@ -338,22 +368,21 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
         })}
       </div>
 
-      {picked !== null && (
-        <p className="mt-4 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
-          {picked === q.answer ? "✅ " : "❌ "}
-          {q.explanation}
-        </p>
+      {picked !== null && picked !== q.answer && (
+        <>
+          <p className="mt-4 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
+            ❌ {q.explanation}
+          </p>
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={next}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            >
+              Question suivante
+            </button>
+          </div>
+        </>
       )}
-
-      <div className="mt-4 flex justify-end">
-        <button
-          onClick={next}
-          disabled={picked === null}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40"
-        >
-          Question suivante
-        </button>
-      </div>
     </Modal>
   );
 }

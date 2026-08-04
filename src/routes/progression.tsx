@@ -28,8 +28,8 @@ export const Route = createFileRoute("/progression")({
 
 function masteryColor(pct: number): string {
   if (pct >= 100) return "bg-yellow-400 border-yellow-200";
-  if (pct >= 60) return "bg-green-400 border-green-300";
-  if (pct >= 25) return "bg-teal-500/60 border-teal-300";
+  if (pct >= 60) return "bg-white border-white/70";
+  if (pct >= 25) return "bg-orange-500/70 border-orange-300";
   if (pct > 0) return "bg-muted border-border";
   return "bg-transparent border-white/20";
 }
@@ -333,11 +333,11 @@ function ProgressionPage() {
                 à faire
               </span>
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-teal-300 bg-teal-500/60" />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-orange-300 bg-orange-500/70" />
                 en cours
               </span>
               <span className="flex items-center gap-1">
-                <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-green-300 bg-green-400" />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-sm border border-white/70 bg-white" />
                 avancé
               </span>
               <span className="flex items-center gap-1">

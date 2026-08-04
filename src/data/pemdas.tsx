@@ -180,6 +180,20 @@ const shuffle = <T,>(arr: T[]): T[] => {
   return a;
 };
 
+// Finds the last run of digits in a formula string and nudges it up or down,
+// so a fallback distractor (see makeQ below) still reads as a plausible —
+// if wrong — answer instead of an obvious internal placeholder. Works
+// uniformly across every format used on this page (plain integers,
+// fractions, factored forms, exponents, polynomials) without needing
+// per-format logic, since they all end in a number.
+const perturbLastNumber = (s: string, bump: number): string => {
+  const match = s.match(/(\d+)(?!.*\d)/);
+  if (!match || match.index === undefined) return `${s}′`;
+  const delta = bump % 2 === 0 ? -(bump / 2) : (bump + 1) / 2;
+  const bumped = Math.max(0, Number.parseInt(match[1], 10) + delta);
+  return s.slice(0, match.index) + bumped + s.slice(match.index + match[1].length);
+};
+
 const makeQ = (
   prompt: ReactNode,
   correct: string,
@@ -191,11 +205,15 @@ const makeQ = (
     if (d !== correct && !uniqueD.includes(d)) uniqueD.push(d);
   }
   // Guarantee 3 distinct distractors so we always render exactly 4 options.
-  let filler = 1;
+  // Reached whenever two of a row's own distractor formulas happen to
+  // collapse to the same string for a given random draw (or one matches the
+  // answer) — rare per-row, but with dozens of rows it happens often enough
+  // that the fallback itself must never look like debug output.
+  let bump = 1;
   while (uniqueD.length < 3) {
-    const candidate = `${correct} (?${filler})`;
+    const candidate = perturbLastNumber(correct, bump);
     if (candidate !== correct && !uniqueD.includes(candidate)) uniqueD.push(candidate);
-    filler++;
+    bump++;
   }
   const all = shuffle([correct, ...uniqueD.slice(0, 3)]);
   return {
@@ -347,7 +365,7 @@ export const rows: PemdasRow[] = [
             Factorise : {c1}a + {c2}b
           </>,
           `${g}(${m}a+${n}b)`,
-          [`${g}(${m}a−${n}b)`, `${c1}(a+${n}b)`, `${m}(${g}a+${n}b)`],
+          [`${g}(${m}a−${n}b)`, `${c1}(a+${n}b)`, `${g}(${n}a+${m}b)`],
           `Le plus grand facteur commun de ${c1} et ${c2} est ${g} : ${c1}a+${c2}b = ${g}(${m}a+${n}b).`,
         );
       }
@@ -392,7 +410,7 @@ export const rows: PemdasRow[] = [
             Factorise : {c1}a − {c2}b
           </>,
           `${g}(${m}a−${n}b)`,
-          [`${g}(${m}a+${n}b)`, `${c1}(a−${n}b)`, `${m}(${g}a−${n}b)`],
+          [`${g}(${m}a+${n}b)`, `${c1}(a−${n}b)`, `${g}(${n}a−${m}b)`],
           `Le plus grand facteur commun de ${c1} et ${c2} est ${g} : ${c1}a−${c2}b = ${g}(${m}a−${n}b).`,
         );
       }
