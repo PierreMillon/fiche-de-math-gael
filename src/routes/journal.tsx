@@ -16,20 +16,9 @@ export const Route = createFileRoute("/journal")({
 });
 
 function JournalPage() {
-  const oldest = CHANGELOG[CHANGELOG.length - 1]?.version;
-  const newest = CHANGELOG[0]?.version;
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <PageHeader
-        eyebrow="Journal"
-        title="Historique des versions"
-        description={
-          <>
-            {CHANGELOG.length} modifications, de la v{oldest} à la v{newest}.
-          </>
-        }
-      />
+      <PageHeader title="Historique des versions" />
 
       <main className="mx-auto max-w-3xl px-6 py-10">
         <ul className="divide-y divide-border">
