@@ -12,6 +12,7 @@ import {
 } from "@/lib/competencies";
 import { RadarChart } from "@/lib/radarChart";
 import { exportProgressPhrase, importProgressPhrase } from "@/lib/wordCode";
+import { PageHeader } from "@/lib/PageHeader";
 
 export const Route = createFileRoute("/progression")({
   head: () => ({
@@ -263,20 +264,18 @@ function ProgressionPage() {
 
   return (
     <div key={tick} className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-4xl px-6 py-10">
-          <Link to="/" className="text-sm text-muted-foreground transition hover:text-primary">
-            ← Toutes les fiches
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">Progression</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Ma progression</h1>
-          <p className="mt-3 text-muted-foreground">
+      <PageHeader
+        eyebrow="Progression"
+        title="Ma progression"
+        description={
+          <>
             {Math.round(overall)}% de maîtrise globale, sur {ALL_COMPETENCIES.length} compétences —
             stocké uniquement sur cet appareil, sauf si tu génères une phrase à coller ailleurs
             (voir plus bas).
-          </p>
-        </div>
-      </header>
+          </>
+        }
+        maxWidth="4xl"
+      />
 
       <main className="mx-auto max-w-4xl space-y-8 px-6 py-10">
         <section className="rounded-xl border border-border bg-card p-6">

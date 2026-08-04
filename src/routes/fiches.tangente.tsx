@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { PageHeader } from "@/lib/PageHeader";
 
 export const Route = createFileRoute("/fiches/tangente")({
   head: () => ({
@@ -143,10 +144,8 @@ function TangentePage() {
   const H = 420;
   const pad = 24;
 
-  const sx = (xv: number) =>
-    pad + ((xv - xMin) / (xMax - xMin)) * (W - 2 * pad);
-  const sy = (yv: number) =>
-    pad + (1 - (yv - yMin) / (yMax - yMin)) * (H - 2 * pad);
+  const sx = (xv: number) => pad + ((xv - xMin) / (xMax - xMin)) * (W - 2 * pad);
+  const sy = (yv: number) => pad + (1 - (yv - yMin) / (yMax - yMin)) * (H - 2 * pad);
 
   // Build curve path, splitting on invalid points (e.g. 1/x at 0)
   const path = useMemo(() => {
@@ -214,34 +213,16 @@ function TangentePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-3xl px-6 py-10">
-          <Link
-            to="/"
-            className="text-sm text-muted-foreground transition hover:text-primary"
-          >
-            ← Toutes les fiches
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">
-            Analyse
-          </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-            La tangente, visuellement
-          </h1>
-          <p className="mt-3 text-muted-foreground">
-            Déplace le point jaune sur la courbe : la droite rose est la
-            tangente, sa pente est f'(x).
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Analyse"
+        title="La tangente, visuellement"
+        description="Déplace le point jaune sur la courbe : la droite rose est la tangente, sa pente est f'(x)."
+      />
 
       <main className="mx-auto max-w-3xl px-6 py-8">
         <div className="rounded-xl border border-border bg-card p-4 sm:p-6">
           <div className="flex flex-wrap items-center gap-3">
-            <label
-              htmlFor="fn-select"
-              className="text-sm text-muted-foreground"
-            >
+            <label htmlFor="fn-select" className="text-sm text-muted-foreground">
               Fonction :
             </label>
             <select
@@ -414,26 +395,11 @@ function TangentePage() {
   );
 }
 
-function Readout({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: boolean;
-}) {
+function Readout({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className="rounded-lg border border-border bg-background px-3 py-3">
-      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-        {label}
-      </div>
-      <div
-        className={
-          "mt-1 font-mono text-base " +
-          (accent ? "text-pink-400" : "text-foreground")
-        }
-      >
+      <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className={"mt-1 font-mono text-base " + (accent ? "text-pink-400" : "text-foreground")}>
         {value}
       </div>
     </div>

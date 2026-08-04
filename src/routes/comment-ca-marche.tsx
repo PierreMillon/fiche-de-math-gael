@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageHeader } from "@/lib/PageHeader";
 
 export const Route = createFileRoute("/comment-ca-marche")({
   head: () => ({
@@ -97,16 +98,11 @@ const RULES: Rule[] = [
 function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-3xl px-6 py-10">
-          <Link to="/" className="text-sm text-muted-foreground transition hover:text-primary">
-            ← Toutes les fiches
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">Guide</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Comment ça marche</h1>
-          <p className="mt-3 text-muted-foreground">Le fonctionnement du site, règle par règle.</p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Guide"
+        title="Comment ça marche"
+        description="Le fonctionnement du site, règle par règle."
+      />
 
       <main className="mx-auto max-w-3xl px-6 py-10">
         <ol className="space-y-6">

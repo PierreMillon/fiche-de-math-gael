@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { rows, COLS, COL_COLOR, type PemdasRow, type QuizQ } from "@/data/pemdas";
@@ -10,6 +10,7 @@ import {
   isHesitant,
 } from "@/lib/pyramid";
 import { extractText } from "@/lib/testUtils";
+import { PageHeader } from "@/lib/PageHeader";
 
 // How long a correct answer stays highlighted before auto-advancing to the
 // next question — long enough to register as positive feedback, short
@@ -41,19 +42,12 @@ function PemdasPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="mx-auto max-w-5xl px-6 py-10">
-          <Link to="/" className="text-sm text-muted-foreground transition hover:text-primary">
-            ← Toutes les fiches
-          </Link>
-          <p className="mt-6 text-xs uppercase tracking-[0.2em] text-primary">Algèbre</p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Bases PEMDAS</h1>
-          <p className="mt-3 text-muted-foreground">
-            Clique une ligne pour ouvrir un QCM. Remplis les 3 paliers de la pyramide, puis affronte
-            le niveau boss (6 bonnes réponses sans faute).
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        eyebrow="Algèbre"
+        title="Bases PEMDAS"
+        description="Clique une ligne pour ouvrir un QCM. Remplis les 3 paliers de la pyramide, puis affronte le niveau boss (6 bonnes réponses sans faute)."
+        maxWidth="5xl"
+      />
 
       <main className="mx-auto max-w-5xl px-6 py-10">
         <div className="grid grid-cols-2 gap-x-2 gap-y-1 border-b border-border pb-3 text-[10px] font-semibold uppercase tracking-[0.15em] landscape:grid-cols-4 landscape:text-xs landscape:tracking-[0.2em]">

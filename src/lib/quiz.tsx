@@ -7,20 +7,12 @@ import {
   readStoredPyramid,
   isHesitant,
 } from "@/lib/pyramid";
+import { pickDistinctChoices } from "@/lib/quizChoices";
 import { exercises, type QItem } from "@/data/exercises";
 
 // How long a correct answer stays highlighted before auto-advancing — see
 // the identical constant in fiches.pemdas.tsx.
 const AUTO_ADVANCE_MS = 500;
-
-const shuffle = <T,>(arr: T[]): T[] => {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
 
 type Built = { item: QItem; choices: string[]; answer: number };
 
@@ -28,17 +20,7 @@ type Built = { item: QItem; choices: string[]; answer: number };
 // duplicate distractors or a distractor equal to the answer.
 // Exported for src/lib/quiz.test.ts.
 export const build = (item: QItem): Built => {
-  const uniqueD: string[] = [];
-  for (const d of item.d) {
-    if (d !== item.a && !uniqueD.includes(d)) uniqueD.push(d);
-  }
-  let filler = 1;
-  while (uniqueD.length < 3) {
-    const candidate = `${item.a} (${filler})`;
-    if (candidate !== item.a && !uniqueD.includes(candidate)) uniqueD.push(candidate);
-    filler++;
-  }
-  const all = shuffle([item.a, ...uniqueD.slice(0, 3)]);
+  const all = pickDistinctChoices(item.a, item.d);
   return { item, choices: all, answer: all.indexOf(item.a) };
 };
 

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { fmt } from "@/lib/mathFormat";
+import { pickDistinctChoices } from "@/lib/quizChoices";
 
 // ---------- Formula rendering primitives ----------
 // Colors (per request): + blue, × red, fraction bar yellow, exponent green.
@@ -171,51 +172,13 @@ export type PemdasRow = {
 
 const rnd = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-const shuffle = <T,>(arr: T[]): T[] => {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
-
-// Finds the last run of digits in a formula string and nudges it up or down,
-// so a fallback distractor (see makeQ below) still reads as a plausible —
-// if wrong — answer instead of an obvious internal placeholder. Works
-// uniformly across every format used on this page (plain integers,
-// fractions, factored forms, exponents, polynomials) without needing
-// per-format logic, since they all end in a number.
-const perturbLastNumber = (s: string, bump: number): string => {
-  const match = s.match(/(\d+)(?!.*\d)/);
-  if (!match || match.index === undefined) return `${s}′`;
-  const delta = bump % 2 === 0 ? -(bump / 2) : (bump + 1) / 2;
-  const bumped = Math.max(0, Number.parseInt(match[1], 10) + delta);
-  return s.slice(0, match.index) + bumped + s.slice(match.index + match[1].length);
-};
-
 const makeQ = (
   prompt: ReactNode,
   correct: string,
   distractors: string[],
   explanation: string,
 ): QuizQ => {
-  const uniqueD: string[] = [];
-  for (const d of distractors) {
-    if (d !== correct && !uniqueD.includes(d)) uniqueD.push(d);
-  }
-  // Guarantee 3 distinct distractors so we always render exactly 4 options.
-  // Reached whenever two of a row's own distractor formulas happen to
-  // collapse to the same string for a given random draw (or one matches the
-  // answer) — rare per-row, but with dozens of rows it happens often enough
-  // that the fallback itself must never look like debug output.
-  let bump = 1;
-  while (uniqueD.length < 3) {
-    const candidate = perturbLastNumber(correct, bump);
-    if (candidate !== correct && !uniqueD.includes(candidate)) uniqueD.push(candidate);
-    bump++;
-  }
-  const all = shuffle([correct, ...uniqueD.slice(0, 3)]);
+  const all = pickDistinctChoices(correct, distractors);
   return {
     prompt,
     choices: all.map((s) => fmt(s)),
