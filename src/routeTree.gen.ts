@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CommentCaMarcheRouteImport } from './routes/comment-ca-marche'
+import { Route as JournalRouteImport } from './routes/journal'
 import { Route as ProgressionRouteImport } from './routes/progression'
 import { Route as RevisionRouteImport } from './routes/revision'
 import { Route as FichesSlugRouteImport } from './routes/fiches.$slug'
@@ -30,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
 const CommentCaMarcheRoute = CommentCaMarcheRouteImport.update({
   id: '/comment-ca-marche',
   path: '/comment-ca-marche',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalRoute = JournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgressionRoute = ProgressionRouteImport.update({
@@ -86,6 +92,7 @@ const FichesTangenteRoute = FichesTangenteRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/comment-ca-marche': typeof CommentCaMarcheRoute
+  '/journal': typeof JournalRoute
   '/progression': typeof ProgressionRoute
   '/revision': typeof RevisionRoute
   '/fiches/$slug': typeof FichesSlugRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/comment-ca-marche': typeof CommentCaMarcheRoute
+  '/journal': typeof JournalRoute
   '/progression': typeof ProgressionRoute
   '/revision': typeof RevisionRoute
   '/fiches/$slug': typeof FichesSlugRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/comment-ca-marche': typeof CommentCaMarcheRoute
+  '/journal': typeof JournalRoute
   '/progression': typeof ProgressionRoute
   '/revision': typeof RevisionRoute
   '/fiches/$slug': typeof FichesSlugRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/comment-ca-marche'
+    | '/journal'
     | '/progression'
     | '/revision'
     | '/fiches/$slug'
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/comment-ca-marche'
+    | '/journal'
     | '/progression'
     | '/revision'
     | '/fiches/$slug'
@@ -159,6 +170,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/comment-ca-marche'
+    | '/journal'
     | '/progression'
     | '/revision'
     | '/fiches/$slug'
@@ -174,6 +186,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CommentCaMarcheRoute: typeof CommentCaMarcheRoute
+  JournalRoute: typeof JournalRoute
   ProgressionRoute: typeof ProgressionRoute
   RevisionRoute: typeof RevisionRoute
   FichesSlugRoute: typeof FichesSlugRoute
@@ -200,6 +213,13 @@ declare module '@tanstack/react-router' {
       path: '/comment-ca-marche'
       fullPath: '/comment-ca-marche'
       preLoaderRoute: typeof CommentCaMarcheRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progression': {
@@ -278,6 +298,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CommentCaMarcheRoute: CommentCaMarcheRoute,
+  JournalRoute: JournalRoute,
   ProgressionRoute: ProgressionRoute,
   RevisionRoute: RevisionRoute,
   FichesSlugRoute: FichesSlugRoute,
