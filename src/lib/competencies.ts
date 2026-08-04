@@ -122,6 +122,16 @@ export function categoryAverage(category: string): number {
   return inCat.reduce((sum, c) => sum + competencyMastery(c), 0) / inCat.length;
 }
 
+// Single source of truth for "overall mastery %" — used both by the
+// progression page's headline figure and by wordCode's badge word, so the
+// two never drift apart.
+export function overallMasteryPercent(): number {
+  if (ALL_COMPETENCIES.length === 0) return 0;
+  return (
+    ALL_COMPETENCIES.reduce((sum, c) => sum + competencyMastery(c), 0) / ALL_COMPETENCIES.length
+  );
+}
+
 export function resetAllProgress(): void {
   const keysToRemove: string[] = [];
   for (let i = 0; i < localStorage.length; i++) {

@@ -1,4 +1,4 @@
-import { ALL_COMPETENCIES } from "@/lib/competencies";
+import { ALL_COMPETENCIES, overallMasteryPercent } from "@/lib/competencies";
 import { BOSS_TARGET, initialPyramid, readStoredPyramid, type Pyramid } from "@/lib/pyramid";
 
 // 256 words, one per byte value (0-255) — a friendly stand-in for hex.
@@ -349,12 +349,16 @@ export function encodeCodes(codes: number[], competencyCount: number): string {
     .join("-");
 }
 
-export function decodeCodes(phrase: string): { header: number; codes: number[] } | null {
+export function decodeCodes(
+  phrase: string,
+  skipWords = 0,
+): { header: number; codes: number[] } | null {
   const words = phrase
     .trim()
     .toLowerCase()
     .split(/[\s,-]+/)
-    .filter(Boolean);
+    .filter(Boolean)
+    .slice(skipWords);
   if (words.length < 1) return null;
 
   const bytes: number[] = [];
@@ -373,6 +377,34 @@ export function decodeCodes(phrase: string): { header: number; codes: number[] }
   return { header, codes };
 }
 
+// A purely cosmetic first word, reflecting OVERALL progress (0-100%) —
+// separate from the header/data words below, which encode per-competency
+// state and whose first byte happens to always be the same value for a
+// given site build (competencyCount % 256 never changes between exports),
+// so it always picked the same WORDLIST entry ("baleine" for everyone,
+// with zero relation to progress). This badge word is what actually moves
+// as mastery climbs, so the phrase visibly "levels up" instead of always
+// starting the same way. 5 tiers x 5 words = 25 possible badge words;
+// within a tier the word still shifts as % climbs, so movement is visible
+// even without crossing a tier boundary. Not decoded for data — always
+// exactly one word, always skipped on import (see importProgressPhrase).
+const BADGE_TIERS: string[][] = [
+  ["chaton", "poussin", "lapereau", "faon", "souriceau"], // 0-19% : ça commence
+  ["papillon", "coccinelle", "luciole", "arcenciel", "etoile"], // 20-39% : ça prend forme
+  ["licorne", "fee", "lutin", "sirene", "farfadet"], // 40-59% : ça devient magique
+  ["diamant", "emeraude", "saphir", "rubis", "perle"], // 60-79% : ça a de la valeur
+  ["couronne", "galaxie", "comete", "astronaute", "etoilefilante"], // 80-100% : presque légendaire
+];
+
+export function badgeWord(overallPercent: number): string {
+  const pct = Math.min(100, Math.max(0, overallPercent));
+  const tierIdx = Math.min(BADGE_TIERS.length - 1, Math.floor(pct / 20));
+  const tier = BADGE_TIERS[tierIdx];
+  const pctInTier = pct - tierIdx * 20; // 0..20
+  const wordIdx = Math.min(tier.length - 1, Math.floor((pctInTier / 20) * tier.length));
+  return tier[wordIdx];
+}
+
 export function exportProgressPhrase(): string {
   const codes = ALL_COMPETENCIES.map((c) => {
     const pyramids = c.keys.map(readStoredPyramid);
@@ -380,13 +412,15 @@ export function exportProgressPhrase(): string {
     const avg = pyramids.reduce((sum, p) => sum + pyramidToCode(p), 0) / pyramids.length;
     return Math.round(avg);
   });
-  return encodeCodes(codes, ALL_COMPETENCIES.length);
+  const badge = badgeWord(overallMasteryPercent());
+  return `${badge}-${encodeCodes(codes, ALL_COMPETENCIES.length)}`;
 }
 
 export type ImportResult = { applied: number; mismatch: boolean };
 
 export function importProgressPhrase(phrase: string): ImportResult | null {
-  const decoded = decodeCodes(phrase);
+  // Skip the leading badge word — it's cosmetic, not data (see badgeWord).
+  const decoded = decodeCodes(phrase, 1);
   if (!decoded) return null;
 
   const mismatch = decoded.header !== ALL_COMPETENCIES.length % 256;
