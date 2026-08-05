@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   PyramidView,
   pyramidLabel,
@@ -65,27 +65,29 @@ function evalGate(g: GateType, a: 0 | 1, b: 0 | 1 = 0): 0 | 1 {
   }
 }
 
-// A tiny inline SVG for each gate (schematic-ish).
-function GateSymbol({ type, size = 44 }: { type: GateType; size?: number }) {
-  const w = size * 1.4;
-  const h = size;
+// The paths/circles for a gate's symbol, in a shared 70×50 local coordinate
+// space — used both by the standalone GateSymbol (its own <svg viewBox="0 0
+// 70 50">, for the "cours" cards) and by CircuitView's diagram (each gate
+// wrapped in its own <g transform="translate(...) scale(...)">, see below),
+// so the reference icons and the circuit diagram render the same gates.
+function gatePaths(type: GateType) {
   const common = "stroke-white fill-none";
   const strokeW = 1.6;
   switch (type) {
     case "AND":
     case "NAND":
       return (
-        <svg width={w} height={h} viewBox="0 0 70 50">
+        <>
           <path className={common} strokeWidth={strokeW} d="M8 8 H35 A17 17 0 0 1 35 42 H8 Z" />
           {type === "NAND" && (
             <circle className={common} strokeWidth={strokeW} cx="57" cy="25" r="3" />
           )}
-        </svg>
+        </>
       );
     case "OR":
     case "NOR":
       return (
-        <svg width={w} height={h} viewBox="0 0 70 50">
+        <>
           <path
             className={common}
             strokeWidth={strokeW}
@@ -94,27 +96,40 @@ function GateSymbol({ type, size = 44 }: { type: GateType; size?: number }) {
           {type === "NOR" && (
             <circle className={common} strokeWidth={strokeW} cx="60" cy="25" r="3" />
           )}
-        </svg>
+        </>
       );
     case "NOT":
       return (
-        <svg width={w} height={h} viewBox="0 0 70 50">
+        <>
           <path className={common} strokeWidth={strokeW} d="M8 8 L50 25 L8 42 Z" />
           <circle className={common} strokeWidth={strokeW} cx="55" cy="25" r="3" />
-        </svg>
+        </>
       );
     case "XOR":
       return (
-        <svg width={w} height={h} viewBox="0 0 70 50">
+        <>
           <path className={common} strokeWidth={strokeW} d="M2 8 Q18 25 2 42" />
           <path
             className={common}
             strokeWidth={strokeW}
             d="M8 8 Q24 25 8 42 Q30 42 55 25 Q30 8 8 8 Z"
           />
-        </svg>
+        </>
       );
   }
+}
+
+// A tiny inline SVG for each gate (schematic-ish) — used standalone in the
+// "cours" reference cards. CircuitView (below) embeds gatePaths() directly
+// instead, positioned on its own coordinate grid.
+function GateSymbol({ type, size = 44 }: { type: GateType; size?: number }) {
+  const w = size * 1.4;
+  const h = size;
+  return (
+    <svg width={w} height={h} viewBox="0 0 70 50">
+      {gatePaths(type)}
+    </svg>
+  );
 }
 
 function TruthTable({ type }: { type: GateType }) {
@@ -202,7 +217,185 @@ function makeCircuit(tier: 1 | 2 | 3): Node {
   return { kind: "gate", type: rndPick(binary), a: g3, b: B };
 }
 
-// Recursive render of the circuit tree as a horizontal diagram.
+// ---------------- Circuit diagram (SVG) ----------------
+// Renders the circuit tree as one SVG with exact pixel coordinates, so
+// wires are drawn as orthogonal (horizontal/vertical only, never diagonal)
+// paths that terminate exactly on a gate's input pin or a leaf's edge —
+// no CSS-flexbox gaps for a wire to visibly "float" across (the previous
+// version drew each wire as an independent flex sibling, with flex `gap`
+// leaving a blank space on both ends of every wire).
+
+const LEAF_W = 40;
+const LEAF_H = 24;
+const GATE_W = 52;
+const GATE_ICON_H = 32;
+const ROW_H = 52; // uniform vertical slot for both a leaf and a gate row
+const ROW_GAP = 10; // vertical gap between two stacked sibling branches
+const COL_GAP = 32; // horizontal gap between a subtree and the gate it feeds
+const EXIT_STUB = 20; // trailing wire past the root gate, before the value badge
+const PIN_OFFSET = GATE_ICON_H * 0.32; // top/bottom input pin distance from a gate's own center
+
+type Measured = { w: number; h: number; cy: number };
+
+// Bottom-up pass: how much space (and where its own vertical center falls)
+// each subtree needs. A binary gate's center is the midpoint between its
+// two children's centers; its own box height is however tall that makes
+// the stack (never less than one row, in case both children are shallow).
+function measure(node: Node): Measured {
+  if (node.kind === "in") return { w: LEAF_W, h: ROW_H, cy: ROW_H / 2 };
+  const a = measure(node.a);
+  const w = (childW: number) => childW + COL_GAP + GATE_W;
+  if (node.type === "NOT") {
+    return { w: w(a.w), h: Math.max(a.h, ROW_H), cy: Math.max(a.cy, ROW_H / 2) };
+  }
+  const b = measure(node.b!);
+  const bTop = a.h + ROW_GAP;
+  const h = Math.max(bTop + b.h, ROW_H);
+  const cy = Math.min(Math.max((a.cy + bTop + b.cy) / 2, ROW_H / 2), h - ROW_H / 2);
+  return { w: w(Math.max(a.w, b.w)), h, cy };
+}
+
+// Depth-first render: places `node`'s own box at (x, y..y+m.h), with
+// `allocW` ≥ measure(node).w — the slack (allocW - naturalWidth) happens
+// when a sibling subtree is deeper, and becomes extra straight wire before
+// the parent gate rather than a gap. Pushes SVG elements into `out` and
+// returns this node's own output point, for the parent to route a wire
+// into its actual input pin (never assumed to already line up).
+function placeNode(
+  node: Node,
+  x: number,
+  y: number,
+  allocW: number,
+  inputs: Record<string, 0 | 1>,
+  reveal: boolean,
+  out: ReactNode[],
+  key: string,
+): { outX: number; outY: number } {
+  const m = measure(node);
+  const cyAbs = y + m.cy;
+
+  if (node.kind === "in") {
+    const boxY = cyAbs - LEAF_H / 2;
+    out.push(
+      <g key={key}>
+        <rect
+          x={x}
+          y={boxY}
+          width={LEAF_W}
+          height={LEAF_H}
+          rx={4}
+          className="fill-card stroke-border"
+        />
+        <text
+          x={x + LEAF_W / 2}
+          y={cyAbs}
+          textAnchor="middle"
+          dominantBaseline="central"
+          className="fill-foreground font-mono text-[11px]"
+        >
+          {node.id}
+        </text>
+      </g>,
+    );
+    const outX = x + allocW;
+    if (outX > x + LEAF_W) {
+      const wireClass = reveal && evalNode(node, inputs) ? "stroke-green-400" : "stroke-white/30";
+      out.push(
+        <line
+          key={`${key}-w`}
+          x1={x + LEAF_W}
+          y1={cyAbs}
+          x2={outX}
+          y2={cyAbs}
+          className={wireClass}
+          strokeWidth={1.5}
+        />,
+      );
+    }
+    return { outX, outY: cyAbs };
+  }
+
+  const a = measure(node.a);
+  const childSlotW = node.type === "NOT" ? a.w : Math.max(a.w, measure(node.b!).w);
+  const gateX = x + childSlotW + COL_GAP;
+  const gateY = cyAbs - GATE_ICON_H / 2;
+
+  // A child's wire runs straight to the gate's x, then jogs vertically
+  // (still along the gate's left edge) to the exact pin height — an "L"
+  // shape, purely orthogonal, that always ends touching the gate.
+  const routeChild = (child: Node, childX: number, childY: number, pinY: number, k: string) => {
+    const res = placeNode(child, childX, childY, childSlotW, inputs, reveal, out, k);
+    const wireClass = reveal && evalNode(child, inputs) ? "stroke-green-400" : "stroke-white/30";
+    out.push(
+      <path
+        key={`${k}-w`}
+        d={`M ${res.outX} ${res.outY} H ${gateX} V ${pinY}`}
+        className={`fill-none ${wireClass}`}
+        strokeWidth={1.5}
+      />,
+    );
+  };
+
+  if (node.type === "NOT") {
+    routeChild(node.a, x, y, gateY + GATE_ICON_H / 2, `${key}-a`);
+  } else {
+    routeChild(node.a, x, y, gateY + GATE_ICON_H / 2 - PIN_OFFSET, `${key}-a`);
+    routeChild(node.b!, x, y + a.h + ROW_GAP, gateY + GATE_ICON_H / 2 + PIN_OFFSET, `${key}-b`);
+  }
+
+  out.push(
+    <g
+      key={`${key}-gate`}
+      transform={`translate(${gateX} ${gateY}) scale(${GATE_W / 70} ${GATE_ICON_H / 50})`}
+    >
+      {gatePaths(node.type)}
+    </g>,
+    <text
+      key={`${key}-label`}
+      x={gateX + GATE_W / 2}
+      y={gateY + GATE_ICON_H + 11}
+      textAnchor="middle"
+      className="fill-muted-foreground text-[8px] uppercase tracking-wider"
+    >
+      {GATE_LABEL[node.type]}
+    </text>,
+  );
+
+  const selfRightX = gateX + GATE_W;
+  const outX = x + allocW;
+  const val = evalNode(node, inputs);
+  const wireClass = reveal && val ? "stroke-green-400" : "stroke-white/30";
+  out.push(
+    <line
+      key={`${key}-out`}
+      x1={selfRightX}
+      y1={cyAbs}
+      x2={outX}
+      y2={cyAbs}
+      className={wireClass}
+      strokeWidth={1.5}
+    />,
+  );
+  // Intermediate value, shown above its wire (not on top of it) so the
+  // line stays unbroken — same "peek at each stage" info the previous
+  // version showed, just no longer severing the connection to draw it.
+  if (reveal) {
+    out.push(
+      <text
+        key={`${key}-val`}
+        x={(selfRightX + outX) / 2}
+        y={cyAbs - 8}
+        textAnchor="middle"
+        className={`font-mono text-[10px] ${val ? "fill-green-400" : "fill-muted-foreground"}`}
+      >
+        {val}
+      </text>,
+    );
+  }
+
+  return { outX, outY: cyAbs };
+}
+
 function CircuitView({
   node,
   inputs,
@@ -212,44 +405,16 @@ function CircuitView({
   inputs: Record<string, 0 | 1>;
   reveal: boolean;
 }) {
-  const val = evalNode(node, inputs);
-  if (node.kind === "in") {
-    return (
-      <div className="flex items-center gap-2">
-        <div className="rounded border border-border bg-card px-2 py-1 text-xs font-mono">
-          {node.id}
-        </div>
-        <div
-          className={`h-px w-6 ${reveal ? (val ? "bg-green-400" : "bg-white/30") : "bg-white/30"}`}
-        />
-      </div>
-    );
-  }
+  const root = measure(node);
+  const width = root.w + EXIT_STUB;
+  const height = root.h;
+  const elements: ReactNode[] = [];
+  placeNode(node, 0, 0, root.w + EXIT_STUB, inputs, reveal, elements, "n");
+
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex flex-col gap-2">
-        <CircuitView node={node.a} inputs={inputs} reveal={reveal} />
-        {node.b && <CircuitView node={node.b} inputs={inputs} reveal={reveal} />}
-      </div>
-      <div className="flex flex-col items-center">
-        <GateSymbol type={node.type} size={36} />
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          {GATE_LABEL[node.type]}
-        </div>
-      </div>
-      <div
-        className={`h-px w-6 ${reveal ? (val ? "bg-green-400" : "bg-white/30") : "bg-white/30"}`}
-      />
-      {reveal && (
-        <div
-          className={`rounded border px-1.5 py-0.5 font-mono text-xs ${
-            val ? "border-green-400 text-green-300" : "border-white/30 text-muted-foreground"
-          }`}
-        >
-          {val}
-        </div>
-      )}
-    </div>
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+      {elements}
+    </svg>
   );
 }
 
