@@ -141,6 +141,14 @@ function RootComponent() {
               >
                 v{APP_VERSION}
               </Link>
+              {/* Plain <a>, not <Link> — this is a separate site
+                  (licence-math), not a route of this one. */}
+              <a
+                href="https://pierremillon.github.io/licence-math/"
+                className="text-xs text-white/80 underline-offset-2 transition hover:text-white hover:underline"
+              >
+                Cours
+              </a>
             </div>
           </div>
         </div>
