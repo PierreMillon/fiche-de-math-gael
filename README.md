@@ -57,3 +57,10 @@ npm run dev
 Push sur `main` déclenche `.github/workflows/deploy-pages.yml`, qui lance
 `npm run verify` (typecheck + lint + tests), puis `npm run build` et publie
 sur GitHub Pages. Un échec de l'une de ces étapes bloque le déploiement.
+
+## Intégration continue
+
+Chaque Pull Request vers `main` déclenche aussi `.github/workflows/ci.yml`
+(`npm run verify` + `npm run build`, sans publication) : ça donne un
+statut vert/rouge visible sur la PR avant la fusion, plutôt que de ne
+découvrir un problème qu'au moment du déploiement.
