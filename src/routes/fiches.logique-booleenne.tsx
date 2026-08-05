@@ -225,11 +225,11 @@ function makeCircuit(tier: 1 | 2 | 3): Node {
 // version drew each wire as an independent flex sibling, with flex `gap`
 // leaving a blank space on both ends of every wire).
 
-const LEAF_W = 40;
-const LEAF_H = 24;
+const LEAF_W = 13; // ~one monospace glyph's width — the wire starts right after
 const GATE_W = 52;
 const GATE_ICON_H = 32;
-const ROW_H = 52; // uniform vertical slot for both a leaf and a gate row
+const ROW_H = 40; // uniform vertical slot for both a leaf and a gate row — no
+// label row to reserve space for anymore (see gatePaths-only gates below)
 const ROW_GAP = 10; // vertical gap between two stacked sibling branches
 const COL_GAP = 32; // horizontal gap between a subtree and the gate it feeds
 const EXIT_STUB = 20; // trailing wire past the root gate, before the value badge
@@ -275,39 +275,34 @@ function placeNode(
   const cyAbs = y + m.cy;
 
   if (node.kind === "in") {
-    const boxY = cyAbs - LEAF_H / 2;
+    // The actual 0/1 value, not the letter — it's already visible on the
+    // switch that controls it, so showing it again here (instead of a
+    // letter the learner has to go match up) is the more direct read. No
+    // box either — the wire starts right at the digit's edge.
+    const v = inputs[node.id] ?? 0;
     out.push(
-      <g key={key}>
-        <rect
-          x={x}
-          y={boxY}
-          width={LEAF_W}
-          height={LEAF_H}
-          rx={4}
-          className="fill-card stroke-border"
-        />
-        <text
-          x={x + LEAF_W / 2}
-          y={cyAbs}
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="fill-foreground font-mono text-[11px]"
-        >
-          {node.id}
-        </text>
-      </g>,
+      <text
+        key={key}
+        x={x}
+        y={cyAbs}
+        dominantBaseline="central"
+        className={`font-mono text-[12px] font-semibold ${v ? "fill-green-400" : "fill-muted-foreground"}`}
+      >
+        {v}
+      </text>,
     );
+    const wireStartX = x + LEAF_W;
     const outX = x + allocW;
-    if (outX > x + LEAF_W) {
+    if (outX > wireStartX) {
       const wireClass = reveal && evalNode(node, inputs) ? "stroke-green-400" : "stroke-white/30";
       out.push(
         <line
           key={`${key}-w`}
-          x1={x + LEAF_W}
+          x1={wireStartX}
           y1={cyAbs}
           x2={outX}
           y2={cyAbs}
-          className={wireClass}
+          className={`transition-colors duration-300 ${wireClass}`}
           strokeWidth={1.5}
         />,
       );
@@ -330,7 +325,7 @@ function placeNode(
       <path
         key={`${k}-w`}
         d={`M ${res.outX} ${res.outY} H ${gateX} V ${pinY}`}
-        className={`fill-none ${wireClass}`}
+        className={`fill-none transition-colors duration-300 ${wireClass}`}
         strokeWidth={1.5}
       />,
     );
@@ -343,27 +338,27 @@ function placeNode(
     routeChild(node.b!, x, y + a.h + ROW_GAP, gateY + GATE_ICON_H / 2 + PIN_OFFSET, `${key}-b`);
   }
 
+  const val = evalNode(node, inputs);
+  // Épuré: no label under the gate, no intermediate value badge (both
+  // removed — the symbol + wire color already carry that information, and
+  // the final answer lives solely in the "Sortie S" picker below). The
+  // gate itself gets a soft glow once its own output is revealed as 1, so
+  // "lighting up" reads the same way a lit wire does.
   out.push(
     <g
       key={`${key}-gate`}
       transform={`translate(${gateX} ${gateY}) scale(${GATE_W / 70} ${GATE_ICON_H / 50})`}
+      className="transition-[filter] duration-300"
+      style={{
+        filter: reveal && val ? "drop-shadow(0 0 3px rgb(74 222 128 / 0.8))" : "none",
+      }}
     >
       {gatePaths(node.type)}
     </g>,
-    <text
-      key={`${key}-label`}
-      x={gateX + GATE_W / 2}
-      y={gateY + GATE_ICON_H + 11}
-      textAnchor="middle"
-      className="fill-muted-foreground text-[8px] uppercase tracking-wider"
-    >
-      {GATE_LABEL[node.type]}
-    </text>,
   );
 
   const selfRightX = gateX + GATE_W;
   const outX = x + allocW;
-  const val = evalNode(node, inputs);
   const wireClass = reveal && val ? "stroke-green-400" : "stroke-white/30";
   out.push(
     <line
@@ -372,26 +367,10 @@ function placeNode(
       y1={cyAbs}
       x2={outX}
       y2={cyAbs}
-      className={wireClass}
+      className={`transition-colors duration-300 ${wireClass}`}
       strokeWidth={1.5}
     />,
   );
-  // Intermediate value, shown above its wire (not on top of it) so the
-  // line stays unbroken — same "peek at each stage" info the previous
-  // version showed, just no longer severing the connection to draw it.
-  if (reveal) {
-    out.push(
-      <text
-        key={`${key}-val`}
-        x={(selfRightX + outX) / 2}
-        y={cyAbs - 8}
-        textAnchor="middle"
-        className={`font-mono text-[10px] ${val ? "fill-green-400" : "fill-muted-foreground"}`}
-      >
-        {val}
-      </text>,
-    );
-  }
 
   return { outX, outY: cyAbs };
 }
@@ -430,7 +409,10 @@ function LogiquePage() {
         maxWidth="5xl"
       />
 
-      <main className="mx-auto max-w-5xl px-6 py-10">
+      {/* Extra bottom clearance: the exercise's own S=0/1 row sits bottom-right,
+          same corner as the fixed "back to top" button (see __root.tsx) —
+          without it, on a short viewport the two visually collide. */}
+      <main className="mx-auto max-w-5xl px-6 pt-10 pb-28">
         <section>
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             Cours — portes logiques
@@ -459,6 +441,50 @@ function LogiquePage() {
         </section>
       </main>
     </div>
+  );
+}
+
+// A sliding on/off switch for one boolean input — replaces the previous
+// text button ("A = 0"/"A = 1"). No letter shown (the letter is dropped
+// site-wide from this exercise — see the diagram's leaves too): the digit
+// is marked directly on the thumb, sliding left (0) or right (1), so
+// there's nothing to read except the value itself. The full pill is the
+// tap target, not just the thumb, comfortably large on a phone. `id` is
+// kept for the accessible name only (`aria-label`) — with several inputs,
+// a screen reader still needs to say which is which even though sighted
+// users no longer see a letter.
+function InputSwitch({
+  id,
+  value,
+  disabled,
+  onToggle,
+}: {
+  id: string;
+  value: 0 | 1;
+  disabled: boolean;
+  onToggle: () => void;
+}) {
+  const on = value === 1;
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={`Entrée ${id} : ${value}`}
+      onClick={onToggle}
+      disabled={disabled}
+      className={`relative h-11 w-20 shrink-0 rounded-full border transition disabled:opacity-60 ${
+        on ? "border-green-400 bg-green-500/20" : "border-border bg-white/5 hover:border-primary"
+      }`}
+    >
+      <span
+        className={`absolute top-0.5 flex h-10 w-10 items-center justify-center rounded-full font-mono text-base font-bold shadow transition-transform duration-200 ${
+          on ? "translate-x-[38px] bg-green-400 text-black" : "translate-x-0.5 bg-white text-black"
+        }`}
+      >
+        {value}
+      </span>
+    </button>
   );
 }
 
@@ -527,6 +553,34 @@ export function CircuitExercise() {
     setInputs((prev) => ({ ...prev, [id]: prev[id] ? 0 : 1 }));
   };
 
+  // Keyboard shortcuts, for going faster on a computer: the input letters
+  // toggle their switch, 0/1 or ←/→ answer directly, Enter/Space repeats
+  // "Nouveau circuit" once a wrong answer is showing. Ignored while some
+  // other field on the page has focus (not the case here today, but cheap
+  // insurance against stealing keystrokes from a text input).
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && /^(input|textarea|select)$/i.test(target.tagName)) return;
+      const key = e.key.toLowerCase();
+      if (key === "arrowleft" || key === "0") {
+        e.preventDefault();
+        pick(0);
+      } else if (key === "arrowright" || key === "1") {
+        e.preventDefault();
+        pick(1);
+      } else if ((key === "enter" || key === " ") && picked !== null && picked !== expected) {
+        e.preventDefault();
+        next();
+      } else {
+        const id = inputIds.find((i) => i.toLowerCase() === key);
+        if (id) toggle(id);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
+
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <div className="mb-4 flex items-center justify-between">
@@ -538,18 +592,13 @@ export function CircuitExercise() {
 
       <div className="mb-4 flex flex-wrap gap-3">
         {inputIds.map((id) => (
-          <button
+          <InputSwitch
             key={id}
-            onClick={() => toggle(id)}
+            id={id}
+            value={inputs[id] ?? 0}
             disabled={picking}
-            className={`rounded-md border px-3 py-1.5 font-mono text-sm transition ${
-              inputs[id]
-                ? "border-green-400 bg-green-500/10 text-green-300"
-                : "border-border text-muted-foreground hover:border-primary"
-            } disabled:opacity-60`}
-          >
-            {id} = {inputs[id] ?? 0}
-          </button>
+            onToggle={() => toggle(id)}
+          />
         ))}
       </div>
 
@@ -557,35 +606,37 @@ export function CircuitExercise() {
         <CircuitView node={node} inputs={inputs} reveal={picking} />
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <span className="text-sm text-muted-foreground">Sortie S =</span>
-        {([0, 1] as const).map((v) => {
-          const state =
-            picked === null
-              ? "border-border hover:border-primary"
-              : v === expected
-                ? "border-green-500 bg-green-500/10 text-green-300"
-                : v === picked
-                  ? "border-red-500 bg-red-500/10 text-red-300"
-                  : "border-border opacity-60";
-          const isRight = v === expected;
-          const isPicked = v === picked;
-          return (
-            <button
-              key={v}
-              onClick={() => pick(v)}
-              disabled={picking}
-              className={`flex items-center gap-1.5 rounded-md border px-4 py-2 font-mono text-sm transition ${state}`}
-            >
-              {picked !== null && (
-                <span aria-hidden="true">{isRight ? "✓" : isPicked ? "✗" : ""}</span>
-              )}
-              {v}
-            </button>
-          );
-        })}
+      <div className="mt-5">
+        <div className="mb-2 text-sm text-muted-foreground">Sortie S =</div>
+        <div className="grid grid-cols-2 gap-3">
+          {([0, 1] as const).map((v) => {
+            const state =
+              picked === null
+                ? "border-border hover:border-primary"
+                : v === expected
+                  ? "border-green-500 bg-green-500/10 text-green-300"
+                  : v === picked
+                    ? "border-red-500 bg-red-500/10 text-red-300"
+                    : "border-border opacity-60";
+            const isRight = v === expected;
+            const isPicked = v === picked;
+            return (
+              <button
+                key={v}
+                onClick={() => pick(v)}
+                disabled={picking}
+                className={`flex min-h-16 items-center justify-center gap-2 rounded-xl border font-mono text-2xl font-semibold transition ${state}`}
+              >
+                {picked !== null && (
+                  <span aria-hidden="true">{isRight ? "✓" : isPicked ? "✗" : ""}</span>
+                )}
+                {v}
+              </button>
+            );
+          })}
+        </div>
         {picked !== null && picked !== expected && (
-          <div className="ml-auto flex items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs text-red-300">Faux — la bonne réponse était {expected}.</span>
             <button
               onClick={next}
