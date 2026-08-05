@@ -391,7 +391,15 @@ function CircuitView({
   placeNode(node, 0, 0, root.w + EXIT_STUB, inputs, reveal, elements, "n");
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+    // width: 100% + no fixed pixel width/height attribute — the SVG scales
+    // down to fit whatever width its container has (phone or desktop),
+    // `viewBox` keeps every coordinate above still correct at any size.
+    // Without this, a wide tier-3 circuit forced its own fixed pixel width
+    // and needed a horizontal scrollbar on a narrow phone.
+    <svg
+      viewBox={`0 0 ${width} ${height}`}
+      style={{ width: "100%", height: "auto", maxWidth: width }}
+    >
       {elements}
     </svg>
   );
@@ -473,13 +481,13 @@ function InputSwitch({
       aria-label={`Entrée ${id} : ${value}`}
       onClick={onToggle}
       disabled={disabled}
-      className={`relative h-11 w-20 shrink-0 rounded-full border transition disabled:opacity-60 ${
+      className={`relative h-10 w-16 shrink-0 rounded-full border transition disabled:opacity-60 ${
         on ? "border-green-400 bg-green-500/20" : "border-border bg-white/5 hover:border-primary"
       }`}
     >
       <span
-        className={`absolute top-0.5 flex h-10 w-10 items-center justify-center rounded-full font-mono text-base font-bold shadow transition-transform duration-200 ${
-          on ? "translate-x-[38px] bg-green-400 text-black" : "translate-x-0.5 bg-white text-black"
+        className={`absolute top-0.5 flex h-9 w-9 items-center justify-center rounded-full font-mono text-sm font-bold shadow transition-transform duration-200 ${
+          on ? "translate-x-[26px] bg-green-400 text-black" : "translate-x-0.5 bg-white text-black"
         }`}
       >
         {value}
@@ -590,7 +598,7 @@ export function CircuitExercise() {
         <PyramidView p={pyramid} size="md" />
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-3">
+      <div className="mb-4 flex flex-wrap gap-2">
         {inputIds.map((id) => (
           <InputSwitch
             key={id}

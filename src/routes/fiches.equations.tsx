@@ -236,9 +236,7 @@ function EquationsPage() {
             <div className="space-y-2">
               <Note>L'inconnue n'apparaît qu'une seule fois.</Note>
               <Chain steps={["1-2x>0", "-2x>-1", "x<1/2"]} />
-              <Chain
-                steps={["-e^(3x)+2>0", "-e^(3x)>-2", "e^(3x)<2", "3x<ln(2)", "x<(1/3)ln(2)"]}
-              />
+              <Chain steps={["-e^(3x)+2>0", "-e^(3x)>-2", "e^(3x)<2", "3x<ln(2)", "x<ln(2)/3"]} />
             </div>
           }
           right={

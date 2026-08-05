@@ -164,11 +164,13 @@ export function readStoredPyramid(key: string): Pyramid | null {
   }
 }
 
+// No fraction/count here on purpose — the pyramid icon shown right next to
+// this label already renders that same progress visually (filled cells,
+// halo rays), so spelling it out again in text was pure redundancy.
 export function pyramidLabel(p: Pyramid): string {
   if (p.bossDone) return "Niveau boss réussi ✨";
-  if (p.complete) return `Niveau boss · ${p.bossRays}/${BOSS_TARGET} rayons`;
-  const need = TIER_SIZE[p.tier];
-  return `Palier ${p.tier} · ${p.filled}/${need}`;
+  if (p.complete) return "Niveau boss";
+  return `Palier ${p.tier}`;
 }
 
 // The pyramid's bounding box is square, but the shape inside it isn't: the
