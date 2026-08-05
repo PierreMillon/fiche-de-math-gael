@@ -6,6 +6,7 @@ import { PyramidView, pyramidLabel, usePyramid } from "@/lib/pyramid";
 import { extractText } from "@/lib/testUtils";
 import { PageHeader } from "@/lib/PageHeader";
 import { useAutoAdvanceQuiz } from "@/lib/useAutoAdvanceQuiz";
+import { fmt } from "@/lib/mathFormat";
 
 export const Route = createFileRoute("/fiches/pemdas")({
   head: () => ({
@@ -292,7 +293,7 @@ function QuizDialog({ row, onClose }: { row: PemdasRow | null; onClose: () => vo
       {picked !== null && picked !== q.answer && (
         <>
           <p className="mt-4 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
-            ❌ {q.explanation}
+            ❌ {fmt(q.explanation)}
           </p>
           <div className="mt-4 flex justify-end">
             <button

@@ -3,6 +3,7 @@ import { type PemdasRow, type QuizQ } from "@/data/pemdas";
 import { PyramidView, pyramidLabel } from "@/lib/pyramid";
 import { extractText } from "@/lib/testUtils";
 import { useAutoAdvanceQuiz } from "@/lib/useAutoAdvanceQuiz";
+import { fmt } from "@/lib/mathFormat";
 
 // A standalone, non-modal version of the PEMDAS quiz — used by the "Réviser
 // mes points faibles" page, which needs to embed a single row's quiz inline
@@ -74,7 +75,7 @@ export function PemdasRowQuiz({ row }: { row: PemdasRow }) {
       {picked !== null && picked !== q.answer && (
         <>
           <p className="mt-4 rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
-            ❌ {q.explanation}
+            ❌ {fmt(q.explanation)}
           </p>
           <div className="mt-4 flex justify-end">
             <button
