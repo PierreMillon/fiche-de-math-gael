@@ -7,6 +7,7 @@ import {
   competencyMastery,
   competencyWrongTotal,
   competencyWeakness,
+  overallMasteryPercent,
   resetAllProgress,
   type Competency,
 } from "@/lib/competencies";
@@ -106,6 +107,12 @@ function TransferSection({ onImported }: { onImported: () => void }) {
             « Générer ma phrase » prend une <strong className="text-foreground">photo</strong> de ta
             progression à cet instant précis et la transforme en quelques mots. Coller cette phrase
             (ou ouvrir le lien) sur un autre appareil recopie cette photo là-bas.
+          </p>
+          <p>
+            Le <strong className="text-foreground">premier mot</strong> est une petite récompense :
+            il change selon ta maîtrise globale (animal → papillon → créature magique → pierre
+            précieuse → mot cosmique en approchant les 100 %). Les mots suivants encodent les
+            données exactes, compétence par compétence.
           </p>
           <p>
             Ce n'est <strong className="text-foreground">pas</strong> une synchronisation en direct
@@ -247,8 +254,7 @@ function ProgressionPage() {
     .sort((a, b) => b.weakness - a.weakness)
     .slice(0, 8);
 
-  const overall =
-    ALL_COMPETENCIES.reduce((sum, c) => sum + competencyMastery(c), 0) / ALL_COMPETENCIES.length;
+  const overall = overallMasteryPercent();
 
   const handleReset = () => {
     if (

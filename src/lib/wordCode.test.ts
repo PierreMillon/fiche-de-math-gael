@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { WORDLIST, codeToPyramid, decodeCodes, encodeCodes, pyramidToCode } from "@/lib/wordCode";
+import {
+  WORDLIST,
+  badgeWord,
+  codeToPyramid,
+  decodeCodes,
+  encodeCodes,
+  pyramidToCode,
+} from "@/lib/wordCode";
 import { initialPyramid, type Pyramid } from "@/lib/pyramid";
 
 describe("WORDLIST", () => {
@@ -43,6 +50,31 @@ describe("encodeCodes / decodeCodes round-trip", () => {
   it("rejects only an empty phrase — a single header-only word is valid", () => {
     expect(decodeCodes("")).toBeNull();
     expect(decodeCodes("chat")).toEqual({ header: 0, codes: [] });
+  });
+
+  it("skips the requested number of leading words (cosmetic badge word support)", () => {
+    expect(decodeCodes("chaton-chat", 1)).toEqual({ header: 0, codes: [] });
+    expect(decodeCodes("chat", 1)).toBeNull(); // nothing left after skipping
+  });
+});
+
+describe("badgeWord", () => {
+  it("stays within [0,100] and always returns a real WORDLIST entry", () => {
+    for (const pct of [-10, 0, 19, 20, 39, 40, 59, 60, 79, 80, 99, 100, 150]) {
+      expect(WORDLIST).toContain(badgeWord(pct));
+    }
+  });
+
+  it("moves to a later word as progress climbs (visible progression, not a fixed word)", () => {
+    const words = [0, 20, 40, 60, 80, 100].map(badgeWord);
+    // Each tier boundary should pick a different word than the previous one.
+    for (let i = 1; i < words.length; i++) {
+      expect(words[i]).not.toBe(words[i - 1]);
+    }
+  });
+
+  it("is deterministic for the same percentage", () => {
+    expect(badgeWord(42)).toBe(badgeWord(42));
   });
 });
 
