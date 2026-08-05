@@ -444,9 +444,7 @@ export const rows: PemdasRow[] = [
         const num = a * c2 + b * c1;
         const den = c1 * c2;
         return makeQ(
-          <>
-            Calcule : {a}/{c1} + {b}/{c2}
-          </>,
+          fmt(`Calcule : ${a}/${c1} + ${b}/${c2}`),
           `${num}/${den}`,
           [`${a + b}/${c1 + c2}`, `${a * c2}/${den}`, `${num}/${c1}`],
           `Dénominateur commun ${c1}×${c2}=${den} : ${a}/${c1}=${a * c2}/${den}, ${b}/${c2}=${b * c1}/${den}, somme = ${num}/${den}.`,
@@ -457,9 +455,7 @@ export const rows: PemdasRow[] = [
         const a = rnd(1, c - 1);
         const b = rnd(1, c - 1);
         return makeQ(
-          <>
-            Calcule : {a}/{c} + {b}/{c}
-          </>,
+          fmt(`Calcule : ${a}/${c} + ${b}/${c}`),
           `${a + b}/${c}`,
           [`${a + b}/${2 * c}`, `${a * b}/${c}`, `${a}+${b}/${c}`],
           `Même dénominateur : on additionne seulement les numérateurs, ${a}+${b}=${a + b}.`,
@@ -469,9 +465,7 @@ export const rows: PemdasRow[] = [
       const a = rnd(1, c - 1);
       const b = rnd(1, c - 1);
       return makeQ(
-        <>
-          Calcule : {a}/{c} + {b}/{c}
-        </>,
+        fmt(`Calcule : ${a}/${c} + ${b}/${c}`),
         `${a + b}/${c}`,
         [`${a + b}/${2 * c}`, `${a * b}/${c}`, `${a}+${b}/${c}`],
         `Même dénominateur : on additionne seulement les numérateurs, ${a}+${b}=${a + b}.`,
@@ -491,9 +485,7 @@ export const rows: PemdasRow[] = [
         const c = rnd(5, 15);
         const d = rnd(6, 16);
         return makeQ(
-          <>
-            Calcule : ({a}/{b}) × ({c}/{d})
-          </>,
+          fmt(`Calcule : (${a}/${b}) × (${c}/${d})`),
           `${a * c}/${b * d}`,
           [`${a + c}/${b + d}`, `${a * b}/${c * d}`, `${a * d}/${b * c}`],
           `On multiplie les numérateurs entre eux (${a}×${c}=${a * c}), et les dénominateurs entre eux (${b}×${d}=${b * d}).`,
@@ -505,9 +497,7 @@ export const rows: PemdasRow[] = [
         const c = rnd(3, 12);
         const d = rnd(4, 13);
         return makeQ(
-          <>
-            Calcule : ({a}/{b}) × ({c}/{d})
-          </>,
+          fmt(`Calcule : (${a}/${b}) × (${c}/${d})`),
           `${a * c}/${b * d}`,
           [`${a + c}/${b + d}`, `${a * b}/${c * d}`, `${a * d}/${b * c}`],
           `On multiplie les numérateurs entre eux (${a}×${c}=${a * c}), et les dénominateurs entre eux (${b}×${d}=${b * d}).`,
@@ -518,9 +508,7 @@ export const rows: PemdasRow[] = [
       const c = rnd(1, lvl >= 2 ? 7 : 5);
       const d = rnd(2, lvl >= 2 ? 7 : 5);
       return makeQ(
-        <>
-          Calcule : ({a}/{b}) × ({c}/{d})
-        </>,
+        fmt(`Calcule : (${a}/${b}) × (${c}/${d})`),
         `${a * c}/${b * d}`,
         [`${a + c}/${b + d}`, `${a * b}/${c * d}`, `${a * d}/${b * c}`],
         `On multiplie les numérateurs entre eux (${a}×${c}=${a * c}), et les dénominateurs entre eux (${b}×${d}=${b * d}).`,
@@ -540,9 +528,7 @@ export const rows: PemdasRow[] = [
         const c = rnd(5, 15);
         const d = rnd(6, 16);
         return makeQ(
-          <>
-            Calcule : ({a}/{b}) ÷ ({c}/{d})
-          </>,
+          fmt(`Calcule : (${a}/${b}) ÷ (${c}/${d})`),
           `${a * d}/${b * c}`,
           [`${a * c}/${b * d}`, `${b * c}/${a * d}`, `${a + d}/${b + c}`],
           `Diviser par une fraction revient à multiplier par son inverse : (${a}/${b}) × (${d}/${c}) = ${a * d}/${b * c}.`,
@@ -554,9 +540,7 @@ export const rows: PemdasRow[] = [
         const c = rnd(3, 12);
         const d = rnd(4, 13);
         return makeQ(
-          <>
-            Calcule : ({a}/{b}) ÷ ({c}/{d})
-          </>,
+          fmt(`Calcule : (${a}/${b}) ÷ (${c}/${d})`),
           `${a * d}/${b * c}`,
           [`${a * c}/${b * d}`, `${b * c}/${a * d}`, `${a + d}/${b + c}`],
           `Diviser par une fraction revient à multiplier par son inverse : (${a}/${b}) × (${d}/${c}) = ${a * d}/${b * c}.`,
@@ -567,9 +551,7 @@ export const rows: PemdasRow[] = [
       const c = rnd(1, lvl >= 2 ? 7 : 5);
       const d = rnd(2, lvl >= 2 ? 7 : 5);
       return makeQ(
-        <>
-          Calcule : ({a}/{b}) ÷ ({c}/{d})
-        </>,
+        fmt(`Calcule : (${a}/${b}) ÷ (${c}/${d})`),
         `${a * d}/${b * c}`,
         [`${a * c}/${b * d}`, `${b * c}/${a * d}`, `${a + d}/${b + c}`],
         `Diviser par une fraction revient à multiplier par son inverse : (${a}/${b}) × (${d}/${c}) = ${a * d}/${b * c}.`,
@@ -588,9 +570,7 @@ export const rows: PemdasRow[] = [
         const b = rnd(2, 15);
         const c = rnd(2, 9);
         return makeQ(
-          <>
-            Simplifie : {a * c}/{b * c}
-          </>,
+          fmt(`Simplifie : ${a * c}/${b * c}`),
           simp(a, b),
           [`${a}/${b * c}`, `${a * c}/${b}`, `${c}/${b}`],
           `Le facteur commun ${c} se simplifie au numérateur et au dénominateur.`,
@@ -601,9 +581,7 @@ export const rows: PemdasRow[] = [
         const b = rnd(4, 12);
         const c = rnd(6, 13);
         return makeQ(
-          <>
-            Simplifie : {a * c}/{b * c}
-          </>,
+          fmt(`Simplifie : ${a * c}/${b * c}`),
           simp(a, b),
           [`${a}/${b * c}`, `${a * c}/${b}`, `${c}/${b}`],
           `Le facteur commun ${c} se simplifie au numérateur et au dénominateur.`,
@@ -613,9 +591,7 @@ export const rows: PemdasRow[] = [
       const b = rnd(2, lvl >= 2 ? 7 : 5);
       const c = rnd(2, lvl >= 2 ? 7 : 5);
       return makeQ(
-        <>
-          Simplifie : {a * c}/{b * c}
-        </>,
+        fmt(`Simplifie : ${a * c}/${b * c}`),
         simp(a, b),
         [`${a}/${b * c}`, `${a * c}/${b}`, `${c}/${b}`],
         `Le facteur commun ${c} se simplifie au numérateur et au dénominateur.`,

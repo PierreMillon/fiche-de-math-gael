@@ -111,28 +111,74 @@ function readMarkupGroup(s: string, i: number): { raw: string; next: number } {
   return { raw, next: i };
 }
 
+// Matches a simple numeric fraction like "3/4" or "-3/4" — deliberately
+// conservative (digits only, no algebraic numerator/denominator like
+// "x/(x^2+1)") so it can't misparse an arbitrary expression's fraction
+// boundaries. Catches exactly the "a/c" notation pemdas.tsx's fraction
+// rows and exercises.ts's answers/distractors use, including nested
+// inside an exponent/subscript (e.g. "x^(1/2)").
+const PLAIN_FRACTION_RE = /(-|−)?\d+\/\d+/;
+
+// Walks `text`, calling `onPlain` for the runs between fraction matches and
+// onFraction(sign, num, den) for each match — shared by toLatexFragment
+// (builds a LaTeX string) and pushPlainText (builds JSX), so both typeset
+// "3/4" as a real \frac instead of a bare "/" character.
+function scanFractions(
+  text: string,
+  onPlain: (chunk: string) => void,
+  onFraction: (sign: string, num: string, den: string) => void,
+) {
+  const re = new RegExp(PLAIN_FRACTION_RE, "g");
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text))) {
+    if (m.index > last) onPlain(text.slice(last, m.index));
+    const whole = m[0];
+    const slash = whole.indexOf("/");
+    const sign = whole[0] === "-" || whole[0] === "−" ? "-" : "";
+    onFraction(sign, whole.slice(sign ? 1 : 0, slash), whole.slice(slash + 1));
+    last = m.index + whole.length;
+  }
+  if (last < text.length) onPlain(text.slice(last));
+}
+
 // Translates a captured exponent/subscript's raw content into LaTeX source,
-// recursing into any nested "^"/"_" and mapping known Unicode symbols.
+// recursing into any nested "^"/"_" and mapping known Unicode symbols and
+// plain numeric fractions.
 function toLatexFragment(s: string): string {
   let out = "";
+  let buf = "";
   let i = 0;
+  const flush = () => {
+    if (!buf) return;
+    scanFractions(
+      buf,
+      (chunk) => (out += chunk),
+      (sign, num, den) => (out += `${sign}\\frac{${num}}{${den}}`),
+    );
+    buf = "";
+  };
   while (i < s.length) {
     const c = s[i];
     if (c === "^" || c === "_") {
+      flush();
       const { raw, next } = readMarkupGroup(s, i + 1);
       out += `${c}{${toLatexFragment(raw)}}`;
       i = next;
     } else if (c in SYMBOL_MAP) {
+      flush();
       out += SYMBOL_MAP[c];
       i++;
     } else if (c === "%" || c === "&" || c === "#" || c === "$") {
+      flush();
       out += `\\${c}`;
       i++;
     } else {
-      out += c;
+      buf += c;
       i++;
     }
   }
+  flush();
   return out;
 }
 
@@ -159,17 +205,34 @@ function katexFragment(key: string, latex: string, text: string): ReactNode {
   );
 }
 
-// Turns a plain math string containing "^" exponents and/or "_" subscripts
-// (e.g. "x^2", "3^(a+b)", "P_B(A)") into JSX with real LaTeX typesetting for
-// those spans, via KaTeX. Strings without either are returned unchanged.
+// Splits plain text on PLAIN_FRACTION_RE matches (see scanFractions above),
+// pushing each match as a glued KaTeX \frac fragment (real horizontal bar)
+// instead of a bare "/" — same rationale as extractTrailingBase: a slash
+// rendered as plain text next to a KaTeX fragment looks visibly
+// disconnected from real math.
+function pushPlainText(parts: ReactNode[], text: string) {
+  scanFractions(
+    text,
+    (chunk) => parts.push(<span key={`t${parts.length}`}>{chunk}</span>),
+    (sign, num, den) => {
+      const whole = `${sign}${num}/${den}`;
+      parts.push(katexFragment(`f${parts.length}`, `${sign}\\frac{${num}}{${den}}`, whole));
+    },
+  );
+}
+
+// Turns a plain math string containing "^" exponents, "_" subscripts,
+// and/or plain numeric fractions ("3/4") into JSX with real LaTeX
+// typesetting for those spans, via KaTeX. Strings with none of these are
+// returned unchanged.
 export function fmt(s: string): ReactNode {
-  if (!s.includes("^") && !s.includes("_")) return s;
+  if (!s.includes("^") && !s.includes("_") && !PLAIN_FRACTION_RE.test(s)) return s;
   const parts: ReactNode[] = [];
   let buf = "";
   let i = 0;
   const flush = () => {
     if (buf) {
-      parts.push(<span key={`t${parts.length}`}>{buf}</span>);
+      pushPlainText(parts, buf);
       buf = "";
     }
   };
