@@ -7,6 +7,18 @@ par compétence) stocké dans le navigateur, sans compte ni serveur.
 
 **Live** : https://pierremillon.github.io/fiche-de-math-gael/
 
+## Stack
+
+TypeScript + React 19, TanStack Router (routing client-only, une route par
+fichier dans `src/routes/`), Tailwind CSS v4, KaTeX pour le rendu des
+formules. Vite pour le build (SPA statique, aucun serveur). Vitest pour les
+tests, ESLint + Prettier pour le style. Aucun framework CSS ni JS "à la
+main" : HTML/CSS/JS bruts suffiraient pour une seule fiche isolée, mais le
+site a ~40 fiches qui partagent des composants (quiz, pyramide de
+progression, rendu LaTeX...) — TypeScript + composants React évitent de
+dupliquer cette logique à chaque fiche et attrapent les erreurs de types
+avant qu'elles n'atteignent le navigateur.
+
 ## Développement local
 
 ```sh
