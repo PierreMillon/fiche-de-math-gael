@@ -1,0 +1,35 @@
+name: CI
+
+# Runs on every pull request targeting main — separate from
+# deploy-pages.yml, which only builds/publishes on push to main. This
+# workflow never deploys anything; it just gives PRs a real pass/fail
+# check before merge, instead of the only verification happening after
+# the code has already landed on main.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Same check deploy-pages.yml runs before building: typecheck + lint
+      # + tests. Also builds, to catch a break that only shows up at build
+      # time (e.g. a bad import) — same as deploy-pages.yml does.
+      - run: npm run verify
+
+      - run: npm run build
+        env:
+          GH_PAGES_BASE: /${{ github.event.repository.name }}/
