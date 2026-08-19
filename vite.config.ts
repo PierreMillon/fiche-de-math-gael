@@ -13,6 +13,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
+import { VitePWA } from "vite-plugin-pwa";
 import { computeAppVersion, computeChangelog } from "./vite.appVersion";
 
 const ghPagesBase = process.env.GH_PAGES_BASE || "/";
@@ -44,6 +45,50 @@ export default defineConfig({
     tsconfigPaths(),
     tailwindcss(),
     react(),
+    // Mode hors-ligne : après une première visite avec réseau, le site
+    // reste utilisable en avion (SPA client-only, aucune donnée serveur —
+    // rien à synchroniser). `registerType: "autoUpdate"` fait prendre la
+    // main au nouveau service worker dès qu'il a fini de s'installer
+    // (skipWaiting + clientsClaim, gérés par le plugin), cohérent avec les
+    // autres sites du même auteur : pas de bannière "nouvelle version" à
+    // valider, juste une reconnexion silencieuse dès qu'il y a du réseau.
+    // Pas de VERSION à faire avancer à la main comme sur les sites HTML
+    // bruts du même auteur : chaque chunk JS/CSS a déjà un hash de
+    // contenu unique posé par Vite, donc un nouveau build produit
+    // naturellement des noms de fichiers différents — Workbox précache
+    // ça tel quel et nettoie les anciens fichiers précachés qui ne sont
+    // plus référencés (cleanupOutdatedCaches, activé par défaut).
+    VitePWA({
+      registerType: "autoUpdate",
+      injectRegister: "auto",
+      includeAssets: ["favicon.ico", "icons/apple-touch-icon.png"],
+      manifest: {
+        name: "Fiches de révision — Maths",
+        short_name: "Fiches Maths",
+        start_url: ghPagesBase,
+        scope: ghPagesBase,
+        display: "standalone",
+        background_color: "#ffffff",
+        theme_color: "#ffffff",
+        icons: [
+          { src: "icons/icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "icons/icon-512.png", sizes: "512x512", type: "image/png" },
+        ],
+      },
+      workbox: {
+        // SPA sans backend : tout ce qui atterrit dans dist-spa est
+        // précaché, y compris les formules/questions (déjà dans le
+        // bundle JS, pas de fetch séparé — voir src/data/).
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
+        // GitHub Pages n'a pas de rewrite serveur (voir le 404.html
+        // copié depuis index.html dans le workflow de déploiement) :
+        // hors-ligne, toute navigation vers une route interne doit
+        // retomber sur index.html pour laisser TanStack Router prendre
+        // le relais côté client, exactement comme le fait déjà le
+        // 404.html en ligne.
+        navigateFallback: "index.html",
+      },
+    }),
   ],
   build: {
     outDir: "../dist-spa",
