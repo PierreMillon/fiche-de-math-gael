@@ -12,6 +12,7 @@ const MINUS = "text-blue-400";
 const TIMES = "text-red-400";
 const FRAC = "border-yellow-400";
 const EXP = "text-green-400";
+const LN = "text-violet-400";
 
 export const n = (v: string | number): ReactNode => <span className={W}>{v}</span>;
 
@@ -80,6 +81,16 @@ const fracImpl = (barColor: string, num: ReactNode, den: ReactNode): ReactNode =
 );
 export const frac = (num: ReactNode, den: ReactNode): ReactNode => fracImpl(FRAC, num, den);
 
+const lnImpl = (color: string, x: ReactNode): ReactNode => (
+  <span className="inline-flex items-center">
+    <span className={color}>ln</span>
+    <span className={W}>(</span>
+    {x}
+    <span className={W}>)</span>
+  </span>
+);
+export const ln = (x: ReactNode): ReactNode => lnImpl(LN, x);
+
 export const pow = (base: ReactNode, exp: ReactNode): ReactNode => (
   <span className="inline-flex items-start">
     {base}
@@ -106,6 +117,7 @@ export const minusW = (a: ReactNode, b: ReactNode): ReactNode => minusImpl(W, a,
 export const timesW = (...parts: ReactNode[]): ReactNode => timesImpl(W, parts);
 export const fracW = (num: ReactNode, den: ReactNode): ReactNode =>
   fracImpl("border-white", num, den);
+export const lnW = (x: ReactNode): ReactNode => lnImpl(W, x);
 
 // Exponent without the green coloring (position kept, color white).
 export const powW = (base: ReactNode, exp: ReactNode): ReactNode => (
@@ -120,12 +132,13 @@ export const COL_COLOR: Record<string, string> = {
   Multiplication: "text-red-400",
   Division: "text-yellow-400",
   Exposant: "text-green-400",
+  Logarithme: "text-violet-400",
 };
 
 // ---------- Row + quiz definitions ----------
 
-export type Col = "Somme" | "Multiplication" | "Division" | "Exposant";
-export const COLS: Col[] = ["Somme", "Multiplication", "Division", "Exposant"];
+export type Col = "Somme" | "Multiplication" | "Division" | "Exposant" | "Logarithme";
+export const COLS: Col[] = ["Somme", "Multiplication", "Division", "Exposant", "Logarithme"];
 
 export type QuizQ = {
   prompt: ReactNode;
@@ -1007,6 +1020,129 @@ export const rows: PemdasRow[] = [
         `x²−${2 * k}x+${k * k}`,
         [`x²+${2 * k}x+${k * k}`, `x²−${k * k}`, `x²−${k}x+${k * k}`],
         `Identité remarquable : (x−${k})² = x²−2×${k}×x+${k}².`,
+      );
+    },
+  },
+  {
+    id: "ln-mul",
+    left: ln(timesW(n("a"), n("b"))),
+    right: plus(lnW(n("a")), lnW(n("b"))),
+    leftCol: "Logarithme",
+    rightCol: "Somme",
+    quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(3, 15);
+        const b = rnd(3, 15);
+        return makeQ(
+          <>
+            Écris ln({a}×{b}) sous forme d'une somme de deux logarithmes.
+          </>,
+          `ln(${a})+ln(${b})`,
+          [`ln(${a})×ln(${b})`, `ln(${a + b})`, `ln(${a})−ln(${b})`],
+          `ln(a×b) = ln(a)+ln(b) : ln(${a}×${b}) = ln(${a})+ln(${b}).`,
+        );
+      }
+      if (lvl >= 3) {
+        const a = rnd(2, 9);
+        const b = rnd(2, 9);
+        return makeQ(
+          <>
+            Écris ln({a}×{b}) sous forme d'une somme de deux logarithmes.
+          </>,
+          `ln(${a})+ln(${b})`,
+          [`ln(${a})×ln(${b})`, `ln(${a + b})`, `ln(${a})−ln(${b})`],
+          `ln(a×b) = ln(a)+ln(b) : ln(${a}×${b}) = ln(${a})+ln(${b}).`,
+        );
+      }
+      const a = rnd(2, lvl >= 2 ? 9 : 6);
+      const b = rnd(2, lvl >= 2 ? 9 : 6);
+      return makeQ(
+        <>
+          Écris ln({a})+ln({b}) sous forme d'un seul logarithme.
+        </>,
+        `ln(${a * b})`,
+        [`ln(${a + b})`, `ln(${a})×ln(${b})`, `${a}×${b}`],
+        `ln(a)+ln(b) = ln(a×b) : ln(${a})+ln(${b}) = ln(${a * b}).`,
+      );
+    },
+  },
+  {
+    id: "ln-div",
+    left: ln(fracW(n("a"), n("b"))),
+    right: minus(lnW(n("a")), lnW(n("b"))),
+    leftCol: "Logarithme",
+    rightCol: "Somme",
+    quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(8, 30);
+        const b = rnd(2, 9);
+        return makeQ(
+          <>
+            Écris ln({a})−ln({b}) sous forme d'un seul logarithme.
+          </>,
+          `ln(${a}/${b})`,
+          [`ln(${a}+${b})`, `ln(${a})/ln(${b})`, `ln(${a - b})`],
+          `ln(a)−ln(b) = ln(a/b) : ln(${a})−ln(${b}) = ln(${a}/${b}).`,
+        );
+      }
+      if (lvl >= 3) {
+        const a = rnd(6, 20);
+        const b = rnd(2, 6);
+        return makeQ(
+          <>
+            Écris ln({a})−ln({b}) sous forme d'un seul logarithme.
+          </>,
+          `ln(${a}/${b})`,
+          [`ln(${a}+${b})`, `ln(${a})/ln(${b})`, `ln(${a - b})`],
+          `ln(a)−ln(b) = ln(a/b) : ln(${a})−ln(${b}) = ln(${a}/${b}).`,
+        );
+      }
+      const a = rnd(4, lvl >= 2 ? 20 : 12);
+      const b = rnd(2, lvl >= 2 ? 6 : 4);
+      return makeQ(
+        <>
+          Écris ln({a}/{b}) sous forme d'une différence de deux logarithmes.
+        </>,
+        `ln(${a})−ln(${b})`,
+        [`ln(${a})/ln(${b})`, `ln(${a - b})`, `ln(${a})+ln(${b})`],
+        `ln(a/b) = ln(a)−ln(b) : ln(${a}/${b}) = ln(${a})−ln(${b}).`,
+      );
+    },
+  },
+  {
+    id: "ln-pow",
+    left: ln(powW(n("a"), n("n"))),
+    right: times(n("n"), lnW(n("a"))),
+    leftCol: "Logarithme",
+    rightCol: "Multiplication",
+    quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(2, 9);
+        const e = rnd(3, 6);
+        return makeQ(
+          <>Écris {fmt(`${e}×ln(${a})`)} sous forme d'un seul logarithme.</>,
+          `ln(${a}^${e})`,
+          [`ln(${e}×${a})`, `ln(${a})^${e}`, `${a}^${e}`],
+          `n×ln(a) = ln(aⁿ) : ${e}×ln(${a}) = ln(${a}^${e}).`,
+        );
+      }
+      if (lvl >= 3) {
+        const a = rnd(2, 9);
+        const e = rnd(2, 4);
+        return makeQ(
+          <>Écris {fmt(`${e}×ln(${a})`)} sous forme d'un seul logarithme.</>,
+          `ln(${a}^${e})`,
+          [`ln(${e}×${a})`, `ln(${a})^${e}`, `${a}^${e}`],
+          `n×ln(a) = ln(aⁿ) : ${e}×ln(${a}) = ln(${a}^${e}).`,
+        );
+      }
+      const a = rnd(2, lvl >= 2 ? 9 : 6);
+      const e = rnd(2, lvl >= 2 ? 4 : 3);
+      return makeQ(
+        <>Simplifie : {fmt(`ln(${a}^${e})`)}</>,
+        `${e}×ln(${a})`,
+        [`ln(${a})`, `${a}×ln(${e})`, `ln(${e})×ln(${a})`],
+        `ln(aⁿ) = n×ln(a) : ln(${a}^${e}) = ${e}×ln(${a}).`,
       );
     },
   },

@@ -40,7 +40,7 @@ function PemdasPage() {
       />
 
       <main className="mx-auto max-w-5xl px-6 py-10">
-        <div className="grid grid-cols-2 gap-x-2 gap-y-1 border-b border-border pb-3 text-[10px] font-semibold uppercase tracking-[0.15em] landscape:grid-cols-4 landscape:text-xs landscape:tracking-[0.2em]">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1 border-b border-border pb-3 text-[10px] font-semibold uppercase tracking-[0.15em] landscape:grid-cols-5 landscape:text-xs landscape:tracking-[0.2em]">
           {COLS.map((c) => (
             <div key={c} className={`text-center ${COL_COLOR[c]}`}>
               {c}
@@ -116,7 +116,7 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
     return (
       <button
         onClick={onOpen}
-        className="relative flex w-full flex-col items-center gap-1 px-4 py-4 transition hover:bg-pink-500/30 landscape:grid landscape:grid-cols-4 landscape:items-center landscape:py-5 landscape:pr-16"
+        className="relative flex w-full flex-col items-center gap-1 px-4 py-4 transition hover:bg-pink-500/30 landscape:grid landscape:grid-cols-5 landscape:items-center landscape:py-5 landscape:pr-16"
       >
         {mobileLine}
         {COLS.map((_, i) => (
@@ -137,12 +137,13 @@ function RowView({ row, onOpen }: { row: PemdasRow; onOpen: () => void }) {
   }
 
   // Different columns: place = at the midpoint of the two column centers.
-  const midPct = ((li + ri + 1) / 2) * 25; // center of col i = (i+0.5)*25%
+  // center of col i = (i+0.5) * (100/COLS.length)%
+  const midPct = ((li + ri + 1) / 2) * (100 / COLS.length);
 
   return (
     <button
       onClick={onOpen}
-      className="relative flex w-full flex-col items-center gap-1 px-4 py-4 transition hover:bg-pink-500/30 landscape:grid landscape:grid-cols-4 landscape:items-center landscape:py-5 landscape:pr-16"
+      className="relative flex w-full flex-col items-center gap-1 px-4 py-4 transition hover:bg-pink-500/30 landscape:grid landscape:grid-cols-5 landscape:items-center landscape:py-5 landscape:pr-16"
     >
       {mobileLine}
       {COLS.map((_, i) => (
