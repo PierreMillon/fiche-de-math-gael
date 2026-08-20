@@ -413,7 +413,7 @@ function LogiquePage() {
       <PageHeader
         eyebrow="Logique"
         title="Logique booléenne — circuits"
-        description="Rappel des portes logiques puis exercice interactif : choisis les entrées et devine la sortie du circuit."
+        description="Exercice interactif : choisis les entrées et devine la sortie du circuit. Rappel des portes logiques plus bas."
         maxWidth="5xl"
       />
 
@@ -422,6 +422,13 @@ function LogiquePage() {
           without it, on a short viewport the two visually collide. */}
       <main className="mx-auto max-w-5xl px-6 pt-10 pb-28">
         <section>
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+            Exercice — circuit interactif
+          </h2>
+          <CircuitExercise />
+        </section>
+
+        <section className="mt-12">
           <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             Cours — portes logiques
           </h2>
@@ -439,13 +446,6 @@ function LogiquePage() {
               </div>
             ))}
           </div>
-        </section>
-
-        <section className="mt-12">
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            Exercice — circuit interactif
-          </h2>
-          <CircuitExercise />
         </section>
       </main>
     </div>
