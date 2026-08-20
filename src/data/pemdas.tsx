@@ -1024,6 +1024,132 @@ export const rows: PemdasRow[] = [
     },
   },
   {
+    id: "e-mul-same-base",
+    left: times(powW(n("e"), n("a")), powW(n("e"), n("b"))),
+    right: pow(n("e"), plus(n("a"), n("b"))),
+    leftCol: "Multiplication",
+    rightCol: "Exposant",
+    quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(3, 12);
+        const b = -rnd(2, 10);
+        const sum = a + b;
+        return makeQ(
+          <>
+            Simplifie : {fmt(`e^${a}`)} × {fmt(`e^${b}`)}
+          </>,
+          `e^${sum}`,
+          [`e^${a - b}`, `e^${a * b}`, `e^${b - a}`],
+          `Même base : on additionne les exposants, ${a}+(${b})=${sum}.`,
+        );
+      }
+      if (lvl >= 3) {
+        const a = rnd(2, 8);
+        const b = rnd(2, 8);
+        return makeQ(
+          <>
+            Simplifie : {fmt(`e^${a}`)} × {fmt(`e^${b}`)}
+          </>,
+          `e^${a + b}`,
+          [`e^${a - b}`, `e^${a * b}`, `e^${a}×e^${b}`],
+          `Même base : on additionne les exposants (${a}+${b}).`,
+        );
+      }
+      const a = rnd(2, lvl >= 2 ? 7 : 5);
+      const b = rnd(2, lvl >= 2 ? 7 : 5);
+      return makeQ(
+        <>
+          Simplifie : {fmt(`e^${a}`)} × {fmt(`e^${b}`)}
+        </>,
+        `e^${a + b}`,
+        [`e^${a - b}`, `e^${a * b}`, `e^${a}×e^${b}`],
+        `Même base : on additionne les exposants (${a}+${b}).`,
+      );
+    },
+  },
+  {
+    id: "e-div-same-base",
+    left: frac(powW(n("e"), n("a")), powW(n("e"), n("b"))),
+    right: pow(n("e"), minus(n("a"), n("b"))),
+    leftCol: "Division",
+    rightCol: "Exposant",
+    quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(2, 6);
+        const b = rnd(7, 14);
+        const diff = a - b;
+        return makeQ(
+          <>
+            Simplifie : {fmt(`e^${a}`)} / {fmt(`e^${b}`)}
+          </>,
+          `e^${diff}`,
+          [`e^${b - a}`, `e^${a + b}`, `e^${a * b}`],
+          `Même base : on soustrait les exposants, ${a}−${b}=${diff}.`,
+        );
+      }
+      if (lvl >= 3) {
+        const a = rnd(6, 14);
+        const b = rnd(2, 5);
+        return makeQ(
+          <>
+            Simplifie : {fmt(`e^${a}`)} / {fmt(`e^${b}`)}
+          </>,
+          `e^${a - b}`,
+          [`e^${b - a}`, `e^${a + b}`, `e^${a * b}`],
+          `Même base : on soustrait les exposants (${a}−${b}).`,
+        );
+      }
+      const a = rnd(5, lvl >= 2 ? 12 : 9);
+      const b = rnd(1, lvl >= 2 ? 4 : 3);
+      return makeQ(
+        <>
+          Simplifie : {fmt(`e^${a}`)} / {fmt(`e^${b}`)}
+        </>,
+        `e^${a - b}`,
+        [`e^${b - a}`, `e^${a + b}`, `e^${a * b}`],
+        `Même base : on soustrait les exposants (${a}−${b}).`,
+      );
+    },
+  },
+  {
+    id: "e-pow-of-pow",
+    left: pow(paren(powW(n("e"), n("a"))), n("b")),
+    right: powRaw(n("e"), timesW(n("a"), n("b"))),
+    leftCol: "Exposant",
+    rightCol: "Exposant",
+    quiz: (lvl) => {
+      if (lvl >= 4) {
+        const a = rnd(2, 6);
+        const b = rnd(4, 8);
+        const prod = a * b;
+        return makeQ(
+          <>Simplifie : {fmt(`(e^${a})^${b}`)}</>,
+          `e^${prod}`,
+          [`e^${a + b}`, `e^${a - b}`, `e^${b}`],
+          `Puissance de puissance : on multiplie les exposants, ${a}×${b}=${prod}.`,
+        );
+      }
+      if (lvl >= 3) {
+        const a = rnd(2, 5);
+        const b = rnd(3, 6);
+        return makeQ(
+          <>Simplifie : {fmt(`(e^${a})^${b}`)}</>,
+          `e^${a * b}`,
+          [`e^${a + b}`, `e^${a - b}`, `e^${b}`],
+          `Puissance de puissance : on multiplie les exposants (${a}×${b}).`,
+        );
+      }
+      const a = rnd(2, lvl >= 2 ? 4 : 3);
+      const b = rnd(2, lvl >= 2 ? 4 : 3);
+      return makeQ(
+        <>Simplifie : {fmt(`(e^${a})^${b}`)}</>,
+        `e^${a * b}`,
+        [`e^${a + b}`, `e^${a - b}`, `e^${b}`],
+        `Puissance de puissance : on multiplie les exposants (${a}×${b}).`,
+      );
+    },
+  },
+  {
     id: "ln-mul",
     left: ln(timesW(n("a"), n("b"))),
     right: plus(lnW(n("a")), lnW(n("b"))),
