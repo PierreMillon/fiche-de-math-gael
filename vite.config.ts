@@ -79,7 +79,12 @@ export default defineConfig({
         // SPA sans backend : tout ce qui atterrit dans dist-spa est
         // précaché, y compris les formules/questions (déjà dans le
         // bundle JS, pas de fetch séparé — voir src/data/).
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
+        // Pas de .woff (audit du 08/09/2026) : KaTeX embarque ses
+        // polices en woff2 ET en woff (fallback pré-2016) — un
+        // navigateur actuel ne charge jamais que le woff2, donc
+        // précacher le woff en plus gonflait le 1er téléchargement de
+        // ~300 Ko pour un format jamais réellement utilisé.
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         // GitHub Pages n'a pas de rewrite serveur (voir le 404.html
         // copié depuis index.html dans le workflow de déploiement) :
         // hors-ligne, toute navigation vers une route interne doit

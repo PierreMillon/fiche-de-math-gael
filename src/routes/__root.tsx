@@ -1,5 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Outlet, Link, createRootRouteWithContext, useRouter } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, useRouter } from "@tanstack/react-router";
 import { ChartColumn } from "lucide-react";
 
 // φ (nombre d'or) tourné à 180° au lieu d'une flèche classique — le jambage
@@ -82,7 +81,7 @@ const SITE_TITLE = "Fiches de révision — Maths";
 const SITE_DESCRIPTION =
   "Fiches de révision de mathématiques classées par sujet : analyse, algèbre, probabilités, géométrie.";
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -107,55 +106,51 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-background">
-        <div className="w-full bg-pink-500 text-white">
-          <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <div className="flex flex-col">
-              <Link to="/" className="text-sm font-semibold tracking-wide">
-                Fiches Maths
-              </Link>
-              <span className="text-xs opacity-90">Réserver un cours : gaelboury@gmail.com</span>
-            </div>
-            <div className="flex items-center justify-between gap-3 sm:justify-end">
-              <Link
-                to="/comment-ca-marche"
-                className="text-xs text-white/80 underline-offset-2 transition hover:text-white hover:underline"
-              >
-                Comment ça marche ?
-              </Link>
-              <Link
-                to="/progression"
-                className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm ring-1 ring-white/40 transition hover:bg-white/25"
-              >
-                <ChartColumn className="h-3.5 w-3.5" />
-                Ma progression
-              </Link>
-              <Link
-                to="/journal"
-                className="shrink-0 rounded-md bg-black/10 px-1.5 py-0.5 text-[10px] tabular-nums text-white/70 transition hover:bg-black/20 hover:text-white"
-                title="Voir l'historique des versions"
-              >
-                v{APP_VERSION}
-              </Link>
-              {/* Plain <a>, not <Link> — this is a separate site
-                  (licence-math), not a route of this one. */}
-              <a
-                href="https://pierremillon.github.io/licence-math/"
-                className="text-xs text-white/80 underline-offset-2 transition hover:text-white hover:underline"
-              >
-                Cours
-              </a>
-            </div>
+    <div className="min-h-screen bg-background">
+      <div className="w-full bg-pink-500 text-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="flex flex-col">
+            <Link to="/" className="text-sm font-semibold tracking-wide">
+              Fiches Maths
+            </Link>
+            <span className="text-xs opacity-90">Réserver un cours : gaelboury@gmail.com</span>
+          </div>
+          <div className="flex items-center justify-between gap-3 sm:justify-end">
+            <Link
+              to="/comment-ca-marche"
+              className="text-xs text-white/80 underline-offset-2 transition hover:text-white hover:underline"
+            >
+              Comment ça marche ?
+            </Link>
+            <Link
+              to="/progression"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm ring-1 ring-white/40 transition hover:bg-white/25"
+            >
+              <ChartColumn className="h-3.5 w-3.5" />
+              Ma progression
+            </Link>
+            <Link
+              to="/journal"
+              className="shrink-0 rounded-md bg-black/10 px-1.5 py-0.5 text-[10px] tabular-nums text-white/70 transition hover:bg-black/20 hover:text-white"
+              title="Voir l'historique des versions"
+            >
+              v{APP_VERSION}
+            </Link>
+            {/* Plain <a>, not <Link> — this is a separate site
+                (licence-math), not a route of this one. */}
+            <a
+              href="https://pierremillon.github.io/licence-math/"
+              className="text-xs text-white/80 underline-offset-2 transition hover:text-white hover:underline"
+            >
+              Cours
+            </a>
           </div>
         </div>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <BackToTopButton />
       </div>
-    </QueryClientProvider>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
+      <BackToTopButton />
+    </div>
   );
 }
