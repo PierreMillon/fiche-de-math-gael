@@ -1270,6 +1270,92 @@ export const exercises: Record<string, Bank> = {
       },
     ],
   },
+  "raisonnement-logique": {
+    1: [
+      {
+        q: "«∀x∈ℝ, x^2≥0» est…",
+        a: "vraie",
+        d: ["fausse", "vraie seulement si x>0", "indécidable"],
+        e: "Un carré réel est toujours positif ou nul.",
+      },
+      {
+        q: "P⇒Q est fausse quand ?",
+        a: "P vraie et Q fausse",
+        d: ["P fausse et Q vraie", "P et Q vraies", "P et Q fausses"],
+        e: "P⇒Q n'est fausse que dans le seul cas où P est vraie et Q fausse.",
+      },
+      {
+        q: "non(∀x∈E, P(x)) s'écrit…",
+        a: "∃x∈E, non P(x)",
+        d: ["∀x∈E, non P(x)", "∃x∈E, P(x)", "non ∃x∈E, P(x)"],
+        e: "La négation d'un « pour tout » est un « il existe » (de la négation).",
+      },
+    ],
+    2: [
+      {
+        q: "Réciproque de «P⇒Q» ?",
+        a: "Q⇒P",
+        d: ["(non P)⇒(non Q)", "(non Q)⇒(non P)", "non(P⇒Q)"],
+        e: "La réciproque échange P et Q ; elle n'est pas toujours vraie même si P⇒Q l'est.",
+      },
+      {
+        q: "Contraposée de «P⇒Q» ?",
+        a: "(non Q)⇒(non P)",
+        d: ["Q⇒P", "(non P)⇒(non Q)", "P⇒(non Q)"],
+        e: "La contraposée est toujours équivalente à l'implication de départ.",
+      },
+      {
+        q: "f:E→F injective signifie…",
+        a: "∀x,x'∈E, f(x)=f(x') ⇒ x=x'",
+        d: ["∀y∈F, ∃x∈E, y=f(x)", "∀y∈F, ∃!x∈E, y=f(x)", "∃x∈E, f(x)=0"],
+        e: "Injective : deux antécédents distincts ne peuvent avoir la même image.",
+      },
+    ],
+    3: [
+      {
+        q: "f:E→F surjective signifie…",
+        a: "∀y∈F, ∃x∈E, y=f(x)",
+        d: ["∀x,x'∈E, f(x)=f(x')⇒x=x'", "∀y∈F, ∃!x∈E, y=f(x)", "f est croissante"],
+        e: "Surjective : tout élément de F a au moins un antécédent dans E.",
+      },
+      {
+        q: "Pour démontrer A=B (ensembles), on utilise…",
+        a: "la double inclusion : A⊂B et B⊂A",
+        d: ["seulement A⊂B", "un contre-exemple", "la contraposée"],
+        e: "Deux ensembles sont égaux si chacun est inclus dans l'autre.",
+      },
+      {
+        q: "Dans une démonstration par l'absurde, on suppose…",
+        a: "non Q vraie, et on cherche une contradiction",
+        d: ["P vraie, et on démontre Q", "Q vraie directement", "P et Q fausses"],
+        e: "On suppose le contraire de ce qu'on veut montrer, jusqu'à obtenir une absurdité.",
+      },
+    ],
+    4: [
+      {
+        q: "Pour (uₙ) vérifiant Pₙ par récurrence, « on suppose Pₙ vraie à un rang n fixé et on montre Pₙ₊₁ » est…",
+        a: "l'hérédité",
+        d: ["l'initialisation", "la conclusion", "l'analyse"],
+        e: "L'hérédité relie le rang n au rang n+1 ; l'initialisation vérifie le premier rang.",
+      },
+      {
+        q: "f:ℕ→ℕ, f(n)=2n. f est…",
+        a: "injective mais pas surjective",
+        d: ["surjective mais pas injective", "bijective", "ni injective ni surjective"],
+        e: "f(n)=f(n') ⇒ n=n' (injective), mais les entiers impairs n'ont pas d'antécédent (pas surjective).",
+      },
+      {
+        q: "Raisonner par analyse-synthèse consiste à…",
+        a: "supposer une solution pour en déduire des conditions nécessaires, puis vérifier quels candidats conviennent",
+        d: [
+          "supposer non Q et chercher une contradiction",
+          "étudier tous les cas séparément",
+          "démontrer la réciproque puis l'implication directe",
+        ],
+        e: "L'analyse réduit le champ des candidats possibles, la synthèse vérifie lesquels sont effectivement solutions.",
+      },
+    ],
+  },
   "series-numeriques": {
     1: [
       {
