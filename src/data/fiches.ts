@@ -339,6 +339,12 @@ export const fiches: Fiche[] = [
           "det(AB) = det(A)·det(B)",
         ],
       },
+      {
+        heading: "Changement de base",
+        content:
+          "Si P est la matrice de passage de l'ancienne base vers la nouvelle, et A la matrice d'un endomorphisme dans l'ancienne base :",
+        formulas: ["A' = P⁻¹·A·P", "P est inversible (det P ≠ 0)"],
+      },
     ],
   },
   {
@@ -359,6 +365,16 @@ export const fiches: Fiche[] = [
           "P(μ−σ ≤ X ≤ μ+σ) ≈ 68 %",
           "P(μ−2σ ≤ X ≤ μ+2σ) ≈ 95 %",
           "P(μ−3σ ≤ X ≤ μ+3σ) ≈ 99,7 %",
+        ],
+      },
+      {
+        heading: "Intervalle de confiance",
+        content:
+          "Pour estimer une proportion p inconnue à partir d'un échantillon de taille n, avec fréquence observée f = (nb d'individus avec le caractère)/n, si n > 25 et 0,2 < f < 0,8 :",
+        formulas: [
+          "Intervalle de confiance à 95 % : [f − 1/√n ; f + 1/√n]",
+          "Marge d'erreur : 1/√n",
+          "Amplitude de l'intervalle : 2/√n",
         ],
       },
     ],
