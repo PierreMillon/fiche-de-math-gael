@@ -212,6 +212,72 @@ export const fiches: Fiche[] = [
     ],
   },
   {
+    slug: "raisonnement-logique",
+    title: "Raisonnement & logique mathématique",
+    category: "Logique",
+    summary:
+      "Quantificateurs, implication/réciproque/contraposée, types de raisonnement et injection/surjection.",
+    sections: [
+      {
+        heading: "Assertions et connecteurs",
+        content:
+          "Une assertion est une phrase vraie ou fausse, jamais les deux. Pour P, Q assertions :",
+        formulas: [
+          "P et Q : vraie si P vraie ET Q vraie",
+          "P ou Q : vraie si P vraie OU Q vraie (ou les deux)",
+          "non P : vraie si P fausse, fausse si P vraie",
+        ],
+      },
+      {
+        heading: "Quantificateurs",
+        content: "Pour affirmer une propriété P(x) sur les éléments d'un ensemble E :",
+        formulas: [
+          "∀x ∈ E, P(x) : pour tout x de E, P(x) est vraie",
+          "∃x ∈ E, P(x) : il existe (au moins) un x de E tel que P(x) soit vraie",
+          "∃! x ∈ E, P(x) : il existe un unique x de E tel que P(x) soit vraie",
+          "non(∀x, P(x)) ⇔ ∃x, non P(x)",
+          "non(∃x, P(x)) ⇔ ∀x, non P(x)",
+        ],
+      },
+      {
+        heading: "Implication, réciproque, contraposée, équivalence",
+        content: "Pour P, Q assertions :",
+        formulas: [
+          "P ⇒ Q : si P est vraie alors Q est vraie",
+          "Réciproque de P⇒Q : Q⇒P (pas forcément vraie si P⇒Q l'est)",
+          "Contraposée de P⇒Q : (non Q)⇒(non P), toujours équivalente à P⇒Q",
+          "P ⇔ Q : vraie si P⇒Q et Q⇒P sont toutes les deux vraies",
+        ],
+      },
+      {
+        heading: "Types de raisonnement",
+        content: "Plusieurs méthodes pour démontrer une propriété :",
+        formulas: [
+          "Direct : on suppose P vraie et on démontre Q",
+          "Par contraposée : on montre que (non Q)⇒(non P)",
+          "Par l'absurde : on suppose (non Q) vraie et on cherche une contradiction",
+          "Par disjonction de cas : on sépare et on étudie tous les cas possibles",
+          "Par récurrence : initialisation (rang n₀), hérédité (Pₙ⇒Pₙ₊₁), conclusion",
+          "Par analyse-synthèse : analyse (conditions nécessaires) puis synthèse (vérifier les candidats)",
+        ],
+      },
+      {
+        heading: "Ensembles : inclusion et égalité",
+        content: "Pour comparer deux ensembles A et B :",
+        formulas: ["A ⊂ B : ∀x, x∈A ⇒ x∈B", "A = B : A⊂B et B⊂A (double inclusion)"],
+      },
+      {
+        heading: "Injection, surjection, bijection",
+        content: "Pour une fonction f : E → F :",
+        formulas: [
+          "f injective : ∀x,x'∈E, f(x)=f(x') ⇒ x=x'",
+          "f surjective : ∀y∈F, ∃x∈E, y=f(x)",
+          "f bijective : injective et surjective ⇔ ∀y∈F, ∃!x∈E, y=f(x)",
+        ],
+      },
+    ],
+  },
+  {
     slug: "logique-booleenne",
     title: "Logique booléenne — circuits",
     category: "Logique",
